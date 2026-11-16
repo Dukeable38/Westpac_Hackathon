@@ -1,0 +1,166 @@
+{
+  "C1": {
+    "name": "Changed bank details for a known supplier ABN",
+    "tier": 0
+  },
+  "C2": {
+    "name": "Flag register hit (account/PayID/ABN/email)",
+    "tier": 0
+  },
+  "C3": {
+    "name": "Confirmation of Payee result",
+    "tier": 0
+  },
+  "C4": {
+    "name": "New payee + high amount",
+    "tier": 0
+  },
+  "C5": {
+    "name": "Invoice hash / template seen before (fraud or duplicate)",
+    "tier": 0
+  },
+  "C6": {
+    "name": "Duplicate invoice number or amount",
+    "tier": 0
+  },
+  "C7": {
+    "name": "Amount anomaly vs supplier history",
+    "tier": 0
+  },
+  "C8": {
+    "name": "ABN checksum (mod 89)",
+    "tier": 0
+  },
+  "C9": {
+    "name": "ACN checksum",
+    "tier": 0
+  },
+  "C10": {
+    "name": "GST maths and tax-invoice validity",
+    "tier": 0
+  },
+  "C11": {
+    "name": "BSB validity and bank-name match (AusPayNet)",
+    "tier": 0
+  },
+  "C12": {
+    "name": "PDF metadata (online editor, mod \u226b create date)",
+    "tier": 0
+  },
+  "C13": {
+    "name": "Incremental updates editing payment fields",
+    "tier": 0
+  },
+  "C14": {
+    "name": "Hidden text, zero-width chars, homoglyphs",
+    "tier": 0
+  },
+  "C15": {
+    "name": "Overlay or annotation over the bank details",
+    "tier": 0
+  },
+  "C16": {
+    "name": "Embedded JS, launch actions, odd links",
+    "tier": 0
+  },
+  "C17": {
+    "name": "Structured extraction + internal consistency",
+    "tier": 1
+  },
+  "C18": {
+    "name": "Payment-method inconsistency (BPAY vs BSB, two accounts)",
+    "tier": 1
+  },
+  "C19": {
+    "name": "\"Bank details have changed\" language",
+    "tier": 1
+  },
+  "C20": {
+    "name": "Urgency / pressure / secrecy language",
+    "tier": 1
+  },
+  "C21": {
+    "name": "ABN Lookup: active, name match, entity type",
+    "tier": 1
+  },
+  "C22": {
+    "name": "GST charged but not GST-registered",
+    "tier": 1
+  },
+  "C23": {
+    "name": "ABN age vs claimed history",
+    "tier": 1
+  },
+  "C24": {
+    "name": "Real ABN, but payee or email belongs to someone else",
+    "tier": 1
+  },
+  "C25": {
+    "name": "ATO / government official payment-details allowlist",
+    "tier": 1
+  },
+  "C26": {
+    "name": "Contact consistency (email vs website domain, free-mail, area code)",
+    "tier": 1
+  },
+  "C27": {
+    "name": "Directory / domain-renewal offer disguised as invoice",
+    "tier": 1
+  },
+  "C28": {
+    "name": "Relationship plausibility (fits the customer's business?)",
+    "tier": 1
+  },
+  "C29": {
+    "name": "Spelling / formatting quality",
+    "tier": 1
+  },
+  "C30": {
+    "name": "Lookalike domain (dnstwist-style)",
+    "tier": 2
+  },
+  "C31": {
+    "name": "Domain age (RDAP; for .au use crt.sh / Wayback)",
+    "tier": 2
+  },
+  "C32": {
+    "name": ".au registrant eligibility ID \u2260 invoice ABN",
+    "tier": 2
+  },
+  "C33": {
+    "name": "Email DNS posture (MX/SPF/DMARC)",
+    "tier": 2
+  },
+  "C34": {
+    "name": "Official contact details cross-check",
+    "tier": 2
+  },
+  "C35": {
+    "name": "Web presence / scam reports",
+    "tier": 2
+  },
+  "C36": {
+    "name": "ASIC company status",
+    "tier": 2
+  },
+  "C37": {
+    "name": "Logo provenance",
+    "tier": 2
+  },
+  "C38": {
+    "name": "Render-vs-text OCR forensics on payment fields",
+    "tier": 3
+  },
+  "C39": {
+    "name": "Prior-revision recovery (\"original details were\u2026\")",
+    "tier": 3
+  },
+  "C40": {
+    "name": "Director / officeholder checks",
+    "tier": 3
+  },
+  "C41": {
+    "name": "Human call-back / fraud-team referral",
+    "tier": 3
+  }
+}
