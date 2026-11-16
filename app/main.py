@@ -1,4 +1,4 @@
-import copy,hashlib,uuid
+import copy,hashlib,uuid,json,os,asyncio
 from fastapi import FastAPI,File,Form,UploadFile,HTTPException
 from .pdf_forensics import analyse
 from .extract import extract_invoice
@@ -9,8 +9,17 @@ from .chat import respond
 from pydantic import BaseModel,Field
 from typing import Literal
 from .storage import receipt
+from fastapi.responses import FileResponse,StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from .seed import ROOT
 app = FastAPI(title='Invoice Scam Checker')
 RESULTS={}
+app.mount('/static',StaticFiles(directory=ROOT/'app/static'),name='static')
+app.mount('/demo/invoices',StaticFiles(directory=ROOT/'demo/invoices'),name='invoices')
+
+@app.get('/')
+def index():
+    return FileResponse(ROOT/'app/static/index.html')
 
 @app.post('/api/check')
 async def check(file:UploadFile=File(...),customer_id:str=Form('cust_greenline')):
@@ -54,6 +63,25 @@ class Decision(BaseModel):
 @app.post('/api/check/{check_id}/decision')
 def decision(check_id:str,body:Decision):
     return receipt(get_result(check_id),body.decision)
+
+@app.get('/api/check/{check_id}/events')
+def events(check_id:str):
+    snapshot=copy.deepcopy(get_result(check_id))
+    async def stream():
+        delay=min(1,max(0,float(os.getenv('DEMO_DELAY_MS','300'))/1000))
+        def event(name,value):
+            return f'event: {name}\ndata: {json.dumps(value)}\n\n'
+        for tier in snapshot['tiers_run']:
+            yield event('tier_start',{'tier':tier,'reason':snapshot['escalation_reason']})
+            for signal in snapshot['signals']:
+                if signal['tier']==tier:
+                    yield event('signal',signal)
+            if delay: await asyncio.sleep(delay)
+            yield event('tier_end',{'tier':tier})
+        if 2 not in snapshot['tiers_run']:
+            yield event('tier_skipped',{'tier':2,'reason':'Not needed: fast clear'})
+        yield event('complete',snapshot)
+    return StreamingResponse(stream(),media_type='text/event-stream',headers={'Cache-Control':'no-cache','X-Accel-Buffering':'no'})
 
 @app.get('/health')
 def health():

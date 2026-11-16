@@ -30,3 +30,4 @@ In progress. Final evidence follows after M7.
 - 2026-11-16 · M5 · SQLite receipt storage added; all 20 original tests pass, zero skips.
 - Decision: upstream AGENTS.md has sections 1–8 only; requested section 9 is absent. Full source read.
 - Decision: initial M1–M4 commits delayed to honour the stronger “never leave tests red at a commit” rule; all milestone commits below use the first fully green integrated state. Upstream snapshot 6236d8d imported through authenticated GitHub connector; later user direction authorises publication to a separate branch, never main.
+- 2026-11-16 · M6 · SSE event playback and bounded smoke script implemented. Script starts/stops its own uvicorn; UI, four uploads (96/0/0/59), complete SSE, chat and receipt pass. Local HTTP uses trust_env=False to avoid inherited proxy settings.
