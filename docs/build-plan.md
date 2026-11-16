@@ -48,7 +48,7 @@ FastAPI (Python 3.11)
 
 Recommended stack: FastAPI + pypdf + pdfplumber + SQLite + plain HTML/JS front end (lift the mock-up). Avoid a React build step unless Paul prefers it; the mock-up is already the front end.
 
-LLM: whatever the hackathon provides ("Jev" in the research notes). Wrap it in `llm.py` with two functions only: `extract(sanitised_text) -> InvoiceJSON` and `classify(question, choices, snippet) -> choice`. Swapping providers then only touches one file.
+LLM: **one model for everything**: Claude (`claude-opus-5-5`) via the `anthropic` SDK, with server-side web search and web fetch for research. No Jev and no ABN Lookup GUID. Wrap it in `llm.py`: `extract(sanitised_text) -> InvoiceJSON`, `classify(question, choices, snippet) -> choice`, `research(query, urls) -> ResearchResult`, plus a deterministic `fake` provider for tests and offline use. See AGENTS.md §4.
 
 ---
 
@@ -128,7 +128,7 @@ Implementation hints:
 
 | Source | Mode | Note |
 |---|---|---|
-| ABN Lookup JSON | Live + mock override | Register for the GUID **today** (arrives by email). Fixture ABNs are made up, so `sources/abn.py` first checks `demo/seed/seed.json → abn_registry` and only goes live for other ABNs |
+| ABN Lookup | Seed first, then live via `llm.research()` web fetch of `abr.business.gov.au/ABN/View?abn=…` | No GUID needed. Fixture ABNs are made up, so `sources/abn.py` first checks `demo/seed/seed.json → abn_registry` and only goes live for other ABNs |
 | Confirmation of Payee | Mock | Return Match / Close match / No match / Unavailable from `seed.json → cop` |
 | Warning register (flag register) | Mock | `seed.json → flag_register` |
 | Supplier profiles / payment history | Mock (SQLite) | `seed.json → customers[].suppliers[]` |
