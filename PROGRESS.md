@@ -34,6 +34,8 @@ Format: `YYYY-MM-DD HH:MM · M# · done / decided / blocked: ...`
 - Decision: research missing/failed evidence remains unknown; ABN dates/GST and live search counts are not inferred from LLM prose. SSE is a replay of completed synchronous checks (API contract), not a live in-flight job. Coverage includes unimplemented high-weight checks and is intentionally partial.
 - Review fixes: fast-clear now gates Tier 2 research before calls; regression proves no domain/search calls. Invisible PDF text rendering modes 3/7 rejected before any LLM call; mixed-script identifiers stripped/flagged; unsupported revision comparisons marked unknown. Multipart temporary files stay inside repo and uploads are explicitly closed; PDFs not retained. 35 tests pass, zero skips.
 
+- P1 C7 added: deterministic amount anomaly >3× known supplier median; unknown for missing history. 36 tests pass.
+
 ## Definition of Done evidence
 1. PASS: `pytest tests/ -q`: **35 passed, 0 failed, 0 skipped**, including all 20 original tests unchanged. Defaults: replay/fake. Additional tests cover locked weights, renamed PDFs, invalid inputs, fast-clear gating, invisible rendering rejection, provider mocks and no-network replay.
 2. PASS: `scripts/smoke_demo.py` starts a background uvicorn on an ephemeral local port, waits ≤10 s, checks HTML, all four PDFs (96 genuine / 0 high_risk / 0 high_risk / 59 check), finite SSE completion, chat → 84 genuine and receipt; shuts down in finally. Exit 0.

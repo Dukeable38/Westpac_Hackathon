@@ -28,6 +28,10 @@ def evaluate(invoice, forensic, customer_id):
     if cop: set_('C3','reassuring' if cop['result']=='MATCH' else 'risk','Mock Confirmation of Payee: '+cop['result'].replace('_',' ').title()+'; account name '+cop['account_name'],cop['result']=='NO_MATCH')
     else: set_('C3','unknown','Mock Confirmation of Payee unavailable for this account')
     set_('C4','risk' if not sup else 'neutral','New payee; independently verify this first payment' if not sup else 'Known supplier')
+    if sup:
+        anomaly=invoice.total>3*sup['payments']['median_amount']
+        set_('C7','risk' if anomaly else 'neutral',f"Amount ${invoice.total:.2f}; supplier median ${sup['payments']['median_amount']:.2f}; anomaly threshold 3× median",weight=.4)
+    else:set_('C7','unknown','No supplier payment history for amount comparison')
     set_('C8','neutral' if abn_valid(invoice.abn) else 'risk','ABN checksum valid' if abn_valid(invoice.abn) else 'ABN checksum invalid',not abn_valid(invoice.abn))
     gstbad=abs(invoice.gst-invoice.subtotal*.1)>.02 or abs(invoice.total-invoice.subtotal-invoice.gst)>.02
     set_('C10','risk' if gstbad else 'neutral',f'GST ${invoice.gst:.2f}; expected ${invoice.subtotal*.1:.2f} at 10%. Check GST-free items separately.')
