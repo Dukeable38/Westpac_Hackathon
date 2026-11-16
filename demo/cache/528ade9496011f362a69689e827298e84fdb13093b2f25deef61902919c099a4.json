@@ -1,0 +1,1 @@
+{"provider": "domain", "model": "seed-v1", "output": {"first_cert": "2014-05-02", "wayback_first": "2014-06-11", "mx": true, "spf": true, "dmarc": "p=quarantine"}}

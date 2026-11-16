@@ -6,6 +6,7 @@ from .identifiers import abn_valid
 from ..seed import SEED,supplier
 from ..models import Signal
 from ..score import CONFIG
+from ..sources.research import abn_lookup,domain_history,web_search
 CATALOGUE=json.loads(Path(__file__).with_name('catalogue.json').read_text())
 
 def evaluate(invoice, forensic, customer_id):
@@ -40,7 +41,7 @@ def evaluate(invoice, forensic, customer_id):
     set_('C19','risk' if bankwords else 'neutral','Invoice says banking details have changed' if bankwords else 'No changed-bank language detected')
     urgency=any(w in t for w in ['urgent','24 hours','do not call','immediately'])
     set_('C20','risk' if urgency else 'neutral','Urgency or pressure to pay quickly detected' if urgency else 'No urgency or pressure detected')
-    reg=SEED['abn_registry'].get(invoice.abn)
+    reg=abn_lookup(invoice.abn)
     if reg:
         norm=lambda s: re.sub(r'[^a-z]','',s.lower()).replace('ptyltd','').replace('co','')
         names=[reg['entity_name']]+reg.get('business_names',[])
@@ -48,8 +49,10 @@ def evaluate(invoice, forensic, customer_id):
         active=reg['status']=='Active'
         set_('C21','reassuring' if active and match else 'risk',f"Seed registry: {reg['status']}; entity {reg['entity_name']}; name {'matches' if match else 'does not match'}",not active)
         # Fixed fixture evidence date keeps replay reproducible; no claim of live lookup.
-        days=(date(2026,11,16)-date.fromisoformat(reg['abn_from'])).days
-        set_('C23','risk' if days<90 else 'neutral',f"Seed registry ABN age: {days} days as at 16 Nov 2026")
+        if reg.get('abn_from'):
+            days=(date(2026,11,16)-date.fromisoformat(reg['abn_from'])).days
+            set_('C23','risk' if days<90 else 'neutral',f"Seed registry ABN age: {days} days as at 16 Nov 2026")
+        else: set_('C23','unknown','Registration date not parsed from live evidence')
     else:
         set_('C21','unknown','No seed registry entry; live registry not checked in replay')
         set_('C23','unknown','ABN registration age unavailable')
@@ -59,13 +62,13 @@ def evaluate(invoice, forensic, customer_id):
     set_('C26','risk' if mismatch or free else 'neutral','Email differs from website or uses a free-mail provider' if mismatch or free else 'Email and website contact fields consistent')
     lookalike=bool(sup and domain!=sup['known_domain'] and SequenceMatcher(None,domain,sup['known_domain']).ratio()>.8)
     set_('C30','risk' if lookalike else 'neutral',f"Email domain {domain} resembles known {sup['known_domain']}" if lookalike else 'No known-supplier lookalike detected',lookalike)
-    dom=SEED['domains'].get(domain)
+    dom=domain_history(domain)
     if dom:
         days=(date(2026,11,16)-date.fromisoformat(dom['first_cert'])).days
         set_('C31','risk' if days<90 else 'neutral',f'First certificate observed {days} days ago in seeded evidence; not a registration date')
     else: set_('C31','unknown','No cached certificate or domain history')
-    web=next((v for name,v in SEED['web_search'].items() if SequenceMatcher(None,name.lower(),invoice.supplier_name.lower()).ratio()>.6),None)
-    if web: set_('C35','risk' if web['reviews']<5 or web['scam_reports'] else 'neutral',f"Seeded web evidence: {web['reviews']} reviews; {web['scam_reports']} scam reports",bool(web['scam_reports']))
+    web=web_search(invoice.supplier_name)
+    if web and 'reviews' in web: set_('C35','risk' if web['reviews']<5 or web['scam_reports'] else 'neutral',f"Seeded web evidence: {web['reviews']} reviews; {web['scam_reports']} scam reports",bool(web['scam_reports']))
     if forensic['original']:
         b,a=forensic['original'];set_('C39','risk',f'Original bank details recovered from prior revision: {b} / {a}',True)
     else: set_('C39','neutral','No earlier differing payment details recovered')
