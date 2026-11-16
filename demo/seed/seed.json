@@ -1,0 +1,128 @@
+{
+  "_note": "All businesses, people, ABNs, domains and accounts are fictional. Phone numbers use the ACMA fictional range 07 5550 xxxx.",
+  "customers": [
+    {
+      "id": "cust_greenline",
+      "name": "Greenline Landscaping Pty Ltd",
+      "contact": "Mia Tran",
+      "industry": "Landscaping",
+      "suppliers": [
+        {
+          "supplier_id": "sup_tallowwood",
+          "name": "Tallowwood Mulch & Soil Co. Pty Ltd",
+          "abn": "74284432214",
+          "known_domain": "tallowwoodmulch.com.au",
+          "known_phone": "07 5550 2184",
+          "accounts": [{ "type": "BSB", "bsb": "064-118", "account_number": "10482291", "account_name": "Tallowwood Mulch & Soil Co Pty Ltd" }],
+          "payments": { "count": 14, "first": "2025-09-12", "last": "2026-10-14", "median_amount": 3080.00, "max_amount": 3412.50 }
+        },
+        {
+          "supplier_id": "sup_ridgeback",
+          "name": "Ridgeback Turf Farms Pty Ltd",
+          "abn": "91637987769",
+          "known_domain": "ridgebackturf.com.au",
+          "known_phone": "07 5550 3301",
+          "accounts": [{ "type": "BSB", "bsb": "034-702", "account_number": "22190457", "account_name": "Ridgeback Turf Farms Pty Ltd" }],
+          "payments": { "count": 9, "first": "2025-11-03", "last": "2026-10-28", "median_amount": 5240.00, "max_amount": 7810.00 }
+        },
+        {
+          "supplier_id": "sup_kestrel",
+          "name": "Kestrel Fuel & Lubricants",
+          "abn": "69324432211",
+          "known_domain": "kestrelfuel.com.au",
+          "known_phone": "07 5550 4419",
+          "accounts": [{ "type": "BPAY", "biller_code": "481726", "reference_pattern": "^GL\\d{6}$" }],
+          "payments": { "count": 22, "first": "2025-01-15", "last": "2026-11-02", "median_amount": 612.40, "max_amount": 988.10 }
+        },
+        {
+          "supplier_id": "sup_saltbush",
+          "name": "Saltbush Stone & Pavers",
+          "abn": "28050119154",
+          "known_domain": "saltbushstone.com.au",
+          "known_phone": "07 5550 1876",
+          "accounts": [{ "type": "PAYID", "payid": "accounts@saltbushstone.com.au", "account_name": "Saltbush Stone Pty Ltd" }],
+          "payments": { "count": 5, "first": "2026-02-20", "last": "2026-09-30", "median_amount": 8900.00, "max_amount": 14250.00 }
+        },
+        {
+          "supplier_id": "sup_harbourline",
+          "name": "Harbourline Plant Nursery",
+          "abn": "39894924677",
+          "known_domain": "harbourlinenursery.com.au",
+          "known_phone": "07 5550 6620",
+          "accounts": [{ "type": "BSB", "bsb": "082-911", "account_number": "77310045", "account_name": "Harbourline Nursery Pty Ltd" }],
+          "payments": { "count": 11, "first": "2025-06-05", "last": "2026-11-05", "median_amount": 1460.00, "max_amount": 2980.00 }
+        },
+        {
+          "supplier_id": "sup_corella",
+          "name": "Corella Machinery Servicing",
+          "abn": "80310379062",
+          "known_domain": "corellamachinery.com.au",
+          "known_phone": "07 5550 7745",
+          "accounts": [{ "type": "BSB", "bsb": "013-560", "account_number": "40917722", "account_name": "Corella Machinery Servicing" }],
+          "payments": { "count": 4, "first": "2026-01-22", "last": "2026-08-19", "median_amount": 720.00, "max_amount": 1150.00 }
+        },
+        {
+          "supplier_id": "sup_wattle",
+          "name": "Wattle Street Accounting",
+          "abn": "38553897501",
+          "known_domain": "wattlestaccounting.com.au",
+          "known_phone": "07 5550 9032",
+          "accounts": [{ "type": "BSB", "bsb": "032-511", "account_number": "60028814", "account_name": "Wattle Street Accounting Pty Ltd" }],
+          "payments": { "count": 12, "first": "2025-11-01", "last": "2026-11-01", "median_amount": 440.00, "max_amount": 440.00 }
+        }
+      ]
+    },
+    { "id": "cust_bluegum", "name": "Bluegum Cafe & Catering", "contact": "Sam Okafor", "industry": "Hospitality", "suppliers": [] },
+    { "id": "cust_pelican", "name": "Pelican Electrical Services", "contact": "Jordan Reyes", "industry": "Trades", "suppliers": [] }
+  ],
+
+  "abn_registry": {
+    "74284432214": { "status": "Active", "entity_name": "TALLOWWOOD MULCH & SOIL CO. PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2014-03-18", "business_names": ["Tallowwood Mulch & Soil"], "state": "QLD", "postcode": "4211" },
+    "88015795425": { "status": "Active", "entity_name": "FERNHILL IRRIGATION CO. PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2026-09-28", "business_names": ["Fernhill Irrigation"], "state": "QLD", "postcode": "4226" },
+    "91637987769": { "status": "Active", "entity_name": "RIDGEBACK TURF FARMS PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2009-07-01", "business_names": [], "state": "QLD", "postcode": "4285" },
+    "69324432211": { "status": "Active", "entity_name": "KESTREL FUEL & LUBRICANTS PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2011-02-14", "business_names": ["Kestrel Fuel"], "state": "QLD", "postcode": "4209" },
+    "28050119154": { "status": "Active", "entity_name": "SALTBUSH STONE PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2018-05-09", "business_names": ["Saltbush Stone & Pavers"], "state": "QLD", "postcode": "4214" },
+    "39894924677": { "status": "Active", "entity_name": "HARBOURLINE NURSERY PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2006-10-02", "business_names": ["Harbourline Plant Nursery"], "state": "QLD", "postcode": "4218" },
+    "80310379062": { "status": "Active", "entity_name": "CORELLA, DANIEL", "entity_type": "Individual/Sole Trader", "gst_registered": true, "abn_from": "2019-08-27", "business_names": ["Corella Machinery Servicing"], "state": "QLD", "postcode": "4210" },
+    "38553897501": { "status": "Active", "entity_name": "WATTLE STREET ACCOUNTING PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2012-01-30", "business_names": [], "state": "QLD", "postcode": "4217" }
+  },
+
+  "cop": {
+    "_note": "Confirmation of Payee mock, keyed by BSB|account. Anything not listed returns NO_MATCH against the invoice's payee name.",
+    "064-118|10482291": { "result": "MATCH", "account_name": "Tallowwood Mulch & Soil Co Pty Ltd" },
+    "033-157|44710932": { "result": "NO_MATCH", "account_name": "J & K Holdings Group", "account_opened": "2026-10-30" },
+    "083-004|66201945": { "result": "NO_MATCH", "account_name": "A Nguyen-Price", "account_opened": "2026-10-11" },
+    "082-140|55301187": { "result": "MATCH", "account_name": "Fernhill Irrigation Co Pty Ltd" }
+  },
+
+  "flag_register": [
+    { "type": "account", "value": "083-004|66201945", "reports": 2, "first_reported": "2026-11-03", "category": "fake invoice", "note": "Reported by 2 businesses in the last 30 days" },
+    { "type": "email", "value": "brightwater.hire.au@gmail.com", "reports": 1, "first_reported": "2026-11-05", "category": "fake invoice" },
+    { "type": "domain", "value": "tallowoodmulch.com.au", "reports": 0, "note": "Not reported yet. Detection relies on the lookalike check (C30)" }
+  ],
+
+  "fraud_invoice_hashes": [],
+
+  "domains": {
+    "tallowwoodmulch.com.au": { "first_cert": "2014-05-02", "wayback_first": "2014-06-11", "mx": true, "spf": true, "dmarc": "p=quarantine" },
+    "tallowoodmulch.com.au": { "first_cert": "2026-10-29", "wayback_first": null, "mx": true, "spf": false, "dmarc": null, "lookalike_of": "tallowwoodmulch.com.au" },
+    "fernhillirrigation.com.au": { "first_cert": "2026-10-05", "wayback_first": "2026-10-19", "mx": true, "spf": true, "dmarc": "p=none" }
+  },
+
+  "web_search": {
+    "Tallowwood Mulch & Soil": { "official_site": "tallowwoodmulch.com.au", "official_phone": "07 5550 2184", "reviews": 63, "scam_reports": 0 },
+    "Fernhill Irrigation": { "official_site": "fernhillirrigation.com.au", "official_phone": "07 5550 8817", "reviews": 2, "scam_reports": 0, "other_mentions": ["Exhibitor list: SEQ Landscape & Garden Expo, Oct 2026"] },
+    "Brightwater Equipment Hire": { "official_site": null, "reviews": 0, "scam_reports": 1 }
+  },
+
+  "bsb_directory": {
+    "064-118": "Commonwealth Bank (fictional branch)",
+    "033-157": "Westpac (fictional branch)",
+    "083-004": "NAB (fictional branch)",
+    "082-140": "NAB (fictional branch)",
+    "034-702": "Westpac (fictional branch)",
+    "082-911": "NAB (fictional branch)",
+    "013-560": "ANZ (fictional branch)",
+    "032-511": "Westpac (fictional branch)"
+  }
+}

@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Team Brief – Invoice Scam Checker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+@page{size:A4;margin:16mm 16mm 18mm}
+:root{--red:#da1710;--red-soft:#fff0f0;--navy:#1f1c4f;--navy-soft:#f1f0fa;--ink:#161619;--muted:#5b5b6a;--line:#dedee1;--pale:#f5f5f6;--ok:#008000;--ok-soft:#f2f9f2;--warn:#c53b00;--warn-soft:#fcf5f2;--info:#0074c4;--info-soft:#f2f8fc}
+*{box-sizing:border-box}
+body{margin:0;font:9.6pt/1.45 "Inter",Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+h1,h2,h3{font-family:"Archivo",Arial,sans-serif;color:var(--navy);margin:0;line-height:1.15}
+h1{font-size:30pt;font-weight:800}
+h2{font-size:17pt;font-weight:700;margin-bottom:8pt}
+h3{font-size:11.5pt;font-weight:700;margin:9pt 0 3pt}
+p{margin:0 0 7pt}
+ul,ol{margin:0 0 8pt;padding-left:16pt}
+li{margin-bottom:2pt}
+.page{page-break-after:always}
+.page:last-child{page-break-after:auto}
+.eyebrow{font:600 8pt "Inter",Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:6pt;display:block}
+.cover{border-top:10pt solid var(--red);padding-top:22pt}
+.lede{font-size:13pt;color:var(--muted);max-width:150mm;margin:10pt 0 18pt}
+.story{background:var(--navy-soft);border-radius:8pt;padding:14pt 16pt;margin:14pt 0}
+.story h3{margin-top:0}
+.box{border:1pt solid var(--line);border-radius:8pt;padding:11pt 13pt;margin:8pt 0;break-inside:avoid}
+.callout{background:var(--red-soft);border-left:4pt solid var(--red);padding:10pt 13pt;border-radius:0 6pt 6pt 0;margin:10pt 0;break-inside:avoid}
+.callout b{color:var(--red)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10pt}
+.in{background:var(--ok-soft);border:1pt solid var(--ok);border-radius:8pt;padding:10pt 12pt}
+.out{background:var(--pale);border:1pt solid var(--line);border-radius:8pt;padding:10pt 12pt}
+.in h3,.out h3{margin-top:0}
+table{border-collapse:collapse;width:100%;font-size:9.5pt;margin:6pt 0 10pt}
+th,td{text-align:left;padding:4pt 7pt;border-bottom:1pt solid var(--line);vertical-align:top}
+th{font:600 7.5pt "Inter",Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--pale)}
+td:first-child{font-weight:600;color:var(--navy);width:34%}
+.task{border:1pt solid var(--line);border-radius:8pt;padding:7pt 11pt;margin:6pt 0;break-inside:avoid}
+.task .hd{display:flex;justify-content:space-between;align-items:baseline;gap:10pt}
+.task .hd b{font-family:"Archivo",Arial,sans-serif;font-size:11.5pt;color:var(--navy)}
+.due{font:600 8pt "Inter",Arial,sans-serif;color:var(--red);white-space:nowrap}
+.small{font-size:9pt;color:var(--muted)}
+.who{display:inline-block;background:var(--navy);color:#fff;font:600 8pt "Inter",Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:3pt 7pt;border-radius:4pt}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:"Inter",Arial,sans-serif}
+.mono{font-family:Consolas,monospace;font-size:9pt}
+.foot{margin-top:14pt;font-size:8.5pt;color:var(--muted);border-top:1pt solid var(--line);padding-top:6pt}
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<section class="page cover">
+  <span class="eyebrow">Westpac AI Hackathon · 16–17 November 2026</span>
+  <h1>Catching invoice scams before the money leaves</h1>
+  <p class="lede">A plain-English brief for the team: what we're building, why it matters, and what Lauren and Nathan can do over the next day. No IT background needed.</p>
+
+  <div class="story">
+    <h3>The problem, as a story</h3>
+    <p>Mia runs a small landscaping business. Every month she pays her mulch supplier about $3,000. One Tuesday an email arrives from the supplier, same logo, same invoice layout, saying <i>"We've changed banks, please use our new account details below."</i></p>
+    <p>She pays. The email didn't come from her supplier. A scammer had broken into the supplier's email, or made a near-identical address, and changed only the bank details. The money lands in a scammer's account and is moved on within hours. Mia's real supplier still wants paying.</p>
+    <p style="margin:0">This is called <b>business email compromise</b> or <b>invoice redirection</b>. Westpac says it makes up <b>94% of the scam money</b> reported by its institutional banking customers.</p>
+  </div>
+
+  <h2>Our idea in three sentences</h2>
+  <ol>
+    <li>Before paying an invoice in Westpac's online banking, the customer can <b>upload the invoice PDF</b>.</li>
+    <li>An AI assistant <b>checks it three ways</b>: does the invoice make sense on its own, does it match what the bank already knows about this supplier, and does the outside world (business register, websites) back it up?</li>
+    <li>It gives a <b>confidence score with reasons</b>, and the customer can <b>chat with it</b> to explain things it couldn't know, like "yes, they're a brand-new business".</li>
+  </ol>
+
+  <div class="callout"><b>Why banks would want this:</b> banks usually learn about a scam only after the money is gone, and many scams are never reported. Our tool sees invoices <i>before</i> payment, both genuine and fake. Over time that builds the data banks need to recognise scams earlier.</div>
+</section>
+
+<!-- PAGE 2 -->
+<section class="page">
+  <span class="eyebrow">How it works</span>
+  <h2>The journey of one invoice</h2>
+  <svg viewBox="0 0 640 560" role="img" aria-label="Flowchart of the invoice check from upload to saved record">
+    <defs><marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1f1c4f"/></marker>
+    <marker id="mr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#da1710"/></marker></defs>
+    <g font-size="12.5">
+    <rect x="200" y="6" width="240" height="44" rx="22" fill="#1f1c4f"/>
+    <text x="320" y="33" text-anchor="middle" fill="#fff" font-weight="600">Customer uploads the invoice</text>
+    <line x1="320" y1="50" x2="320" y2="74" stroke="#1f1c4f" stroke-width="1.5" marker-end="url(#m)"/>
+
+    <rect x="20" y="78" width="190" height="104" rx="10" fill="#fff" stroke="#1f1c4f" stroke-width="1.4"/>
+    <text x="115" y="102" text-anchor="middle" font-weight="700" fill="#1f1c4f">1. Invoice on its own</text>
+    <text x="115" y="124" text-anchor="middle" fill="#5b5b6a" font-size="11">Do the sums add up?</text>
+    <text x="115" y="141" text-anchor="middle" fill="#5b5b6a" font-size="11">Spelling, layout, hidden text?</text>
+    <text x="115" y="158" text-anchor="middle" fill="#5b5b6a" font-size="11">Pushy "pay today" wording?</text>
+
+    <rect x="225" y="78" width="190" height="104" rx="10" fill="#fff0f0" stroke="#da1710" stroke-width="2"/>
+    <text x="320" y="102" text-anchor="middle" font-weight="700" fill="#1f1c4f">2. Bank's own records</text>
+    <text x="320" y="124" text-anchor="middle" fill="#5b5b6a" font-size="11">Paid this supplier before?</text>
+    <text x="320" y="141" text-anchor="middle" fill="#5b5b6a" font-size="11">Same bank account as last time?</text>
+    <text x="320" y="158" text-anchor="middle" fill="#5b5b6a" font-size="11">Reported by other customers?</text>
+
+    <rect x="430" y="78" width="190" height="104" rx="10" fill="#fff" stroke="#1f1c4f" stroke-width="1.4"/>
+    <text x="525" y="102" text-anchor="middle" font-weight="700" fill="#1f1c4f">3. Outside research</text>
+    <text x="525" y="124" text-anchor="middle" fill="#5b5b6a" font-size="11">Real registered business?</text>
+    <text x="525" y="141" text-anchor="middle" fill="#5b5b6a" font-size="11">Website matches invoice?</text>
+    <text x="525" y="158" text-anchor="middle" fill="#5b5b6a" font-size="11">Any scam reports online?</text>
+
+    <polyline points="115,182 115,206 525,206 525,182" fill="none" stroke="#1f1c4f" stroke-width="1.4"/>
+    <line x1="320" y1="182" x2="320" y2="206" stroke="#1f1c4f" stroke-width="1.4"/>
+    <line x1="320" y1="206" x2="320" y2="228" stroke="#1f1c4f" stroke-width="1.5" marker-end="url(#m)"/>
+
+    <rect x="190" y="232" width="260" height="56" rx="10" fill="#f1f0fa" stroke="#1f1c4f" stroke-width="1.4"/>
+    <text x="320" y="256" text-anchor="middle" font-weight="700" fill="#1f1c4f">4. Confidence score</text>
+    <text x="320" y="275" text-anchor="middle" fill="#5b5b6a" font-size="11">each warning sign subtracts points</text>
+    <line x1="320" y1="288" x2="320" y2="312" stroke="#1f1c4f" stroke-width="1.5" marker-end="url(#m)"/>
+
+    <rect x="170" y="316" width="300" height="56" rx="10" fill="#fff" stroke="#1f1c4f" stroke-width="1.4"/>
+    <text x="320" y="340" text-anchor="middle" font-weight="700" fill="#1f1c4f">Score + reasons shown</text>
+    <text x="320" y="359" text-anchor="middle" fill="#5b5b6a" font-size="11">e.g. "62/100 · bank details changed"</text>
+
+    <rect x="490" y="316" width="140" height="56" rx="10" fill="#fff" stroke="#da1710" stroke-width="1.4"/>
+    <text x="560" y="340" text-anchor="middle" font-weight="700" fill="#da1710">Chat</text>
+    <text x="560" y="359" text-anchor="middle" fill="#5b5b6a" font-size="11">customer explains</text>
+    <line x1="470" y1="344" x2="488" y2="344" stroke="#da1710" stroke-width="1.5" marker-end="url(#mr)"/>
+    <polyline points="560,316 560,260 452,260" fill="none" stroke="#da1710" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#mr)"/>
+    <text x="510" y="252" text-anchor="middle" fill="#da1710" font-size="10.5" font-style="italic">re-score</text>
+
+    <line x1="320" y1="372" x2="320" y2="396" stroke="#1f1c4f" stroke-width="1.5" marker-end="url(#m)"/>
+    <rect x="130" y="400" width="110" height="38" rx="19" fill="#f2f9f2" stroke="#008000"/>
+    <text x="185" y="424" text-anchor="middle" font-weight="600">Pay</text>
+    <rect x="265" y="400" width="110" height="38" rx="19" fill="#fcf5f2" stroke="#c53b00"/>
+    <text x="320" y="424" text-anchor="middle" font-weight="600">Hold &amp; call</text>
+    <rect x="400" y="400" width="110" height="38" rx="19" fill="#fcf2f2" stroke="#c40000"/>
+    <text x="455" y="424" text-anchor="middle" font-weight="600">Report</text>
+
+    <line x1="185" y1="438" x2="185" y2="462" stroke="#1f1c4f" stroke-width="1.5" marker-end="url(#m)"/>
+    <rect x="40" y="466" width="300" height="70" rx="10" fill="#fff" stroke="#1f1c4f" stroke-width="1.4"/>
+    <text x="190" y="490" text-anchor="middle" font-weight="700" fill="#1f1c4f">5. Receipt saved with the payment</text>
+    <text x="190" y="509" text-anchor="middle" fill="#5b5b6a" font-size="11">file name + a digital "fingerprint"</text>
+    <text x="190" y="525" text-anchor="middle" fill="#5b5b6a" font-size="11">the PDF itself is deleted (privacy)</text>
+    <polyline points="455,438 455,500 360,500" fill="none" stroke="#0074c4" stroke-width="1.5" marker-end="url(#m)"/>
+    <text x="470" y="480" fill="#0074c4" font-size="10.5" font-style="italic">warns the</text>
+    <text x="470" y="494" fill="#0074c4" font-size="10.5" font-style="italic">next customer</text>
+    </g>
+  </svg>
+
+  <div class="grid2" style="margin-top:6pt">
+    <div class="box">
+      <h3 style="margin-top:0">Think of it like medical testing</h3>
+      <p style="margin:0">A cheap screening test runs on everyone. Only if it flags something do you order the expensive, specific tests. We do the same: quick checks on every invoice, deeper online research only when something looks off. That keeps it fast for the 95% of invoices that are fine.</p>
+    </div>
+    <div class="box">
+      <h3 style="margin-top:0">The "fingerprint" idea</h3>
+      <p style="margin:0">Any file can be turned into a unique code. Change one comma and the code changes completely. We store the code with the payment, so months later you can prove which exact invoice you paid against, even if someone has edited their copy since.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 3 -->
+<section class="page">
+  <span class="eyebrow">Words you'll hear</span>
+  <h2>Mini glossary</h2>
+  <table>
+    <thead><tr><th>Term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>BSB + account number</td><td>The classic way to identify an Australian bank account. The BSB (6 digits) identifies the bank and branch.</td></tr>
+      <tr><td>PayID</td><td>A shortcut for an account: pay a phone number, email or ABN instead of typing a BSB.</td></tr>
+      <tr><td>BPAY</td><td>Paying bills with a biller code and reference number, common for utilities and big suppliers.</td></tr>
+      <tr><td>ABN</td><td>Australian Business Number. Every business has one, and anyone can look it up on the public register (abr.business.gov.au).</td></tr>
+      <tr><td>Confirmation of Payee</td><td>Introduced in 2025. When you add a new payee, the bank tells you whether the account name matches what you typed. Useful, but it only checks the name.</td></tr>
+      <tr><td>Business email compromise (BEC)</td><td>A scammer gets into, or imitates, a real business's email and sends invoices with their own bank details.</td></tr>
+      <tr><td>Mule account</td><td>A bank account scammers use to receive stolen money and pass it on, often opened in someone else's name.</td></tr>
+      <tr><td>OSINT</td><td>"Open-source intelligence": researching using only public information such as registers, websites and social media.</td></tr>
+      <tr><td>Hash / fingerprint</td><td>The unique code generated from a file, described on the previous page.</td></tr>
+      <tr><td>Confidence score</td><td>Our 0–100 rating of how confident we are the invoice and payee are genuine, always shown with reasons.</td></tr>
+    </tbody>
+  </table>
+
+  <span class="eyebrow" style="margin-top:12pt">Scope</span>
+  <h2>What we cover, and what to ignore</h2>
+  <p>Please keep research inside the green box. If you find a great stat about something in the grey box, it doesn't help our pitch, so skip it.</p>
+  <div class="grid2">
+    <div class="in"><h3>In scope</h3><ul>
+      <li>Businesses and sole traders paying supplier invoices</li>
+      <li>Invoice redirection (real supplier, swapped bank details)</li>
+      <li>Fake invoices from businesses that don't exist</li>
+      <li>Fake bills pretending to be a real business or the ATO</li>
+      <li>Invoices edited after payment, and disputes about them</li>
+      <li>Payments by BSB, PayID or BPAY</li>
+    </ul></div>
+    <div class="out"><h3>Out of scope</h3><ul>
+      <li>Credit and debit card fraud, card skimming</li>
+      <li>Romance, investment, crypto and job scams</li>
+      <li>Hacked online-banking logins, stolen passwords</li>
+      <li>Phishing texts asking for codes or passwords</li>
+      <li>Personal payments between friends and family</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- PAGE 4 -->
+<section class="page">
+  <span class="who">Lauren</span>
+  <h2 style="margin-top:8pt">Research and design</h2>
+
+  <h3>Part A · Research: how big is the problem?</h3>
+  <p>The judges score <b>Impact (20%)</b>. We need a handful of strong, recent, Australian numbers. Aim for <b>quality over quantity: 6–10 great stats</b>, each with its source link and year.</p>
+  <div class="task">
+    <div class="hd"><b>Questions to answer</b><span class="due">Due: 9:30am Tuesday</span></div>
+    <ol style="margin-top:6pt">
+      <li>How much money do Australian businesses lose to invoice / payment-redirection scams each year? Is it going up or down?</li>
+      <li>How much do <b>small businesses and sole traders</b> lose specifically? What's the average loss per incident?</li>
+      <li>What share of scams go <b>unreported</b>? (This supports our "banks only learn afterwards" point.)</li>
+      <li>How often do victims get their money back?</li>
+      <li>What has Westpac said publicly about scams? Look for its own numbers and its scam tools (SaferPay, Verify, Confirmation of Payee).</li>
+      <li>What does the <b>Scams Prevention Framework</b> (a 2025 law) require banks to do? One or two sentences is enough.</li>
+      <li>One or two real news stories of an Australian small business losing money to a fake or changed invoice. These are great for the pitch.</li>
+    </ol>
+    <p class="small" style="margin:0">Good places to look: Scamwatch "Targeting Scams" report (scamwatch.gov.au), ASD/ACSC Annual Cyber Threat Report (cyber.gov.au), ASIC, AFP, Australian Banking Association, Westpac newsroom, ABC News. Prefer 2024–2026 figures.</p>
+  </div>
+  <p class="small">Format: a shared Google Doc with one line per stat: <span class="mono">the number · what it measures · source link · year</span>.</p>
+
+  <h3>Part B · Design: making it look like Westpac</h3>
+  <p>You're <b>not</b> responsible for how the app works or where buttons go; Kiel and Paul handle that. Your job is the <b>look and feel</b>, and you're the team's eye for what feels trustworthy.</p>
+  <p>Westpac publishes its design system, called <b>GEL</b>, as a normal website you can browse, with no coding needed: <b>gel.westpacgroup.com.au/design-system</b>. It shows their colours, fonts, icons and example components.</p>
+  <div class="task">
+    <div class="hd"><b>1. Mood board</b><span class="due">Tonight if possible</span></div>
+    <p style="margin:4pt 0 0">Screenshot 6–10 examples of how banking apps show warnings and trust: Westpac, CommBank, ANZ, NAB, plus anything else that feels "safe" or "alarming". Add one line on each: what works, what doesn't.</p>
+  </div>
+  <div class="task">
+    <div class="hd"><b>2. Answer the design questions</b><span class="due">Kiel will send these</span></div>
+    <p style="margin:4pt 0 0">A short list about how the score and warnings should look and feel: colours for each risk level, tone of voice, icons. Your answers go straight into the build.</p>
+  </div>
+  <div class="task">
+    <div class="hd"><b>3. Pitch slide style</b><span class="due">Tuesday morning</span></div>
+    <p style="margin:4pt 0 0">A simple slide template in Westpac's colours (red <span class="mono">#DA1710</span>, navy <span class="mono">#1F1C4F</span>) for our video, in Canva or Google Slides.</p>
+  </div>
+</section>
+
+<!-- PAGE 5 -->
+<section class="page">
+  <span class="who">Nathan</span>
+  <h2 style="margin-top:8pt">The story, the pitch and the test invoices</h2>
+  <p>The submission is a <b>video of up to 10 minutes</b> plus a written summary, due <b>4pm Tuesday</b>. Judges weigh <b>Innovation 25%, Creativity 25%, Feasibility 20%, Impact 20%, Technical 10%</b>, so the story matters as much as the code.</p>
+
+  <div class="task">
+    <div class="hd"><b>1. Test invoices (most urgent)</b><span class="due">Due: 9:30am Tuesday</span></div>
+    <p style="margin:4pt 0 4pt">Make 4 realistic-looking invoices (Word, Google Docs or Canva → export as PDF) for <b>made-up</b> businesses. Never use a real company's name, logo or ABN.</p>
+    <ol style="margin:0">
+      <li><b>Clean:</b> a normal invoice from a supplier we "pay every month".</li>
+      <li><b>Swapped bank details:</b> identical to #1, but with a different BSB and account and a "we've changed banks" note.</li>
+      <li><b>Sloppy fake:</b> spelling mistakes, GST that doesn't add up, says "pay by BPAY" but only gives a BSB, "pay within 24 hours".</li>
+      <li><b>Genuine but new:</b> a real-looking business that only started recently. The AI should be wary at first, then relax after the customer explains in the chat.</li>
+    </ol>
+  </div>
+
+  <div class="task">
+    <div class="hd"><b>2. Existing defences and the gap</b><span class="due">Due: 9:30am Tuesday</span></div>
+    <p style="margin:4pt 0 0">In half a page: what do Australian banks already do against invoice scams (Confirmation of Payee, CommBank NameCheck, Westpac SaferPay, warnings), and where does each fall short? This is our "why existing tools aren't enough" slide. Keep it to the green-box scope.</p>
+  </div>
+
+  <div class="task">
+    <div class="hd"><b>3. Pitch script and video plan</b><span class="due">First draft 11am Tuesday</span></div>
+    <p style="margin:4pt 0 4pt">Suggested shape for an 8–10 minute video:</p>
+    <ol style="margin:0">
+      <li>Hook: a story like Mia's, plus Lauren's best stat (≈1 min)</li>
+      <li>Why current protections miss it (≈1 min)</li>
+      <li>Our solution in one sentence, and the flowchart (≈1 min)</li>
+      <li>Live demo: the 4 test invoices, including the chat changing the score (≈4 min)</li>
+      <li>Why banks win: earlier data, the shared warning register, the receipt fingerprint (≈1.5 min)</li>
+      <li>Close: what's next and the team (≈30 sec)</li>
+    </ol>
+  </div>
+
+  <div class="task">
+    <div class="hd"><b>4. A name</b><span class="due">Anytime</span></div>
+    <p style="margin:4pt 0 0">Suggest 3–5 product names, short and trustworthy, something that would sit naturally beside Westpac's "SaferPay" and "Verify". Run them past Lauren.</p>
+  </div>
+
+  <div class="task">
+    <div class="hd"><b>5. Written summary</b><span class="due">Tuesday afternoon</span></div>
+    <p style="margin:4pt 0 0">The email submission needs a short summary of what we're trying to achieve and why it's a good idea. Half a page, written after the script so the two match.</p>
+  </div>
+</section>
+
+<!-- PAGE 6 -->
+<section class="page">
+  <span class="eyebrow">Timeline</span>
+  <h2>The next four days</h2>
+  <table>
+    <thead><tr><th>When</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>Mon 16 Nov, evening</td><td>Kiel finalises the build plan; Paul's AI coding tools build overnight. Lauren starts research and the mood board; Nathan starts the test invoices.</td></tr>
+      <tr><td>Tue 17 Nov, 9:30am</td><td>Research, test invoices and the "existing defences" page shared in the group chat.</td></tr>
+      <tr><td>Tue 17 Nov, 10am–1pm</td><td>Polish the app, run the test invoices through it, finish the script and slides.</td></tr>
+      <tr><td>Tue 17 Nov, 1pm–3pm</td><td>Record the video (screen recording of the demo + team presenting).</td></tr>
+      <tr><td>Tue 17 Nov, by 4pm</td><td><b>Hard deadline.</b> Email submission to Westpac: summary + YouTube link.</td></tr>
+      <tr><td>Thu 19 Nov, 2pm</td><td>Shortlist announced.</td></tr>
+      <tr><td>Fri 20 Nov, 9:30am</td><td>Awards day at the Westpac Gold Coast hub: a 5-minute live pitch if shortlisted.</td></tr>
+    </tbody>
+  </table>
+
+  <span class="eyebrow" style="margin-top:14pt">Working together</span>
+  <h2>A few ground rules</h2>
+  <ul>
+    <li><b>Always keep the source link.</b> A stat without a source can't go in the pitch.</li>
+    <li><b>Australian and recent beats global and old.</b> If you can only find a global number, label it clearly.</li>
+    <li><b>Made-up businesses only</b> in test invoices and demos: no real company names, logos or ABNs.</li>
+    <li><b>AI tools are fine</b> for finding sources, but check every number against the original page. AI tools sometimes invent statistics.</li>
+    <li><b>Stuck or unsure?</b> Message the group. A quick question beats an hour going the wrong way.</li>
+  </ul>
+  <p class="foot">Prepared for the team by Kiel · 16 November 2026 · Colours from Westpac's public GEL design system</p>
+</section>
+
+</body>
+</html>
