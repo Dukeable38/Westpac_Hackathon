@@ -53,7 +53,7 @@ def analyse(data):
                 # Appended content is painted after earlier content. Compare the drawing
                 # sequence, not the filename, and keep the later payment block legible.
                 prefix=len(pp.chars)
-                same=all(a['text']==b['text'] and abs(a['x0']-b['x0'])<0.1 for a,b in zip(p.chars[:prefix],pp.chars))
+                same=len(p.chars)>=prefix and all(a['text']==b['text'] and abs(a['x0']-b['x0'])<0.1 for a,b in zip(p.chars[:prefix],pp.chars))
                 if not same:revision_unknown=True
                 added=p.chars[prefix:] if same else []
                 added_visible=[c for c in added if not _hidden(c,p)]
