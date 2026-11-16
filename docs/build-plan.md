@@ -48,7 +48,7 @@ FastAPI (Python 3.11)
 
 Recommended stack: FastAPI + pypdf + pdfplumber + SQLite + plain HTML/JS front end (lift the mock-up). Avoid a React build step unless Paul prefers it; the mock-up is already the front end.
 
-LLM: **one model for everything**: Claude (`claude-opus-5-5`) via the `anthropic` SDK, with server-side web search and web fetch for research. No Jev and no ABN Lookup GUID. Wrap it in `llm.py`: `extract(sanitised_text) -> InvoiceJSON`, `classify(question, choices, snippet) -> choice`, `research(query, urls) -> ResearchResult`, plus a deterministic `fake` provider for tests and offline use. See AGENTS.md §4.
+LLM: **one model for everything, swappable via `.env`** (`LLM_PROVIDER` = `fake` | `anthropic` | `openai_compatible`, the last covering Gemini, NVIDIA NIM, OpenRouter, Groq, Ollama). No Jev and no ABN Lookup GUID. `llm.py` exposes `extract`, `classify` and `summarise`. Research is code-driven: we fetch pages ourselves and the LLM only reads them, so it works with any model. See AGENTS.md §4.
 
 ---
 
@@ -128,7 +128,7 @@ Implementation hints:
 
 | Source | Mode | Note |
 |---|---|---|
-| ABN Lookup | Seed first, then live via `llm.research()` web fetch of `abr.business.gov.au/ABN/View?abn=…` | No GUID needed. Fixture ABNs are made up, so `sources/abn.py` first checks `demo/seed/seed.json → abn_registry` and only goes live for other ABNs |
+| ABN Lookup | Seed first, then live: code fetches `abr.business.gov.au/ABN/View?abn=…` | No GUID needed. Fixture ABNs are made up, so `sources/abn.py` first checks `demo/seed/seed.json → abn_registry` and only goes live for other ABNs |
 | Confirmation of Payee | Mock | Return Match / Close match / No match / Unavailable from `seed.json → cop` |
 | Warning register (flag register) | Mock | `seed.json → flag_register` |
 | Supplier profiles / payment history | Mock (SQLite) | `seed.json → customers[].suppliers[]` |

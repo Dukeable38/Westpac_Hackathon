@@ -23,4 +23,6 @@ You are building the Invoice Scam Checker in this repo. Work autonomously; I may
 ---
 
 Tip for Claude Code: run it with auto-accept for edits and tests so it doesn't stall on permission
-prompts overnight, and give it an `ANTHROPIC_API_KEY` in `.env` if you want M7 verified live.
+prompts overnight. No API key is needed to build: it uses `LLM_PROVIDER=fake`. To try a real model
+later, copy `.env.example` to `.env`, fill in one provider block (Claude, Gemini, NVIDIA, OpenRouter,
+Ollama) and run `python scripts/llm_smoke.py`.

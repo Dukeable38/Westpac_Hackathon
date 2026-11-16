@@ -20,7 +20,7 @@ or away. Do not stop to ask questions. When something is ambiguous, decide, writ
 You are done when **all** of these hold:
 - [ ] `pytest tests/ -q` passes with no skips, running offline (`DEMO_MODE=replay`, `LLM_PROVIDER=fake`, the defaults in `tests/conftest.py`).
 - [ ] `uvicorn app.main:app` serves the UI at `/`, and all 4 PDFs in `demo/invoices/` can be uploaded through the browser, showing the result, tier progress, signals, chat and receipt as in the mock-up.
-- [ ] The same 4 uploads work with `LLM_PROVIDER=anthropic` (real model) if `ANTHROPIC_API_KEY` is set. If no key is available, record that in PROGRESS.md as "not verified live" (this alone doesn't block Done).
+- [ ] Swapping the model is `.env`-only: `fake`, `anthropic` and `openai_compatible` all implemented, `.env.example` filled in, and `python scripts/llm_smoke.py` passes for whichever real provider has a key. If no key is available, record that in PROGRESS.md as "not verified live" (this alone doesn't block Done).
 - [ ] `README.md` has accurate setup and run steps, and `requirements.txt` is complete.
 - [ ] PROGRESS.md ends with a "Handover" section: what works, what's stubbed, known issues, how to run the demo.
 
@@ -42,24 +42,42 @@ Milestones, in order. Each ends with a commit.
 | M4 | Chat (claims → rule table → re-score → diff) | all chat tests |
 | M5 | Receipt + decision endpoint | `test_receipt` |
 | M6 | Front end wired to the API, plus SSE progress | manual: 4 uploads in the browser look like the mock-up |
-| M7 | Real LLM provider + research via web tools, cache recording | live run of the 4 fixtures; `demo/cache/` populated |
+| M7 | Real LLM adapters (`anthropic`, `openai_compatible`), code-driven research, cache recording | `scripts/llm_smoke.py` passes for any provider with a key; `demo/cache/` populated |
 
 **Priority if time runs short:** fixture #2 > #4 > #3 > #1 > receipt > everything else.
 
-## 4. LLM and research: one model, no other keys needed
-- Use **one** LLM for everything: Claude via the official `anthropic` Python SDK, model **`claude-opus-5-5`**. Key in `ANTHROPIC_API_KEY` in `.env` (gitignored). Don't use Jev, and don't add a second provider.
-- `llm.py` exposes these as plain module functions, called as `llm.extract(...)` (the guardrail test patches it):
-  - `extract(sanitised_text) -> InvoiceJSON`: use structured outputs, validated by Pydantic.
-  - `classify(question, choices, snippet) -> choice`: used for urgency, "bank details changed" language and chat claims.
-  - `research(query, urls=None) -> ResearchResult`: uses the server-side tools `web_search_20260209` and `web_fetch_20260209`. Web fetch only opens URLs that appear in the conversation, so put them in the prompt, e.g. `https://abr.business.gov.au/ABN/View?abn=<digits>` for ABN status, name, GST and registration date. The result is **evidence for a check, never a score**.
-- `LLM_PROVIDER=fake`: a deterministic stand-in (regex extraction, keyword classification, canned research from `seed.json`). The tests use it, and it is your fallback whenever there's no key or no network. **Build it in M1.**
-- The fixture businesses are fictional, so live research on them will find nothing. Seed-first lookups (`seed.json → abn_registry`, `domains`, `web_search`) answer the fixtures; use live research only for other invoices.
-- Every `research()` and live HTTP call goes through `cache.py`. `DEMO_MODE=record` saves to `demo/cache/`, and `DEMO_MODE=replay` never touches the network.
+## 4. LLM and research: plug-and-play provider
+The model is **swappable by editing `.env` only**: no code changes, no restart beyond reloading. Kiel may test Claude, Gemini, NVIDIA, a free OpenRouter/Groq model, etc. on the morning of the demo. Use one model for everything (no Jev).
+
+**`llm.py` is the only file that knows about providers.** It exposes plain module functions, called as `llm.extract(...)` (the guardrail test patches it):
+- `extract(sanitised_text) -> InvoiceJSON`: ask for JSON, validate with Pydantic, retry once with the validation error on failure.
+- `classify(question, choices, snippet) -> choice`: urgency, "bank details changed" language, chat claims.
+- `summarise(question, page_text) -> str`: answer a question from text that **our code** fetched (used by research).
+
+Providers, chosen by `LLM_PROVIDER`:
+| `LLM_PROVIDER` | Covers | Settings |
+|---|---|---|
+| `fake` | Tests and offline use. Deterministic: regex extraction, keyword classification, canned research from `seed.json`. **Build it in M1.** | none |
+| `anthropic` | Claude via the official `anthropic` SDK | `ANTHROPIC_API_KEY`, `LLM_MODEL` (default `claude-opus-5-5`) |
+| `openai_compatible` | Anything with an OpenAI-style `/chat/completions` endpoint: **Gemini**, **NVIDIA NIM**, OpenRouter (has free models), Groq, Together, local Ollama/LM Studio | `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` |
+
+Make `openai_compatible` work with a plain `httpx` POST (or the `openai` package), and don't depend on provider-specific features. Use JSON mode if available, otherwise "reply with JSON only" plus Pydantic validation. Free tiers rate-limit, so retry 429s with backoff and keep prompts small. `.env.example` lists ready-to-fill examples for each provider; keep it up to date.
+
+**Research does not depend on the model having web tools.** `sources/research.py` does it in code:
+1. **Fetch:** our code downloads known pages with `httpx` (e.g. `https://abr.business.gov.au/ABN/View?abn=<digits>` for ABN status, name, GST and registration date; crt.sh; Wayback CDX; DNS over HTTPS). No API key is needed.
+2. **Search (optional):** if `SEARCH_PROVIDER=tavily` and `TAVILY_API_KEY` are set, use Tavily (free tier). Otherwise web-search checks return `unknown` ("search not configured"). Don't fail.
+3. **Read:** pass the fetched text plus a narrow question to `llm.summarise()`. Parse simple facts (dates, status) with code where possible.
+
+The result is **evidence for a check, never a score**. With `LLM_PROVIDER=anthropic`, you *may* also use its server-side `web_search_20260209` / `web_fetch_20260209` tools as an upgrade, but the code path above must work with every provider.
+
+- The fixture businesses are fictional, so live research on them will find nothing. Seed-first lookups (`seed.json → abn_registry`, `domains`, `web_search`) answer the fixtures; live research is only for other invoices.
+- Every LLM, research and HTTP call goes through `cache.py`, keyed by (provider, model, input). `DEMO_MODE=record` saves to `demo/cache/`, and `DEMO_MODE=replay` never touches the network.
+- Add `scripts/llm_smoke.py`: it runs `extract` + `classify` + `summarise` once against the configured provider and prints pass/fail. It's the 30-second check after swapping keys.
 
 ## 5. When you're blocked, don't stop
 | Blocker | Do this |
 |---|---|
-| No `ANTHROPIC_API_KEY` | Finish everything on `LLM_PROVIDER=fake`. Mark M7 "awaiting key" in PROGRESS.md and continue. |
+| No API key for any provider | Finish everything on `LLM_PROVIDER=fake`, and still write the `anthropic` and `openai_compatible` adapters so a key just plugs in. Mark M7 "awaiting key" in PROGRESS.md and continue. |
 | No network | Same as above; replay mode and seed data cover the demo. |
 | A test seems to contradict the spec | build-plan.md wins. Fix the test minimally and explain it in PROGRESS.md. Never delete assertions just to go green. |
 | Can't hit a score threshold | Tune `weights.yaml` (bias and weights), not the test. |
