@@ -10,3 +10,13 @@ def forensics():
 def test_amount_anomaly():
     signals,_=evaluate(fixture_invoice(),forensics(),'cust_greenline')
     assert next(s for s in signals if s['id']=='C7')['state']=='risk'
+
+def test_bsb_unknown_is_not_invalid():
+    invoice=fixture_invoice();invoice.payment_methods[0].bsb='123-456'
+    signals,_=evaluate(invoice,forensics(),'cust_greenline')
+    assert next(s for s in signals if s['id']=='C11')['state']=='unknown'
+
+def test_bsb_invalid_format():
+    invoice=fixture_invoice();invoice.payment_methods[0].bsb='123'
+    signals,_=evaluate(invoice,forensics(),'cust_greenline')
+    assert next(s for s in signals if s['id']=='C11')['state']=='risk'

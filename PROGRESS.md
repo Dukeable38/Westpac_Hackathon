@@ -36,6 +36,8 @@ Format: `YYYY-MM-DD HH:MM · M# · done / decided / blocked: ...`
 
 - P1 C7 added: deterministic amount anomaly >3× known supplier median; unknown for missing history. 36 tests pass.
 
+- P1 C11 added: BSB format and seeded directory validation; unknown entries remain unknown, not invalid. Bank-name mismatch requires an asserted bank name and is not implemented. 38 tests pass.
+
 ## Definition of Done evidence
 1. PASS: `pytest tests/ -q`: **35 passed, 0 failed, 0 skipped**, including all 20 original tests unchanged. Defaults: replay/fake. Additional tests cover locked weights, renamed PDFs, invalid inputs, fast-clear gating, invisible rendering rejection, provider mocks and no-network replay.
 2. PASS: `scripts/smoke_demo.py` starts a background uvicorn on an ephemeral local port, waits ≤10 s, checks HTML, all four PDFs (96 genuine / 0 high_risk / 0 high_risk / 59 check), finite SSE completion, chat → 84 genuine and receipt; shuts down in finally. Exit 0.

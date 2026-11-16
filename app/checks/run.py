@@ -35,6 +35,13 @@ def evaluate(invoice, forensic, customer_id):
     set_('C8','neutral' if abn_valid(invoice.abn) else 'risk','ABN checksum valid' if abn_valid(invoice.abn) else 'ABN checksum invalid',not abn_valid(invoice.abn))
     gstbad=abs(invoice.gst-invoice.subtotal*.1)>.02 or abs(invoice.total-invoice.subtotal-invoice.gst)>.02
     set_('C10','risk' if gstbad else 'neutral',f'GST ${invoice.gst:.2f}; expected ${invoice.subtotal*.1:.2f} at 10%. Check GST-free items separately.')
+    if p and p.bsb:
+        valid_format=bool(re.fullmatch(r'\d{3}-?\d{3}',p.bsb))
+        bank=SEED['bsb_directory'].get(p.bsb)
+        if not valid_format:set_('C11','risk','BSB does not contain six digits',True)
+        elif bank:set_('C11','neutral','BSB found in demo directory: '+bank+'; invoice does not assert a bank name to compare')
+        else:set_('C11','unknown','BSB format valid but not in the small demo directory; not evidence of invalidity')
+    else:set_('C11','unknown','No BSB provided for directory comparison')
     set_('C13','unknown' if forensic.get('revision_unknown') else 'risk' if forensic['tampered'] else 'neutral','Payment fields changed in a later PDF revision' if forensic['tampered'] else 'Revision comparison unsupported; payment edits not ruled out' if forensic.get('revision_unknown') else 'No payment-field revision change found',forensic['tampered'])
     set_('C14','risk' if forensic['hidden'] else 'neutral','Hidden instruction-like text removed before AI processing' if forensic['hidden_instruction'] else 'Hidden/invisible text removed before AI processing' if forensic['hidden'] else 'No hidden text detected',forensic['hidden'])
     set_('C15','unknown' if forensic.get('revision_unknown') else 'risk' if forensic['overlay'] else 'neutral','Later text is drawn over the original bank details' if forensic['overlay'] else 'Revision comparison unsupported; overlays not ruled out' if forensic.get('revision_unknown') else 'No payment-field overlay detected',forensic['overlay'])
