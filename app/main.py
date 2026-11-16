@@ -1,4 +1,4 @@
-import copy,hashlib,uuid,json,os,asyncio
+import copy,hashlib,uuid,json,os,asyncio,tempfile
 from fastapi import FastAPI,File,Form,UploadFile,HTTPException
 from .pdf_forensics import analyse
 from .extract import extract_invoice
@@ -12,6 +12,8 @@ from .storage import receipt
 from fastapi.responses import FileResponse,StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from .seed import ROOT
+(ROOT/'app/.tmp').mkdir(exist_ok=True)
+tempfile.tempdir=str(ROOT/'app/.tmp')
 app = FastAPI(title='Invoice Scam Checker')
 RESULTS={}
 app.mount('/static',StaticFiles(directory=ROOT/'app/static'),name='static')
@@ -23,7 +25,10 @@ def index():
 
 @app.post('/api/check')
 async def check(file:UploadFile=File(...),customer_id:str=Form('cust_greenline')):
-    data=await file.read(10*1024*1024+1)
+    try:
+        data=await file.read(10*1024*1024+1)
+    finally:
+        await file.close()
     try:
         forensic=analyse(data)
         invoice=extract_invoice(forensic['text'])

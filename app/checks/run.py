@@ -31,9 +31,9 @@ def evaluate(invoice, forensic, customer_id):
     set_('C8','neutral' if abn_valid(invoice.abn) else 'risk','ABN checksum valid' if abn_valid(invoice.abn) else 'ABN checksum invalid',not abn_valid(invoice.abn))
     gstbad=abs(invoice.gst-invoice.subtotal*.1)>.02 or abs(invoice.total-invoice.subtotal-invoice.gst)>.02
     set_('C10','risk' if gstbad else 'neutral',f'GST ${invoice.gst:.2f}; expected ${invoice.subtotal*.1:.2f} at 10%. Check GST-free items separately.')
-    set_('C13','risk' if forensic['tampered'] else 'neutral','Payment fields changed in a later PDF revision' if forensic['tampered'] else 'No payment-field revision change found',forensic['tampered'])
+    set_('C13','unknown' if forensic.get('revision_unknown') else 'risk' if forensic['tampered'] else 'neutral','Payment fields changed in a later PDF revision' if forensic['tampered'] else 'Revision comparison unsupported; payment edits not ruled out' if forensic.get('revision_unknown') else 'No payment-field revision change found',forensic['tampered'])
     set_('C14','risk' if forensic['hidden'] else 'neutral','Hidden instruction-like text removed before AI processing' if forensic['hidden_instruction'] else 'Hidden/invisible text removed before AI processing' if forensic['hidden'] else 'No hidden text detected',forensic['hidden'])
-    set_('C15','risk' if forensic['overlay'] else 'neutral','Later text is drawn over the original bank details' if forensic['overlay'] else 'No payment-field overlay detected',forensic['overlay'])
+    set_('C15','unknown' if forensic.get('revision_unknown') else 'risk' if forensic['overlay'] else 'neutral','Later text is drawn over the original bank details' if forensic['overlay'] else 'Revision comparison unsupported; overlays not ruled out' if forensic.get('revision_unknown') else 'No payment-field overlay detected',forensic['overlay'])
     inconsistent=bool(p and p.type=='BPAY' and not p.biller_code)
     set_('C18','risk' if inconsistent else 'neutral','Claims BPAY but supplies a BSB/account without a biller code' if inconsistent else 'Payment method fields are consistent')
     t=' '.join(forensic['text'].lower().split())
@@ -60,15 +60,17 @@ def evaluate(invoice, forensic, customer_id):
     mismatch=bool(invoice.website and domain and domain!=invoice.website)
     free=domain in ['gmail.com','outlook.com','hotmail.com','yahoo.com']
     set_('C26','risk' if mismatch or free else 'neutral','Email differs from website or uses a free-mail provider' if mismatch or free else 'Email and website contact fields consistent')
-    lookalike=bool(sup and domain!=sup['known_domain'] and SequenceMatcher(None,domain,sup['known_domain']).ratio()>.8)
-    set_('C30','risk' if lookalike else 'neutral',f"Email domain {domain} resembles known {sup['known_domain']}" if lookalike else 'No known-supplier lookalike detected',lookalike)
-    dom=domain_history(domain)
-    if dom:
-        days=(date(2026,11,16)-date.fromisoformat(dom['first_cert'])).days
-        set_('C31','risk' if days<90 else 'neutral',f'First certificate observed {days} days ago in seeded evidence; not a registration date')
-    else: set_('C31','unknown','No cached certificate or domain history')
-    web=web_search(invoice.supplier_name)
-    if web and 'reviews' in web: set_('C35','risk' if web['reviews']<5 or web['scam_reports'] else 'neutral',f"Seeded web evidence: {web['reviews']} reviews; {web['scam_reports']} scam reports",bool(web['scam_reports']))
+    fast_clear=bool(sup and unchanged and sup['payments']['count']>=2 and cop and cop['result']=='MATCH' and invoice.total<=3*sup['payments']['median_amount'] and not any(signals[c]['state']=='risk' for c in ['C13','C14','C15']) and signals['C21']['state']=='reassuring' and not any(v['tier']==1 and v['state']=='risk' and v['weight']>.4 for v in signals.values()))
+    if not fast_clear:
+        lookalike=bool(sup and domain!=sup['known_domain'] and SequenceMatcher(None,domain,sup['known_domain']).ratio()>.8)
+        set_('C30','risk' if lookalike else 'neutral',f"Email domain {domain} resembles known {sup['known_domain']}" if lookalike else 'No known-supplier lookalike detected',lookalike)
+        dom=domain_history(domain)
+        if dom:
+            days=(date(2026,11,16)-date.fromisoformat(dom['first_cert'])).days
+            set_('C31','risk' if days<90 else 'neutral',f'First certificate observed {days} days ago in seeded evidence; not a registration date')
+        else: set_('C31','unknown','No cached certificate or domain history')
+        web=web_search(invoice.supplier_name)
+        if web and 'reviews' in web: set_('C35','risk' if web['reviews']<5 or web['scam_reports'] else 'neutral',f"Seeded web evidence: {web['reviews']} reviews; {web['scam_reports']} scam reports",bool(web['scam_reports']))
     if forensic['original']:
         b,a=forensic['original'];set_('C39','risk',f'Original bank details recovered from prior revision: {b} / {a}',True)
     else: set_('C39','neutral','No earlier differing payment details recovered')

@@ -1,4 +1,4 @@
-"""Local demo records. Uploaded PDF bytes are never written to disk."""
+"""Local demo records. Uploaded PDF bytes are not retained after processing."""
 import json,sqlite3,uuid
 from datetime import datetime,timezone
 from .seed import ROOT,SEED
