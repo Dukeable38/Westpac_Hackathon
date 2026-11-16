@@ -38,8 +38,13 @@ Format: `YYYY-MM-DD HH:MM · M# · done / decided / blocked: ...`
 
 - P1 C11 added: BSB format and seeded directory validation; unknown entries remain unknown, not invalid. Bank-name mismatch requires an asserted bank name and is not implemented. 38 tests pass.
 
+## Fictional-data correction and official audit
+- 2026-11-16 UTC · Follow-up official ABN Lookup audit confirmed original Corella ABN 80310379062 was a real cancelled sole-trader record. Replaced both seed references with checksum-valid 93270000491; official result: no record matching ABN 93 270 000 491. No real person details copied into the demo or audit artifact.
+- Audited all eight checksum-valid seed registry ABNs. No other collisions found; all current values returned “ABN not found”. Source URLs and timestamp in demo/seed/abn-audit.json. Direct official HTTPS responses checked via bounded curl after the web lookup tool could not open these pages. Domain ownership remains unverified; absence can change.
+- Searched all four invoice PDFs and the team-brief PDF: none contains the old Corella ABN, so PDF fixtures and their hashes remain unchanged. Original acceptance assertions unchanged. SQLite seeded profiles refresh on startup/access without deleting saved receipts. Added collision/audit and stale-profile regression tests: **40 passed, zero failures/skips**; full demo smoke and fake LLM smoke pass with unchanged 96/0/0/59 scores.
+
 ## Definition of Done evidence
-1. PASS: `pytest tests/ -q`: **38 passed, 0 failed, 0 skipped**, including all 20 original tests unchanged. Defaults: replay/fake. Additional tests cover locked weights, renamed PDFs, invalid inputs, fast-clear gating, invisible rendering rejection, provider mocks and no-network replay.
+1. PASS: `pytest tests/ -q`: **40 passed, 0 failed, 0 skipped**, including all 20 original tests unchanged. Defaults: replay/fake. Additional tests cover locked weights, renamed PDFs, invalid inputs, fast-clear gating, invisible rendering rejection, provider mocks and no-network replay.
 2. PASS: `scripts/smoke_demo.py` starts a background uvicorn on an ephemeral local port, waits ≤10 s, checks HTML, all four PDFs (96 genuine / 0 high_risk / 0 high_risk / 59 check), finite SSE completion, chat → 84 genuine and receipt; shuts down in finally. Exit 0.
 3. PASS: frontend in app/static retains mock-up CSS/layout and uses API upload, signal/tier SSE playback, chat/diff and decisions/receipts. JavaScript syntax check exit 0. mockups unchanged. No visual-browser QA claimed (scripted replacement requested).
 4. PASS: fake, anthropic and openai_compatible implemented in app/llm.py; .env selection. `scripts/llm_smoke.py` fake pass; both real adapters tested with mocked transports. Real providers **not verified live**, no keys provided or used.
@@ -49,7 +54,7 @@ Format: `YYYY-MM-DD HH:MM · M# · done / decided / blocked: ...`
 
 ## Handover
 ### What works
-All four supplied PDFs produce the expected bands offline. Prior payment fields are recovered from the actual PDF revision, not filenames. Hidden instructions are excluded before llm.extract; invisible Tr=3/7 inputs are rejected. Locked signals cannot be softened. New-business context moves 59 → 84. Real API frontend, finite SSE playback, SQLite receipts and local SHA-256 verification work. All 38 tests and two smoke scripts pass.
+All four supplied PDFs produce the expected bands offline. Prior payment fields are recovered from the actual PDF revision, not filenames. Hidden instructions are excluded before llm.extract; invisible Tr=3/7 inputs are rejected. Locked signals cannot be softened. New-business context moves 59 → 84. Real API frontend, finite SSE playback, SQLite receipts and local SHA-256 verification work. All 40 tests and two smoke scripts pass.
 
 ### Stubbed / deliberately limited
 CoP, supplier history and warning register are mocked. Fixture ABN/domain/web evidence is seeded. P1/P2 checks not implemented return unknown with reasons: C5, C6, C9, C12, C16, C17, C22, C24, C25, C27, C28, C29, C32, C33, C34, C36, C37, C38, C40, C41. P1 C7 amount anomalies and C11 BSB format/seed-directory checks are implemented; full BSB bank-name matching remains unavailable. C35 seeded web evidence is implemented because new-business chat needs it; unsupported live search counts stay unknown. No payment, report, reminder or bank integration occurs. Fake extraction does not populate line items. Chat explanatory reply is a deterministic statement of the applied diff, not unconstrained generated advice.
@@ -58,7 +63,7 @@ CoP, supplier history and warning register are mocked. Fixture ABN/domain/web ev
 Heuristic PDF inspection is not full OCR/render validation; complex transparency, forms and unsupported revisions require manual review. GST assumes 10% taxable subtotal. Replay fixture age uses 16 Nov 2026. Coverage is intentionally partial and displayed; a green band is not proof of safety. SSE plays the synchronous API's completed evidence, not a live background job. Results are in memory; receipts persist in ignored SQLite. No authentication, public hosting, retention UI, or production hardening. Use fictional invoices and localhost only. User's latest branch-publication direction supersedes the earlier local-only clause. Milestone commits M1–M5 were combined to obey the stronger no-red-commit rule; intermediate failing progress was logged, assertions not weakened.
 
 ### Not verified
-Anthropic/OpenAI-compatible live calls (no key); live ABN/crt.sh/Wayback/DNS/Tavily reachability and correctness; Windows installation/runtime; visual browser interaction/accessibility; whether invented ABNs/domains remain unassigned; performance under concurrent load. Provider mocks are not live-provider evidence. No claim that public hosting exists.
+Anthropic/OpenAI-compatible live calls (no key); live ABN/crt.sh/Wayback/DNS/Tavily reachability and correctness; Windows installation/runtime; visual browser interaction/accessibility; domain ownership; future assignment of currently absent seeded ABNs; performance under concurrent load. Provider mocks are not live-provider evidence. No claim that public hosting exists.
 
 ### Exact demo commands (PowerShell, repository root)
 ```powershell

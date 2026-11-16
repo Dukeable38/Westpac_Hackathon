@@ -55,7 +55,7 @@
         {
           "supplier_id": "sup_corella",
           "name": "Corella Machinery Servicing",
-          "abn": "80310379062",
+          "abn": "93270000491",
           "known_domain": "corellamachinery.com.au",
           "known_phone": "07 5550 7745",
           "accounts": [{ "type": "BSB", "bsb": "013-560", "account_number": "40917722", "account_name": "Corella Machinery Servicing" }],
@@ -83,7 +83,7 @@
     "69324432211": { "status": "Active", "entity_name": "KESTREL FUEL & LUBRICANTS PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2011-02-14", "business_names": ["Kestrel Fuel"], "state": "QLD", "postcode": "4209" },
     "28050119154": { "status": "Active", "entity_name": "SALTBUSH STONE PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2018-05-09", "business_names": ["Saltbush Stone & Pavers"], "state": "QLD", "postcode": "4214" },
     "39894924677": { "status": "Active", "entity_name": "HARBOURLINE NURSERY PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2006-10-02", "business_names": ["Harbourline Plant Nursery"], "state": "QLD", "postcode": "4218" },
-    "80310379062": { "status": "Active", "entity_name": "CORELLA, DANIEL", "entity_type": "Individual/Sole Trader", "gst_registered": true, "abn_from": "2019-08-27", "business_names": ["Corella Machinery Servicing"], "state": "QLD", "postcode": "4210" },
+    "93270000491": { "status": "Active", "entity_name": "CORELLA, DANIEL", "entity_type": "Individual/Sole Trader", "gst_registered": true, "abn_from": "2019-08-27", "business_names": ["Corella Machinery Servicing"], "state": "QLD", "postcode": "4210" },
     "38553897501": { "status": "Active", "entity_name": "WATTLE STREET ACCOUNTING PTY LTD", "entity_type": "Australian Private Company", "gst_registered": true, "abn_from": "2012-01-30", "business_names": [], "state": "QLD", "postcode": "4217" }
   },
 

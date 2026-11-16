@@ -9,7 +9,9 @@ def connect():
     db.execute('CREATE TABLE IF NOT EXISTS receipts (id TEXT PRIMARY KEY, data TEXT NOT NULL)')
     db.execute('CREATE TABLE IF NOT EXISTS customers (id TEXT PRIMARY KEY, data TEXT NOT NULL)')
     for customer in SEED['customers']:
-        db.execute('INSERT OR IGNORE INTO customers VALUES (?,?)',(customer['id'],json.dumps(customer)))
+        # Seed corrections must replace stale demo profiles after an upgrade.
+        # This updates only seeded customer rows, never decision receipts.
+        db.execute('INSERT INTO customers VALUES (?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data',(customer['id'],json.dumps(customer)))
     db.commit()
     return db
 

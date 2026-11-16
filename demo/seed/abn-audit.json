@@ -1,0 +1,51 @@
+{
+  "checked_at": "2026-11-16T14:20:48.483828+00:00",
+  "scope": "All checksum-valid ABNs in demo/seed/seed.json; absence is point-in-time, not a permanent reservation.",
+  "replaced_collision": {
+    "old_abn": "80310379062",
+    "new_abn": "93270000491",
+    "reason": "Old value resolves to a real cancelled sole-trader record; no real person is associated with our fictional business."
+  },
+  "records": [
+    {
+      "abn": "74284432214",
+      "url": "https://abr.business.gov.au/ABN/View?abn=74284432214",
+      "result": "ABN not found: no record matching this ABN"
+    },
+    {
+      "abn": "88015795425",
+      "url": "https://abr.business.gov.au/ABN/View?abn=88015795425",
+      "result": "ABN not found: no record matching this ABN"
+    },
+    {
+      "abn": "91637987769",
+      "url": "https://abr.business.gov.au/ABN/View?abn=91637987769",
+      "result": "ABN not found: no record matching this ABN"
+    },
+    {
+      "abn": "69324432211",
+      "url": "https://abr.business.gov.au/ABN/View?abn=69324432211",
+      "result": "ABN not found: no record matching this ABN"
+    },
+    {
+      "abn": "28050119154",
+      "url": "https://abr.business.gov.au/ABN/View?abn=28050119154",
+      "result": "ABN not found: no record matching this ABN"
+    },
+    {
+      "abn": "39894924677",
+      "url": "https://abr.business.gov.au/ABN/View?abn=39894924677",
+      "result": "ABN not found: no record matching this ABN"
+    },
+    {
+      "abn": "93270000491",
+      "url": "https://abr.business.gov.au/ABN/View?abn=93270000491",
+      "result": "ABN not found: no record matching this ABN"
+    },
+    {
+      "abn": "38553897501",
+      "url": "https://abr.business.gov.au/ABN/View?abn=38553897501",
+      "result": "ABN not found: no record matching this ABN"
+    }
+  ]
+}
