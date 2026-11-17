@@ -47,3 +47,24 @@ def test_invalid_choice_rejected(monkeypatch):
     monkeypatch.setenv('DEMO_MODE','live');monkeypatch.setenv('LLM_PROVIDER','anthropic')
     monkeypatch.setattr(llm,'_complete',lambda prompt:'{"choice":"MAKE_SAFE"}')
     with pytest.raises(ValueError):llm.classify('Claim?',['NONE'],'untrusted')
+
+def test_openai_compatible_backs_off_on_429_and_honours_retry_after(monkeypatch):
+    monkeypatch.setenv('DEMO_MODE','live');monkeypatch.setenv('LLM_PROVIDER','openai_compatible')
+    monkeypatch.setenv('LLM_BASE_URL','https://provider.example/v1');monkeypatch.setenv('LLM_MODEL','test-backoff')
+    monkeypatch.setenv('LLM_API_KEY','mock-test-only');monkeypatch.setenv('LLM_TIMEOUT','45')
+    sleeps=[];timeouts=[]
+    monkeypatch.setattr(llm.time,'sleep',sleeps.append)
+    statuses=iter([429,429,503,200])
+    class Response:
+        def __init__(self,code):self.status_code=code;self.headers={'retry-after':'7'} if code==429 and not sleeps else {}
+        def raise_for_status(self):pass
+        def json(self):return {'choices':[{'message':{'content':'{"choice":"NONE"}'}}]}
+    class Client:
+        def __init__(self,**kw):timeouts.append(kw.get('timeout'))
+        def __enter__(self):return self
+        def __exit__(self,*args):pass
+        def post(self,url,**kw):return Response(next(statuses))
+    monkeypatch.setattr(llm.httpx,'Client',Client)
+    assert llm.classify('Backoff?',['NEW_BUSINESS','NONE'],'plain text')=='NONE'
+    assert timeouts==[45.0]
+    assert sleeps==[7.0,4.0,8.0]
