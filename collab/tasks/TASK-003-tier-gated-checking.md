@@ -1,6 +1,6 @@
 # TASK-003 · Tier-gated checking with hard-stop short-circuit
 
-- **Status:** ready
+- **Status:** in-review
 - **Assignee:** Paul's agent
 - **Branch:** `task/TASK-003-tier-gated-checking`
 
@@ -34,5 +34,14 @@ Today `GET /api/check/{id}/events` replays a check that has already finished. If
 ## Log
 - 2026-11-17 · drafted by Kiel's side; not ready until the strategy is confirmed.
 - 2026-11-17 · rewritten and set ready by TASK-004 Part A2; decision: tier-gated, cost-aware whole-tier gates with evidence-only follow-up after hard stops.
+- 2026-11-17 · claimed by Paul's Codex agent; implementing deterministic gates test-first on the prescribed branch.
+- 2026-11-17 · implementation complete; hard-stop chat regression fixed and full suite/smoke verified on Windows. Ready for review.
+- 2026-11-17 · scope note: touched `app/models.py` to represent signal disposition and `app/chat.py` so chat cannot append Tier 3 to a locked hard stop; both are required by this task's acceptance rules.
 
 ## Handback
+- Implemented deterministic whole-tier gates in `policy.py` and bounded evaluation through the current tier.
+- 01 runs T0/T1 then `fast_clear`; 02 and 03 stop after T0 `hard_stop`; 04 runs through T2 then `budget_exhausted`.
+- Hard stops run only C17/C39 as `evidence`; later decision checks are `skipped`. Chat cannot reopen a locked hard stop.
+- Results expose `stopped_at`, `gate`, `tier_gates`, confidence, and per-signal `disposition`; SSE adds `tier_gate` and evidence lifecycle events.
+- Updated two older acceptance assertions that previously required T1/T2 checks after a T0 hard stop; risk levels, scores and locked evidence remain unchanged.
+- Verify with `.\.venv\Scripts\python.exe -m pytest tests\ -q` and `.\.venv\Scripts\python.exe scripts\smoke_demo.py`.

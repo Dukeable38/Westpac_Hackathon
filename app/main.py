@@ -2,9 +2,9 @@ import copy,hashlib,uuid,json,os,asyncio,tempfile
 from fastapi import FastAPI,File,Form,UploadFile,HTTPException
 from .pdf_forensics import analyse
 from .extract import extract_invoice
-from .checks.run import evaluate
+from .checks.run import evaluate,evidence_followup
 from .score import calculate,confidence,risk_level
-from .policy import plan
+from .policy import decide_gate
 from .chat import respond
 from pydantic import BaseModel,Field
 from typing import Literal
@@ -36,19 +36,24 @@ async def check(file:UploadFile=File(...),customer_id:str=Form('cust_greenline')
         invoice=extract_invoice(forensic['text'])
     except Exception as exc:
         raise HTTPException(422,'Unable to read this PDF safely: '+str(exc)[:200]) from exc
-    signals,sup=evaluate(invoice,forensic,customer_id)
-    score,band,coverage=calculate(signals)
-    tiers,reason=plan(invoice,signals,sup,score,coverage)
-    for s in signals:
-        if s['tier'] not in tiers:
-            s.update(state='unknown',evidence='Not needed: fast clear' if tiers==[0,1] else 'Not checked within this screening',weight=0,applicable=False)
-    score,band,coverage=calculate(signals)
+    tiers=[];tier_gates=[];signals=sup=None
+    for tier in range(4):
+        signals,sup=evaluate(invoice,forensic,customer_id,max_tier=tier)
+        tiers.append(tier)
+        score,band,coverage=calculate(signals)
+        confidence_value,confidence_label=confidence(signals)
+        gate,reason=decide_gate(tier,invoice,signals,sup,score,confidence_value)
+        tier_gates.append({'tier':tier,'decision':gate,'reason':reason})
+        if gate!='escalate':break
+    stopped_at=tiers[-1]
+    if gate=='hard_stop':
+        evidence_followup(signals,forensic)
+        confidence_value,confidence_label=confidence(signals)
     level=risk_level(score,signals)
-    confidence_value,confidence_label=confidence(signals)
     advice='Call the supplier on a number you already know before paying.' if band=='high_risk' else 'Confirm the supplier and payment details independently before paying.' if band=='check' else 'No major warning signs found. Check the details before choosing whether to pay.'
     if band=='high_risk' and sup: advice=f"Do not pay yet. Call {sup['known_phone']} (the number on your earlier invoices)."
     if level=='low' and confidence_label=='low': advice='No major warning signs in the checks completed, but important checks were unavailable. Verify the details independently.'
-    result=dict(check_id=uuid.uuid4().hex,file_name=file.filename,sha256=hashlib.sha256(data).hexdigest(),extracted=invoice.model_dump(),signals=signals,score=score,band=band,level=level,coverage=coverage,confidence=confidence_value,confidence_label=confidence_label,tiers_run=tiers,advice=advice,escalation_reason=reason,customer_id=customer_id)
+    result=dict(check_id=uuid.uuid4().hex,file_name=file.filename,sha256=hashlib.sha256(data).hexdigest(),extracted=invoice.model_dump(),signals=signals,score=score,band=band,level=level,coverage=coverage,confidence=confidence_value,confidence_label=confidence_label,tiers_run=tiers,stopped_at=stopped_at,gate=gate,tier_gates=tier_gates,advice=advice,escalation_reason=reason,customer_id=customer_id)
     RESULTS[result['check_id']]=result
     return copy.deepcopy(result)
 
@@ -88,8 +93,16 @@ def events(check_id:str):
                     yield event('signal',signal)
             if delay: await asyncio.sleep(delay)
             yield event('tier_end',{'tier':tier})
+            gate=next(item for item in snapshot['tier_gates'] if item['tier']==tier)
+            yield event('tier_gate',gate)
         if 2 not in snapshot['tiers_run']:
-            yield event('tier_skipped',{'tier':2,'reason':'Not needed: fast clear'})
+            reason='Not needed: fast clear' if snapshot['gate']=='fast_clear' else 'Not run after '+snapshot['gate'].replace('_',' ')
+            yield event('tier_skipped',{'tier':2,'reason':reason})
+        evidence=[signal for signal in snapshot['signals'] if signal.get('disposition')=='evidence']
+        if evidence:
+            yield event('evidence_start',{'checks':[signal['id'] for signal in evidence]})
+            for signal in evidence:yield event('signal',signal)
+            yield event('evidence_end',{'checks':[signal['id'] for signal in evidence]})
         yield event('complete',snapshot)
     return StreamingResponse(stream(),media_type='text/event-stream',headers={'Cache-Control':'no-cache','X-Accel-Buffering':'no'})
 

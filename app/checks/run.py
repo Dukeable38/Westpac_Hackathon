@@ -10,11 +10,16 @@ from ..score import CONFIG
 from ..sources.research import abn_lookup,dns_posture,domain_history,web_search
 CATALOGUE=json.loads(Path(__file__).with_name('catalogue.json').read_text())
 
-def evaluate(invoice, forensic, customer_id):
+def evaluate(invoice, forensic, customer_id, max_tier=3):
     signals={cid:Signal(id=cid,**meta).model_dump() for cid,meta in CATALOGUE.items()}
-    def set_(cid,state,evidence,locked=False,weight=None,applicable=True):
+    for signal in signals.values():
+        if signal['tier']>max_tier:
+            signal.update(applicable=False,disposition='skipped',evidence='Not run: awaiting tier gate')
+    def set_(cid,state,evidence,locked=False,weight=None,applicable=True,disposition=None):
+        if signals[cid]['tier']>max_tier:return
         weight=CONFIG.get('reassuring',{}).get(cid,0) if state=='reassuring' else CONFIG['weights'].get(cid,1) if weight is None else weight
-        signals[cid].update(state=state,evidence=evidence,locked=locked,weight=weight,applicable=applicable)
+        disposition=disposition or ('not_applicable' if not applicable else 'unavailable' if state=='unknown' else 'checked')
+        signals[cid].update(state=state,evidence=evidence,locked=locked,weight=weight,applicable=applicable,disposition=disposition)
     p=invoice.payment_methods[0] if invoice.payment_methods else None
     sup=supplier(customer_id,invoice.abn)
     customer=next((c for c in SEED['customers'] if c['id']==customer_id),{})
@@ -73,7 +78,7 @@ def evaluate(invoice, forensic, customer_id):
     set_('C44',chronology_state,chronology_evidence)
     observation=SEED.get('payee_observations',{}).get(key)
     set_('C47','risk' if observation else 'neutral',observation['note'] if observation else 'No cross-customer payee reuse found in fictional bank observations',bool(observation))
-    reg=abn_lookup(invoice.abn)
+    reg=abn_lookup(invoice.abn) if max_tier>=1 else None
     if reg:
         norm=lambda s: re.sub(r'[^a-z]','',s.lower()).replace('ptyltd','').replace('co','')
         names=[reg['entity_name']]+reg.get('business_names',[])
@@ -110,13 +115,13 @@ def evaluate(invoice, forensic, customer_id):
     mismatch=bool(invoice.website and domain and domain!=invoice.website)
     free=domain in ['gmail.com','outlook.com','hotmail.com','yahoo.com']
     set_('C26','risk' if mismatch or free else 'neutral','Email differs from website or uses a free-mail provider' if mismatch or free else 'Email and website contact fields consistent')
-    if domain and not free:
+    if max_tier>=2 and domain and not free:
         posture=dns_posture(domain)
         if posture:
             weak=not posture.get('mx') or not posture.get('spf') or not posture.get('dmarc')
             set_('C33','risk' if weak else 'neutral','Email domain lacks MX, SPF or DMARC in seeded/DNS evidence' if weak else 'Email domain has MX, SPF and DMARC evidence',weight=.2)
         else:set_('C33','unknown','Email DNS evidence unavailable')
-    else:set_('C33','unknown','Not applicable: no business email domain to assess',applicable=False)
+    elif max_tier>=2:set_('C33','unknown','Not applicable: no business email domain to assess',applicable=False)
     if sup and domain:
         domain_changed=domain!=sup['known_domain']
         set_('C50','risk' if domain_changed else 'neutral',f"Invoice email domain {domain} differs from known {sup['known_domain']}" if domain_changed else 'Invoice email domain matches supplier history')
@@ -124,8 +129,7 @@ def evaluate(invoice, forensic, customer_id):
     currency=foreign_currency(forensic.get('text',''))
     domestic=bool(reg and reg.get('state'))
     set_('C51','risk' if currency and domestic else 'neutral',f'Foreign currency {currency} conflicts with domestic supplier evidence' if currency and domestic else 'No foreign-currency mismatch found')
-    fast_clear=bool(sup and unchanged and sup['payments']['count']>=2 and cop and cop['result']=='MATCH' and invoice.total<=3*sup['payments']['median_amount'] and not any(signals[c]['state']=='risk' for c in ['C13','C14','C15']) and signals['C21']['state']=='reassuring' and not any(v['tier']==1 and v['state']=='risk' and v['weight']>.4 for v in signals.values()))
-    if not fast_clear:
+    if max_tier>=2:
         lookalike=bool(sup and domain!=sup['known_domain'] and SequenceMatcher(None,domain,sup['known_domain']).ratio()>.8)
         set_('C30','risk' if lookalike else 'neutral',f"Email domain {domain} resembles known {sup['known_domain']}" if lookalike else 'No known-supplier lookalike detected',lookalike)
         dom=domain_history(domain)
@@ -139,3 +143,15 @@ def evaluate(invoice, forensic, customer_id):
         b,a=forensic['original'];set_('C39','risk',f'Original bank details recovered from prior revision: {b} / {a}',True)
     else: set_('C39','neutral','No earlier differing payment details recovered')
     return list(signals.values()),sup
+
+
+def evidence_followup(signals,forensic):
+    """Attach explanation evidence after a locked hard stop without running decision tiers."""
+    by={signal['id']:signal for signal in signals}
+    by['C17'].update(state='neutral',evidence='Structured invoice extraction completed and passed schema validation',weight=0,applicable=True,disposition='evidence')
+    if forensic.get('original'):
+        b,a=forensic['original']
+        by['C39'].update(state='risk',evidence=f'Original bank details recovered from prior revision: {b} / {a}',weight=CONFIG['weights']['C39'],locked=True,applicable=True,disposition='evidence')
+    else:
+        by['C39'].update(state='neutral',evidence='No earlier differing payment details recovered',weight=0,applicable=True,disposition='evidence')
+    return signals

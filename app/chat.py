@@ -20,7 +20,7 @@ def respond(result,message):
     if claim=='SUPPLIER_CHANGED_BANKS':
         sup=supplier(result['customer_id'],result['extracted']['abn'])
         result['advice']=f"Do not pay yet. Call {sup['known_phone']} (the number on your earlier invoices)." if sup else 'Call the supplier on a number you already had, not one on this invoice.'
-        if 3 not in result['tiers_run']:result['tiers_run'].append(3)
+        if result.get('gate')!='hard_stop' and 3 not in result['tiers_run']:result['tiers_run'].append(3)
     elif changed:
         result['advice']='Your context explains some soft signals. Confirm the bank details independently before paying.'
     reply=('Your answer softened '+', '.join(changed)+'. Locked findings were not changed.' if changed else 'Your answer does not remove the warning signs. Locked findings cannot be softened by chat.')

@@ -72,8 +72,8 @@ def test_02_changed_bank_high_risk(check):
     for cid in ("C13", "C15"):                      # edited after creation / overlay on bank details
         s = sig(r, cid)
         assert s["state"] == "risk" and s["locked"], cid
-    assert sig(r, "C19")["state"] == "risk"         # "our banking details have changed"
-    assert sig(r, "C30")["state"] == "risk"         # tallowoodmulch.com.au lookalike
+    for cid in ("C19", "C30"):
+        assert sig(r, cid)["disposition"] == "skipped"  # Tier 0 hard stop prevents later decision work
 
 
 def test_02_recovers_original_bank_details(check):
@@ -103,8 +103,10 @@ def test_03_sloppy_fake(check):
     r = check(F3)
     assert r["band"] == "high_risk"
     assert r["score"] <= 15
-    for cid in ("C2", "C8", "C10", "C18", "C20"):
+    for cid in ("C2", "C8", "C10"):
         assert sig(r, cid)["state"] == "risk", cid
+    for cid in ("C18", "C20"):
+        assert sig(r, cid)["disposition"] == "skipped", cid
     s14 = sig(r, "C14")
     assert s14["state"] == "risk" and s14["locked"]
 
