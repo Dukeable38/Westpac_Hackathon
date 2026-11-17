@@ -12,6 +12,8 @@ Newest first. These override older docs where they conflict. Each line: date · 
 - **2026-11-17 · High and Critical steer to "Report this invoice"** as the primary action. No promise that "Westpac will call you".
 - **2026-11-17 · Confirmation of Payee is not our feature.** Westpac Verify already does it. Show its result as the bank's existing check; Radar adds the invoice evidence on top.
 
+- **2026-11-17 · UI target is `mockups/radar/index.html`** (pending Kiel's sign-off). The old `mockups/index.html` is kept only as history.
+
 ## AI
 - **2026-11-17 · LLM access via OpenRouter**, through the existing `openai_compatible` provider (`LLM_BASE_URL=https://openrouter.ai/api/v1`). Model choice is open: Delvin + Paul decide using the TASK-002 eval and TASK-004 research.
 

@@ -12,14 +12,10 @@
 Source: "Branding Kit Lauren VIP" (Canva, comment access). This file transcribes it so code and AI agents can use it. The Canva page is the master; update this file if it changes.
 
 ## Name
-- **Verified Invoice Protection (VIP)**
-- Usage: "VIP Score: 94/100", "Run a VIP Check", "Protected by VIP"
+- **Radar**. Usage: "Radar check", "Radar score 94/100", "Checked by Radar". Never "verified", "protected" or "safe".
 - Subtitle on title cards: "2026 Westpac Hackathon · QUT Dean's Scholars"
-
-## Logo
-- Stacked wordmark: VERIFIED / INVOICE / PROTECTION, first letters (V, I, P) in purple, rest in navy, Anton.
-- Mark: Westpac-style "W" shape in purple gradient + "VIP" in navy, Anton.
 - Title cards show the Westpac logo top-left on white, then a red (#DA1710) banner with white Anton title.
+- In the app UI (`mockups/radar/index.html`), Radar elements use navy + the logo's red ping; Westpac's own controls keep Westpac red/maroon.
 
 ## Colours
 | Role | Hex |

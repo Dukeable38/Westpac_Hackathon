@@ -1,7 +1,7 @@
 # Collaboration protocol (humans + AI agents)
 
 This folder is how the team and our AI agents hand work to each other through git.
-**Any agent starting work on this repo reads this file first, then `DECISIONS.md`, then its task file.**
+**Any agent starting work on this repo reads this file first, then `STATUS.md` and `DECISIONS.md`, then its task file.**
 
 ## Files
 | Path | What it is | Who writes it |
@@ -9,6 +9,7 @@ This folder is how the team and our AI agents hand work to each other through gi
 | `collab/README.md` | This protocol | Kiel (or his agent) only |
 | `collab/DECISIONS.md` | Agreed product and design decisions. **Overrides** older docs (`AGENTS.md`, `docs/build-plan.md`, `mockups/index.html`) where they conflict | Kiel (or his agent) only |
 | `collab/tasks/TASK-NNN-slug.md` | One task each: goal, scope, acceptance, status | Created by Kiel's side; the assignee updates **Status** and **Log** only |
+| `collab/STATUS.md` | Where things stand right now: working, in flight, next | Kiel's side, updated each session |
 | `PROGRESS.md` | Running build log (existing) | Anyone, append-only |
 
 ## Task lifecycle
