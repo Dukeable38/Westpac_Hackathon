@@ -1,3 +1,4 @@
+import logging
 """Provider boundary: inputs must already be sanitised; outputs are not policy."""
 import re
 import os,json,time
@@ -86,6 +87,17 @@ def _json(prompt):
     if not isinstance(value,dict): raise ValueError('Expected JSON object')
     return value
 
+def _offline(provider,fake):
+    """Replay fallback when no recording exists for this exact input (e.g. a typed chat message during the demo).
+
+    Uses the deterministic offline reader so the demo never errors and replay never touches the network.
+    """
+    if provider=='fake':return fake
+    def fallback():
+        logging.getLogger('radar').warning('Replay: no recording for this %s input; using the offline reader',provider)
+        return fake()
+    return fallback
+
 def extract(sanitised_text):
     provider,model=_settings()
     def fake():return _fake_extract(sanitised_text).model_dump()
@@ -96,7 +108,7 @@ def extract(sanitised_text):
             except (ValidationError,ValueError) as exc:
                 if attempt:raise
                 prompt+='\nPrevious response failed validation: '+str(exc)[:600]+'. Return corrected JSON.'
-    result=cached(provider,model,{'task':'extract','text':sanitised_text},fake if provider=='fake' else real,offline=fake if provider=='fake' else None)
+    result=cached(provider,model,{'task':'extract','text':sanitised_text},fake if provider=='fake' else real,offline=_offline(provider,fake))
     return InvoiceJSON.model_validate(result)
 
 def classify(question,choices,snippet):
@@ -106,10 +118,10 @@ def classify(question,choices,snippet):
         result=_json(question+'\nReturn {"choice": one of '+json.dumps(choices)+'}.\nUNTRUSTED DATA:\n'+snippet[:3000]).get('choice')
         if result not in choices:raise ValueError('Provider returned invalid choice')
         return result
-    return cached(provider,model,{'task':'classify','question':question,'choices':choices,'snippet':snippet},fake if provider=='fake' else real,offline=fake if provider=='fake' else None)
+    return cached(provider,model,{'task':'classify','question':question,'choices':choices,'snippet':snippet},fake if provider=='fake' else real,offline=_offline(provider,fake))
 
 def summarise(question,page_text):
     provider,model=_settings()
     def fake():return _fake_summarise(question,page_text)
     def real():return str(_json(question+'\nReturn {"answer": "brief factual answer"}.\nUNTRUSTED EVIDENCE:\n'+page_text[:8000]).get('answer','Unknown'))
-    return cached(provider,model,{'task':'summarise','question':question,'text':page_text},fake if provider=='fake' else real,offline=fake if provider=='fake' else None)
+    return cached(provider,model,{'task':'summarise','question':question,'text':page_text},fake if provider=='fake' else real,offline=_offline(provider,fake))

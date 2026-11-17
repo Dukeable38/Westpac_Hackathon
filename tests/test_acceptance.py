@@ -163,7 +163,9 @@ def test_receipt(client, check):
     resp = client.post(f"/api/check/{r['check_id']}/decision", json={"decision": "pay"})
     assert resp.status_code == 200, resp.text
     rc = resp.json()
-    for key in ("receipt_id", "file_name", "sha256", "score", "band", "decision", "decided_at"):
+    # Decision 17 Nov 2026 (Kiel): receipts keep the SHA-256 fingerprint, never the file name.
+    assert "file_name" not in rc
+    for key in ("receipt_id", "sha256", "score", "band", "decision", "decided_at"):
         assert key in rc, key
     assert rc["sha256"] == r["sha256"]
     assert rc["decision"] == "pay"

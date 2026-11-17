@@ -1,0 +1,58 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Tallowwood INV-2041 (statement copy)</title>
+<style>:root{--brand:#3c6e2f}
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; background: transparent; }
+body { font: 10pt/1.45 Arial, Helvetica, sans-serif; color: #222; }
+.page { width: 210mm; height: 297mm; padding: 18mm 18mm 14mm; position: relative; }
+.hdr { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid var(--brand); padding-bottom: 10px; }
+.logo { display: flex; gap: 12px; align-items: center; }
+.mark { width: 46px; height: 46px; border-radius: 10px; background: var(--brand); color: #fff; font: 700 20px Arial; display: grid; place-items: center; }
+.co { font: 700 17pt Arial; color: var(--brand); }
+.co small { display: block; font: 400 9pt Arial; color: #555; }
+.from { text-align: right; font-size: 9pt; color: #444; }
+h1 { font: 700 22pt Arial; margin: 18px 0 2px; letter-spacing: .04em; color: #333; }
+.meta { display: flex; justify-content: space-between; margin: 10px 0 18px; }
+.meta table td { padding: 1px 10px 1px 0; font-size: 9.5pt; }
+.meta table td:first-child { color: #666; }
+.billto b { display: block; font-size: 8pt; text-transform: uppercase; letter-spacing: .1em; color: #777; }
+table.items { width: 100%; border-collapse: collapse; margin-top: 6px; }
+table.items th { text-align: left; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .06em; color: #fff; background: var(--brand); padding: 6px 8px; }
+table.items td { padding: 7px 8px; border-bottom: 1px solid #ddd; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.totals { margin-left: auto; width: 260px; margin-top: 10px; }
+.totals td { padding: 4px 8px; }
+.totals tr.grand td { font-weight: 700; font-size: 12pt; border-top: 2px solid #333; }
+.pay { margin-top: 22px; border: 1px solid #ccc; border-radius: 6px; padding: 12px 14px; width: 330px; background: #fff; }
+.pay h3 { margin: 0 0 6px; font-size: 10pt; text-transform: uppercase; letter-spacing: .08em; color: var(--brand); }
+.pay td { padding: 2px 12px 2px 0; font-size: 10pt; }
+.pay td:first-child { color: #666; }
+.note { margin-top: 14px; min-height: 64px; width: 330px; font-size: 9.5pt; }
+.foot { position: absolute; bottom: 14mm; left: 18mm; right: 18mm; font-size: 8.5pt; color: #777; border-top: 1px solid #ddd; padding-top: 6px; }
+/* overlay mode: keep layout, show only the forged blocks */
+.overlay .page * { visibility: hidden; }
+.overlay .forge, .overlay .forge * { visibility: visible; }
+.overlay .forge { background: #fff; }
+</style></head>
+<body class=""><div class="page">
+  <div class="hdr">
+    <div class="logo"><div class="mark">TW</div>
+      <div class="co">Tallowwood Mulch &amp; Soil Co.<small>ABN 74 284 432 214</small></div></div>
+    <div class="from">42 Ironbark Road, Nerang QLD 4211<br>07 5550 2184<br>accounts@tallowwoodmulch.com.au<br>tallowwoodmulch.com.au</div>
+  </div>
+  <h1>TAX INVOICE</h1>
+  <div class="meta">
+    <div class="billto"><b>Bill to</b>Greenline Landscaping Pty Ltd<br>Attn: Mia Tran<br>7 Banksia Place<br>Burleigh Heads QLD 4220</div>
+    <table><tr><td>Invoice no.</td><td>INV-2041</td></tr><tr><td>Date</td><td>10 Nov 2026</td></tr><tr><td>Due</td><td>24 Nov 2026</td></tr><tr><td>Account</td><td>GREEN-014</td></tr></table>
+  </div>
+  <table class="items"><tr><th>Description</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Amount</th></tr><tr><td>Premium hardwood mulch (m³)</td><td class='num'>50</td><td class='num'>$52.00</td><td class='num'>$2,600.00</td></tr><tr><td>Organic garden soil blend (m³)</td><td class='num'>10</td><td class='num'>$68.00</td><td class='num'>$680.00</td></tr><tr><td>Delivery, Burleigh Heads (per load)</td><td class='num'>2</td><td class='num'>$65.00</td><td class='num'>$130.00</td></tr></table>
+  <table class="totals">
+    <tr><td>Subtotal</td><td class="num">$3,410.00</td></tr>
+    <tr><td>GST (10%)</td><td class="num">$341.00</td></tr>
+    <tr class="grand"><td>Total due (AUD)</td><td class="num">$3,751.00</td></tr>
+  </table>
+  <div class="pay"><h3>Payment by EFT</h3><table><tr><td>Account name</td><td>Tallowwood Mulch &amp; Soil Co Pty Ltd</td></tr><tr><td>BSB</td><td>064-118</td></tr><tr><td>Account</td><td>1048 2291</td></tr><tr><td>Reference</td><td>INV-2041</td></tr></table></div>
+  <div class="note"><b>Statement reminder:</b> our records show $3,751.00 for INV-2041 and a payment of $3,179.00 received. <b>Balance outstanding: $572.00.</b> Please pay the balance within 7 days. Questions? Call 07 5550 2184.</div>
+  
+  <div class="foot">Tallowwood Mulch &amp; Soil Co. Pty Ltd · ABN 74 284 432 214 · Payment terms 14 days · Questions? Call 07 5550 2184</div>
+</div></body></html>

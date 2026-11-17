@@ -245,7 +245,7 @@ function renderResult(){
     med:`<button class="btn red big" data-topay>Pay this invoice</button><button class="btn ghost big" data-hold>Save for later</button><button class="btn link" data-go="report">Report this invoice</button>`,
     high:`<button class="btn red big" data-go="report">Report this invoice</button><button class="btn ghost big" data-hold>Don't pay it</button>`,
     crit:`<button class="btn red big" data-go="report">Report this invoice</button><button class="btn ghost big" data-hold>Don't pay it</button>`};
-  $('#actions').innerHTML=A[kk];
+  $('#actions').innerHTML=A[kk]+(kk==='low'?'':'<button class="btn link" data-payanyway style="font-size:12px;color:var(--muted)">Pay anyway</button>');
   const phone=String(r.advice||'').match(/(0\d[\d ]{7,11}\d)/);
   $('#callout').innerHTML=(kk==='high'||kk==='crit')?`<div class="callout">${ICON.phone}<div><b>Want to check with them? Call first</b><span>${phone?'Only on the number from your earlier invoices:<span class="num">'+esc(phone[1])+'</span>':'Use a number you already have, never one on this invoice.'}</span></div></div>`:'';
   const chatOn=chatLog.length>0||kk==='med'||kk==='high';
@@ -306,12 +306,63 @@ function downloadReceipt(){
   const a=document.createElement('a');a.href=url;a.download='radar-receipt-'+receipt.receipt_id+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
+
+// ---------- pay anyway: Radar warns, it never blocks ----------
+function openWarn(){
+  const r=current,L=LV[levelKey(r)],top=findings(r).filter(f=>f.ic!=='g').slice(0,3).map(f=>'<li>'+esc(titleOf(f.s))+'</li>').join('');
+  $('#warnBody').innerHTML=`<div class="verdict no" style="margin:0 0 12px;border-color:${L.hex};background:var(--${L.css}-t)">${ICON[L.icon].replace('<svg','<svg style="color:'+L.hex+'"')}<div><h3>Radar: ${L.name} risk</h3>${esc(L.title)}. Radar found:<ul style="margin:6px 0 0">${top}</ul></div></div>
+    <p style="font-size:13px;line-height:1.5;margin:0">If this invoice is a scam, the money may not be recoverable once it's sent. If you've confirmed the details with the supplier on a number you already had, you can still pay. Your Radar receipt will record that you chose to pay despite the warning.</p>`;
+  $('#warnModal').classList.add('on');
+}
+
+// ---------- payments list: Radar receipts and fingerprint comparison ----------
+let receiptRows=[],compareId=null;
+const LVHEX={low:'#1B7F4B',medium:'#F2A900',high:'#DA1811',critical:'#7A0C09'};
+const shortHash=h=>h?h.slice(0,10)+'…'+h.slice(-6):'—';
+const longDate=d=>new Date(d).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+async function renderReceipts(){
+  $('#rcList').innerHTML='<div class="emptyrow">Loading…</div>';
+  try{receiptRows=await api('/api/receipts?customer_id='+CUSTOMER);}catch(e){$('#rcList').innerHTML='<div class="emptyrow">'+esc(e.message)+'</div>';return;}
+  const rows=receiptRows.filter(r=>r.decision==='pay');
+  if(!rows.some(r=>r.receipt_id===compareId))compareId=rows.length?rows[0].receipt_id:null;
+  $('#rcList').innerHTML=rows.length?`<table class="rct"><tr><th>Date</th><th>Paid to</th><th>Invoice</th><th style="text-align:right">Amount</th><th>Radar check</th><th>Invoice fingerprint</th><th></th></tr>${rows.map(r=>`<tr class="${r.receipt_id===compareId?'sel':''}"><td>${esc(new Date(r.decided_at).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}))}</td><td>${esc(r.payee)}</td><td>${esc(r.invoice_number||'—')}</td><td style="text-align:right">${esc(money(r.amount))}</td><td><span class="lvdot" style="background:${LVHEX[r.level]||'#999'}"></span>${esc((LV[r.level]||{name:r.level}).name)} · ${esc(r.score)}</td><td class="fp">${esc(shortHash(r.sha256))}</td><td><span class="gbtn" data-compare="${esc(r.receipt_id)}">Compare an invoice</span></td></tr>`).join('')}</table>`
+    :'<div class="emptyrow">No payments checked by Radar yet. Pay an invoice with <b>Attach invoice</b> and it appears here.</div>';
+  renderCompare(null);
+}
+function renderCompare(res){
+  const r=receiptRows.find(x=>x.receipt_id===compareId);
+  if(!r){$('#rcCompare').innerHTML='';return;}
+  let verdict='';
+  if(res){
+    verdict=res.match
+      ?`<div class="verdict ok">${ICON.ok}<div><h3>Exact match</h3>This is the invoice Radar checked before you paid ${esc(money(r.amount))} to ${esc(r.payee)} on ${esc(longDate(r.decided_at))}.</div></div>`
+      :`<div class="verdict no">${ICON.alert}<div><h3>This is not the invoice you paid</h3>The file you dropped is different from the invoice Radar checked before you paid ${esc(money(r.amount))} to ${esc(r.payee)} on ${esc(longDate(r.decided_at))}. Even a one-character change gives a different fingerprint. Your receipt shows exactly which invoice you were sent and paid.</div></div>`;
+    verdict+=`<div class="fps"><span>On your receipt</span><code>${esc(res.receipt_sha256)}</code><span>Invoice you dropped</span><code class="${res.match?'':'diff'}">${esc(res.uploaded_sha256)}</code></div>
+      <div style="margin-top:12px;display:flex;gap:16px"><span class="gbtn" data-receiptdl="${esc(r.receipt_id)}">Save receipt as proof</span></div>`;
+  }
+  $('#rcCompare').innerHTML=`<div class="cmp"><div class="h">Compare an invoice with this payment</div><div class="b">
+    <p style="margin:0 0 10px;font-size:13px"><b>${esc(r.payee)}</b> · ${esc(r.invoice_number||'')} · ${esc(money(r.amount))}. Got a copy of this invoice that looks different, or a claim that you still owe more? Drop it here. It's only fingerprinted, never stored.</p>
+    <div class="drop" id="cmpDrop" role="button" tabindex="0"><h3 style="margin:0 0 4px">Drop the invoice you've been sent</h3><p style="margin:0">or click to choose a PDF</p></div>${verdict}</div></div>`;
+  const d=$('#cmpDrop');d.onclick=()=>pickFor('compare');
+  ['dragover','dragenter'].forEach(t=>d.addEventListener(t,e=>{e.preventDefault();e.stopPropagation();d.classList.add('over');}));
+  ['dragleave','drop'].forEach(t=>d.addEventListener(t,()=>d.classList.remove('over')));
+  d.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();compareFile(e.dataTransfer.files[0]);});
+}
+async function compareFile(file){
+  if(!file||!compareId)return;
+  const form=new FormData();form.append('file',file);
+  try{renderCompare(await api('/api/receipts/'+encodeURIComponent(compareId)+'/verify',{method:'POST',body:form}));}
+  catch(e){$('#rcCompare').insertAdjacentHTML('beforeend','<div class="errbox">'+esc(e.message)+'</div>');}
+}
+let pickMode='check';
+function pickFor(mode){pickMode=mode;$('#file').click();}
+
 // ---------- navigation ----------
-const URLS={overview:'overview',pay:'payments/make-a-payment',check:'payments/check-an-invoice',result:'payments/radar-result',report:'payments/radar-report',reported:'payments/radar-report/confirmation',paid:'payments/confirmation'};
+const URLS={receipts:'payments/payments-list',overview:'overview',pay:'payments/make-a-payment',check:'payments/check-an-invoice',result:'payments/radar-result',report:'payments/radar-report',reported:'payments/radar-report/confirmation',paid:'payments/confirmation'};
 function show(v){
   $('#modal').classList.remove('on');
   $$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));
-  $('#url').textContent='banking.westpac.com.au/secure/banking/'+(URLS[v]||v);
+  const u=$('#url');if(u)u.textContent='banking.westpac.com.au/secure/banking/'+(URLS[v]||v);
   $('#t-ov').classList.toggle('on',v==='overview');$('#t-pay').classList.toggle('on',v!=='overview');
   $$('.demo [data-start]').forEach(b=>b.classList.toggle('on',['pay','check','overview'].includes(v)&&b.dataset.start===(v==='overview'?'overview':ctx)));
   if(v==='pay')renderPay();
@@ -320,6 +371,7 @@ function show(v){
   if(v==='report')renderReport();
   if(v==='reported')renderReported();
   if(v==='paid')fill();
+  if(v==='receipts')renderReceipts();
   window.scrollTo(0,0);
 }
 function start(where){
@@ -329,16 +381,25 @@ function start(where){
 }
 function openModal(){fill();const L=LV[levelKey(current)];err('modal','');$('#mbar').innerHTML=`<span style="color:${L.hex}">✓</span> Radar check: ${L.name} risk · ${esc(L.title)}`;$('#modal').classList.add('on');}
 
-$('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';runCheck(f);};
-const pick=()=>{if(!checking)$('#file').click();};
+$('#file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(pickMode==='compare'){pickMode='check';compareFile(f);}else runCheck(f);};
+const pick=()=>{if(!checking){pickMode='check';$('#file').click();}};
 const drop=$('#checkDrop');
 drop.onclick=pick;drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}};
 ['dragover','dragenter'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over');}));
 ['dragleave','drop'].forEach(t=>drop.addEventListener(t,()=>drop.classList.remove('over')));
 drop.addEventListener('drop',e=>{e.preventDefault();if(!checking)runCheck(e.dataTransfer.files[0]);});
+// Drag an invoice anywhere onto Make a payment to attach it.
+let dragDepth=0;
+const onPay=()=>$('#v-pay').classList.contains('on')&&!checking;
+window.addEventListener('dragenter',e=>{if(!onPay())return;e.preventDefault();dragDepth++;$('#payDrop').classList.add('on');});
+window.addEventListener('dragover',e=>{if(onPay())e.preventDefault();});
+window.addEventListener('dragleave',()=>{if(--dragDepth<=0){dragDepth=0;$('#payDrop').classList.remove('on');}});
+window.addEventListener('drop',e=>{dragDepth=0;$('#payDrop').classList.remove('on');if(!onPay())return;e.preventDefault();const f=e.dataTransfer.files[0];if(f){gen++;current=null;runCheck(f);}});
+if(new URLSearchParams(location.search).has('demo'))$('#demobar').hidden=false;
 $('#cont').onclick=()=>{if(!current)return;['low','lowNew'].includes(levelKey(current))?openModal():show('result');};
 $('#resBack').onclick=()=>show(ctx==='pay'?'pay':'check');
 $('#composer').onsubmit=e=>{e.preventDefault();ask($('#msg').value);};
+$('#warnGo').onclick=()=>{$('#warnModal').classList.remove('on');if(ctx==='pay')openModal();else{ctx='pay';show('pay');}};
 $('#confirmPay').onclick=async()=>{if(await decide('pay','modal'))show('paid');};
 $('#sendReport').onclick=async()=>{if(await decide('report','report'))show('reported');};
 document.addEventListener('click',async e=>{
@@ -349,11 +410,15 @@ document.addEventListener('click',async e=>{
   if(e.target.closest('[data-modal]'))return openModal();
   if(e.target.closest('[data-close]'))return $('#modal').classList.remove('on');
   if(e.target.closest('[data-download]'))return downloadReceipt();
+  const cmp=e.target.closest('[data-compare]');if(cmp){compareId=cmp.dataset.compare;$$('.rct tr').forEach(t=>t.classList.toggle('sel',!!t.querySelector('[data-compare="'+compareId+'"]')));renderCompare(null);$('#rcCompare').scrollIntoView({behavior:'smooth',block:'start'});return;}
+  const rdl=e.target.closest('[data-receiptdl]');if(rdl){const r=receiptRows.find(x=>x.receipt_id===rdl.dataset.receiptdl);if(r){const url=URL.createObjectURL(new Blob([JSON.stringify(r,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='radar-receipt-'+r.receipt_id+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}return;}
+  if(e.target.closest('[data-payanyway]'))return openWarn();
+  if(e.target.closest('[data-closewarn]'))return $('#warnModal').classList.remove('on');
   if(e.target.closest('[data-hold]')){if(await decide('hold','result'))start('overview');return;}
   if(e.target.closest('[data-topay]')){ctx='pay';return show('pay');}  // carries the checked invoice into the payment
   const r=e.target.closest('[data-r]');if(r){reportPaid=r.dataset.r;$$('#paidQ .radio').forEach(o=>o.classList.remove('on'));r.classList.add('on');}
   const g=e.target.closest('[data-go]');if(g){e.preventDefault();show(g.dataset.go);}
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#modal').classList.remove('on');if((e.key==='Enter'||e.key===' ')&&e.target.id==='attach'){e.preventDefault();pick();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#modal').classList.remove('on');$('#warnModal').classList.remove('on');}if(e.ctrlKey&&e.shiftKey&&(e.key==='D'||e.key==='d')){e.preventDefault();const b=$('#demobar');b.hidden=!b.hidden;}if((e.key==='Enter'||e.key===' ')&&e.target.id==='attach'){e.preventDefault();pick();}});
 const q=new URLSearchParams(location.search);
 start(['pay','check'].includes(q.get('v'))?q.get('v'):'overview');

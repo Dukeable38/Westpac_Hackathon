@@ -16,6 +16,10 @@ Newest first. These override older docs where they conflict. Each line: date · 
 - **2026-11-17 · Delvin's opening animation is the Radar intro and loading state.** `docs/brand/radar-opening-animation.html`; `class="scanning"` on the svg loops the sonar while an invoice is being checked.
 - **2026-11-17 · UI target is `mockups/radar/index.html`, signed off by Kiel and now live at `/`** (`app/static/`). Plain-English signal titles are a display layer in `app.js`; the server still decides level, score and findings. The old `mockups/index.html` is kept only as history.
 
+- **2026-11-17 · Receipts store the invoice's SHA-256 fingerprint, never its file name** (Kiel). A file name points back to the original file on someone's computer; the hash alone proves which invoice was checked. Payments list → "Compare an invoice" checks a later copy against it (story: supplier says you still owe more).
+- **2026-11-17 · Radar never blocks.** Every Medium/High/Critical result has a small "Pay anyway" link → one final warning → normal payment confirmation (Kiel).
+- **2026-11-17 · Demo runs in offline replay** of recorded OpenRouter answers (`run_demo.bat`), with real drag-and-drop uploads and no demo bar (Ctrl+Shift+D shows it).
+
 ## AI
 - **2026-11-17 · LLM access via OpenRouter**, through the existing `openai_compatible` provider (`LLM_BASE_URL=https://openrouter.ai/api/v1`). Model choice is open: Delvin + Paul decide using the TASK-002 eval and TASK-004 research.
 

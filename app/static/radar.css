@@ -306,3 +306,34 @@ svg.ra.scanning .p2{animation-delay:.2s}
 .demo a{color:#A9A6C9;font-size:12px;margin-left:auto}
 .ev-raw{display:block;font-size:11px;color:#8A8A92;margin-top:3px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* real (non-mock-up) page: fills the browser like Online Banking */
+body:has(.browser.real){background:#fff}
+.browser.real{max-width:1280px;margin:0 auto;border-radius:0;box-shadow:none;overflow:visible}
+.demo[hidden]{display:none}
+.dropcover{display:none;position:fixed;inset:0;z-index:40;background:rgba(31,28,79,.55);align-items:center;justify-content:center}
+.dropcover.on{display:flex}
+.dropcover>div{background:#fff;border:3px dashed var(--navy);padding:34px 46px;text-align:center;font-size:20px;color:var(--navy);font-weight:700;pointer-events:none}
+.dropcover small{font-size:14px;font-weight:400;color:var(--muted)}
+.dropcover svg{width:40px;height:46px;display:block;margin:0 auto 10px;color:var(--navy)}
+/* payments list + compare */
+.rct{width:100%;border-collapse:collapse;font-size:13px}
+.rct th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:10px 14px;border-bottom:1px solid var(--line);background:#fff}
+.rct td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.rct tr:last-child td{border-bottom:0}
+.rct .fp{font-family:Consolas,monospace;font-size:12px;color:var(--muted)}
+.rct .lvdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.rct tr.sel td{background:#F6F5FB}
+.cmp{border:1px solid var(--line);margin-top:16px}
+.cmp .h{padding:14px 18px;font-size:19px;color:var(--navy);border-bottom:1px solid var(--line)}
+.cmp .b{padding:16px 18px}
+.cmp .drop{padding:22px}
+.verdict{display:flex;gap:14px;padding:16px 18px;border-top:2px solid;border-bottom:2px solid;margin-top:14px;line-height:1.5}
+.verdict svg{width:30px;height:30px;flex:none}
+.verdict.ok{background:var(--low-t);border-color:var(--low)}.verdict.ok svg{color:var(--low)}
+.verdict.no{background:var(--med-t);border-color:var(--med)}.verdict.no svg{color:#B57F00}
+.verdict h3{margin:0 0 4px;font-size:18px;color:var(--navy)}
+.fps{display:grid;grid-template-columns:170px 1fr;gap:4px 12px;font-size:12px;margin-top:10px}
+.fps code{font-family:Consolas,monospace;word-break:break-all}
+.fps .diff{color:var(--high)}
+.emptyrow{padding:18px;color:var(--muted);font-size:13px}

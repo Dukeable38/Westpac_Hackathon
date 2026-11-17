@@ -8,7 +8,7 @@ from .policy import decide_gate
 from .chat import respond
 from pydantic import BaseModel,Field
 from typing import Literal
-from .storage import receipt
+from .storage import receipt,receipts,get_receipt
 from fastapi.responses import FileResponse,StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from .seed import ROOT
@@ -105,6 +105,23 @@ def events(check_id:str):
             yield event('evidence_end',{'checks':[signal['id'] for signal in evidence]})
         yield event('complete',snapshot)
     return StreamingResponse(stream(),media_type='text/event-stream',headers={'Cache-Control':'no-cache','X-Accel-Buffering':'no'})
+
+@app.get('/api/receipts')
+def list_receipts(customer_id:str='cust_greenline'):
+    """Radar receipts for the payments list (no signal detail, no file names)."""
+    keep=['receipt_id','decision','decided_at','sha256','score','level','payee','amount','invoice_number','pay_to']
+    return [{k:r.get(k) for k in keep} for r in receipts(customer_id)]
+
+@app.post('/api/receipts/{receipt_id}/verify')
+async def verify_receipt(receipt_id:str,file:UploadFile=File(...)):
+    """Compare an uploaded PDF with the fingerprint on a receipt. The file is hashed and discarded."""
+    r=get_receipt(receipt_id)
+    if not r: raise HTTPException(404,'Receipt not found')
+    try: data=await file.read(10*1024*1024+1)
+    finally: await file.close()
+    digest=hashlib.sha256(data).hexdigest()
+    return {'match':digest==r['sha256'],'uploaded_sha256':digest,'receipt_sha256':r['sha256'],'receipt_id':receipt_id,
+            'payee':r.get('payee'),'amount':r.get('amount'),'invoice_number':r.get('invoice_number'),'decided_at':r.get('decided_at'),'decision':r.get('decision')}
 
 @app.get('/health')
 def health():

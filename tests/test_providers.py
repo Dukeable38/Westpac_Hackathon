@@ -68,3 +68,13 @@ def test_openai_compatible_backs_off_on_429_and_honours_retry_after(monkeypatch)
     assert llm.classify('Backoff?',['NEW_BUSINESS','NONE'],'plain text')=='NONE'
     assert timeouts==[45.0]
     assert sleeps==[7.0,4.0,8.0]
+
+
+def test_replay_miss_for_real_provider_falls_back_offline(monkeypatch):
+    """Demo safety: an unrecorded input in replay uses the offline reader instead of failing (and never calls out)."""
+    from app import llm
+    monkeypatch.setenv('DEMO_MODE', 'replay')
+    monkeypatch.setenv('LLM_PROVIDER', 'openai_compatible')
+    monkeypatch.setenv('LLM_MODEL', 'never-recorded/model')
+    monkeypatch.setattr(llm, '_complete', lambda *a, **k: (_ for _ in ()).throw(AssertionError('network called')))
+    assert llm.classify('Is this urgent?', ['urgent', 'not_urgent'], 'pay within 24 hours') in ('urgent', 'not_urgent')

@@ -16,7 +16,7 @@
 <input type="file" id="file" accept="application/pdf,.pdf" class="sr" tabindex="-1" aria-hidden="true">
 
 <!-- Demo helper bar: not part of the bank UI. Sample invoices run through the real checks. -->
-<div class="demo">
+<div class="demo" id="demobar" hidden>
   <div class="brand"><svg style="color:#fff"><use href="#radar"/></svg>RADAR · DEMO</div>
   <div class="grp"><span class="lbl">Sample invoice</span>
     <button data-sample="01-tallowwood-clean.pdf">Tallowwood · usual</button>
@@ -26,11 +26,10 @@
   </div>
   <div class="sep"></div>
   <div class="grp"><span class="lbl">Start from</span><button data-start="pay">Make a payment</button><button data-start="check">Check an invoice</button><button data-start="overview">Overview</button></div>
-  <a href="/radar" target="_blank" rel="noopener">Live debug ↗</a>
+  <a href="/radar" target="_blank" rel="noopener">Live debug ↗</a><span class="lbl" style="margin-left:10px">Ctrl+Shift+D hides this bar</span>
 </div>
 
-<div class="browser">
-  <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url" id="url">banking.westpac.com.au/secure/banking/overview</div></div>
+<div class="browser real">
   <div class="ob">
     <div class="hdr">
       <div class="logo"><svg style="color:var(--red)"><use href="#wbank"/></svg></div>
@@ -41,7 +40,7 @@
     </div>
     <div class="nav">
       <a data-go="overview" id="t-ov">Overview</a>
-      <a id="t-pay">Payments<div class="menu"><div data-start="pay">Make a payment</div><div>Transfer funds</div><div>Payees &amp; BPAY® billers</div><div>Multiple payments</div><div>Payments list</div><div class="rad" data-start="check"><svg><use href="#radar"/></svg>Check an invoice</div></div></a>
+      <a id="t-pay">Payments<div class="menu"><div data-start="pay">Make a payment</div><div>Transfer funds</div><div>Payees &amp; BPAY® billers</div><div>Multiple payments</div><div data-go="receipts">Payments list</div><div class="rad" data-start="check"><svg><use href="#radar"/></svg>Check an invoice</div></div></a>
       <a>Service</a><a>Westpac Rewards</a><a>Business Hub</a><a>Products</a><a>Home loans</a>
     </div>
 
@@ -73,6 +72,7 @@
 
     <!-- MAKE A PAYMENT, with Radar as "Attach invoice" -->
     <section class="view page" id="v-pay">
+      <div class="dropcover" id="payDrop"><div><svg><use href="#radar"/></svg>Drop the invoice to attach it<br><small>Radar checks it before you pay</small></div></div>
       <div class="titlebar"><span class="back" data-go="overview">Back</span><h1>Make a payment</h1></div>
       <div class="errbox" id="err-pay" hidden></div>
       <div class="cols">
@@ -190,7 +190,19 @@
           <div class="r"><span>Invoice fingerprint</span><span class="mono" style="font-size:12px" data-f="hash"></span></div>
           <div class="r"><span>Checked</span><span data-f="when"></span></div></div>
         <p class="disclaim">Demo: the decision and its receipt are saved, but no money is moved.</p>
-      </div><div class="sidebox side"><div data-download>Save receipt</div><div data-start="overview">Back to accounts</div></div></div>
+      </div><div class="sidebox side"><div data-download>Save receipt</div><div data-go="receipts">Payments list</div><div data-start="overview">Back to accounts</div></div></div>
+    </section>
+
+    <!-- PAYMENTS LIST with Radar receipts -->
+    <section class="view page" id="v-receipts">
+      <div class="titlebar"><span class="back" data-go="overview">Back</span><h1>Payments list</h1></div>
+      <div class="cols">
+        <div>
+          <div class="panel"><div class="h">Payments checked by Radar</div><div id="rcList"></div></div>
+          <div id="rcCompare"></div>
+        </div>
+        <aside class="sidebox"><h4><span class="i">i</span>Radar receipts</h4><p>Every invoice Radar checks before you pay gets a <b>fingerprint</b>: a code unique to that exact file. Radar keeps the fingerprint, not the invoice or its file name.</p><p style="margin:0">If someone later says an invoice was different, or that you still owe more, drop their copy on the payment. Radar tells you whether it's the exact invoice you checked and paid.</p></aside>
+      </div>
     </section>
   </div>
 </div>
@@ -203,6 +215,12 @@
     <div class="errbox" id="err-modal" hidden></div>
     <div style="display:flex;justify-content:flex-end;gap:24px;align-items:center"><a style="font-size:13px;text-decoration:underline;cursor:pointer" data-close>Go back and edit</a><button class="btn red" id="confirmPay">Confirm</button></div>
   </div>
+</div></div>
+
+<div class="scrim" id="warnModal"><div class="modal" role="dialog" aria-modal="true" aria-label="Before you pay" style="border-top-color:var(--crit)">
+  <div class="h">Before you pay this invoice <span style="cursor:pointer" data-closewarn>✕</span></div>
+  <div class="b" id="warnBody"></div>
+  <div class="b" style="padding-top:0;display:flex;justify-content:flex-end;gap:24px;align-items:center"><a style="font-size:13px;text-decoration:underline;cursor:pointer" data-closewarn>Go back</a><button class="btn red" id="warnGo">I understand, pay anyway</button></div>
 </div></div>
 
 <script src="/static/app.js" defer></script>
