@@ -103,6 +103,10 @@
 
   "fraud_invoice_hashes": [],
 
+  "payee_observations": {
+    "083-004|66201945": { "unrelated_customers": 3, "unrelated_suppliers": 4, "note": "Fictional account appeared across unrelated supplier identities" }
+  },
+
   "domains": {
     "tallowwoodmulch.com.au": { "first_cert": "2014-05-02", "wayback_first": "2014-06-11", "mx": true, "spf": true, "dmarc": "p=quarantine" },
     "tallowoodmulch.com.au": { "first_cert": "2026-10-29", "wayback_first": null, "mx": true, "spf": false, "dmarc": null, "lookalike_of": "tallowwoodmulch.com.au" },

@@ -59,7 +59,7 @@
   "weight_class": "High / Med",
   "chat_adjustable": "No / yes for retainer",
   "hard_stop": true,
-  "built": false,
+  "built": "skeleton",
   "feeds": [
    "C6"
   ]
@@ -72,7 +72,7 @@
   "weight_class": "Med",
   "chat_adjustable": "Yes",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C7": {
@@ -109,7 +109,7 @@
   "weight_class": "Med",
   "chat_adjustable": "No",
   "hard_stop": false,
-  "built": false,
+  "built": true,
   "feeds": [
    "C36"
   ]
@@ -144,7 +144,7 @@
   "weight_class": "Med",
   "chat_adjustable": "\"I re-saved it\"",
   "hard_stop": false,
-  "built": false,
+  "built": true,
   "feeds": [
    "C13"
   ]
@@ -197,7 +197,7 @@
   "weight_class": "Med",
   "chat_adjustable": "No",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C17": {
@@ -208,7 +208,7 @@
   "weight_class": "enabler",
   "chat_adjustable": "n/a",
   "hard_stop": false,
-  "built": false,
+  "built": true,
   "feeds": [
    "C18",
    "C19",
@@ -280,7 +280,7 @@
   "weight_class": "Med–High",
   "chat_adjustable": "Just registered",
   "hard_stop": false,
-  "built": false,
+  "built": true,
   "feeds": []
  },
  "C23": {
@@ -304,7 +304,7 @@
   "weight_class": "High",
   "chat_adjustable": "Factoring → check new entity",
   "hard_stop": false,
-  "built": false,
+  "built": true,
   "feeds": [
    "C40"
   ]
@@ -317,7 +317,7 @@
   "weight_class": "High, hard stop",
   "chat_adjustable": "No",
   "hard_stop": true,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C26": {
@@ -342,7 +342,7 @@
   "weight_class": "High",
   "chat_adjustable": "\"I have a listing\"",
   "hard_stop": false,
-  "built": false,
+  "built": true,
   "feeds": []
  },
  "C28": {
@@ -353,7 +353,7 @@
   "weight_class": "Med",
   "chat_adjustable": "ORDERED_THIS",
   "hard_stop": false,
-  "built": false,
+  "built": true,
   "feeds": []
  },
  "C29": {
@@ -364,7 +364,7 @@
   "weight_class": "Low",
   "chat_adjustable": "Yes",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C30": {
@@ -401,7 +401,7 @@
   "weight_class": "Med–High",
   "chat_adjustable": "Agency-registered",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C33": {
@@ -412,7 +412,7 @@
   "weight_class": "Low",
   "chat_adjustable": "Yes",
   "hard_stop": false,
-  "built": false,
+  "built": true,
   "feeds": []
  },
  "C34": {
@@ -423,7 +423,7 @@
   "weight_class": "Med–High",
   "chat_adjustable": "\"they moved\" (address only)",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C35": {
@@ -445,7 +445,7 @@
   "weight_class": "Med–High",
   "chat_adjustable": "No",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C37": {
@@ -456,7 +456,7 @@
   "weight_class": "Low–Med",
   "chat_adjustable": "Yes",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C38": {
@@ -467,7 +467,7 @@
   "weight_class": "High",
   "chat_adjustable": "No",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C39": {
@@ -491,7 +491,7 @@
   "weight_class": "Low–Med",
   "chat_adjustable": "—",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
  },
  "C41": {
@@ -502,7 +502,95 @@
   "weight_class": "resolves",
   "chat_adjustable": "—",
   "hard_stop": false,
-  "built": false,
+  "built": "skeleton",
   "feeds": []
+ },
+ "C42": {
+  "name": "Embedded payment link or QR destination",
+  "tier": 0,
+  "description": "Extracts links and QR destinations without opening them and checks whether they conflict with the supplier or printed payment details.",
+  "exec": "C",
+  "weight_class": "High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": "skeleton",
+  "feeds": ["C16", "C30"]
+ },
+ "C43": {
+  "name": "Account-name and entity-type mismatch",
+  "tier": 1,
+  "description": "Checks whether a personal payee name is being used for a company supplier, or the payee is otherwise unrelated to the registered entity.",
+  "exec": "C",
+  "weight_class": "Med–High",
+  "chat_adjustable": "Trading name only",
+  "hard_stop": false,
+  "built": true,
+  "feeds": ["C3", "C24"]
+ },
+ "C44": {
+  "name": "Invoice chronology anomaly",
+  "tier": 0,
+  "description": "Detects future issue dates, due dates before issue dates and implausibly stale invoices.",
+  "exec": "C",
+  "weight_class": "Low–Med",
+  "chat_adjustable": "Contractual explanation",
+  "hard_stop": false,
+  "built": true,
+  "feeds": ["C6", "C20"]
+ },
+ "C47": {
+  "name": "Cross-customer payee reuse or mule pattern",
+  "tier": 0,
+  "description": "Detects one new account appearing for multiple unrelated suppliers or customers in fictional bank-side observations.",
+  "exec": "C (bank data)",
+  "weight_class": "High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": true,
+  "feeds": ["C2", "C41"]
+ },
+ "C48": {
+  "name": "Template reuse across unrelated suppliers",
+  "tier": 0,
+  "description": "Uses layout fingerprints to find the same invoice template presented as unrelated suppliers.",
+  "exec": "C (bank corpus)",
+  "weight_class": "Med–High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": "skeleton",
+  "feeds": ["C5", "C47"]
+ },
+ "C50": {
+  "name": "Supplier domain changed from history",
+  "tier": 1,
+  "description": "Detects a newly seen email domain for a known supplier even when it is not a spelling lookalike.",
+  "exec": "C (supplier profile)",
+  "weight_class": "Med–High",
+  "chat_adjustable": "Known-number callback only",
+  "hard_stop": false,
+  "built": true,
+  "feeds": ["C30", "C31"]
+ },
+ "C51": {
+  "name": "Currency or geography mismatch",
+  "tier": 0,
+  "description": "Flags foreign currency or payment geography inconsistent with a domestic supplier and customer history.",
+  "exec": "C",
+  "weight_class": "Med",
+  "chat_adjustable": "Yes",
+  "hard_stop": false,
+  "built": true,
+  "feeds": ["C7", "C28"]
+ },
+ "C52": {
+  "name": "BPAY biller and CRN consistency",
+  "tier": 0,
+  "description": "Validates biller identity and customer-reference rules when reliable bank-side BPAY data is available.",
+  "exec": "C (bank data)",
+  "weight_class": "Med–High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": "skeleton",
+  "feeds": ["C3", "C18"]
  }
 }

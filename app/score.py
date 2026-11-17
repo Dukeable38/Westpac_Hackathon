@@ -1,7 +1,8 @@
-import math
+import json,math
 from pathlib import Path
 import yaml
 CONFIG=yaml.safe_load(Path(__file__).with_name('weights.yaml').read_text())
+CATALOGUE=json.loads((Path(__file__).with_name('checks')/'catalogue.json').read_text())
 
 def hard_stop(signals):
     risk={s['id'] for s in signals if s['state']=='risk'}
@@ -14,6 +15,21 @@ def risk_level(score,signals):
     if hard_stop(signals) or score<50:
         return 'high'
     return 'low' if score>=80 else 'medium'
+
+def confidence(signals):
+    def importance(check_id):
+        weight=CATALOGUE.get(check_id,{}).get('weight_class','').lower()
+        if 'enabler' in weight or 'resolves' in weight:return 0
+        if 'high' in weight:return 3
+        if 'med' in weight:return 2
+        if 'low' in weight:return 1
+        return 0
+    applicable=[s for s in signals if s.get('applicable',True) and importance(s['id'])]
+    total=sum(importance(s['id']) for s in applicable)
+    checked=sum(importance(s['id']) for s in applicable if s['state']!='unknown')
+    value=round(checked/total,3) if total else 0.0
+    label='high' if value>=.8 else 'partial' if value>=.5 else 'low'
+    return value,label
 
 def _value(signals):
     z=CONFIG['bias']+sum(s['weight'] * (-1 if s['state']=='risk' else 1 if s['state']=='reassuring' else 0) for s in signals)
