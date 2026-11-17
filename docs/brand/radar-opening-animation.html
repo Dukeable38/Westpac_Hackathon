@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Radar – opening animation</title>
+<style>
+  :root{--bg:#FFFFFF;--ink:#1F1C4F;--accent:#DA1710;--sw:15px}
+  body.dark{--bg:#1F1C4F;--ink:#FFFFFF}
+  html,body{height:100%;margin:0}
+  body{background:var(--bg);display:grid;place-items:center;font-family:Arial,sans-serif;transition:background .3s}
+  svg.logo{width:min(86vw,420px);height:auto;color:var(--ink);overflow:visible}
+
+  /* 1. The invoice rises in with the red dot already there (0.1s to 0.7s) */
+  .doc{fill:var(--ink);transform-origin:150px 262px;opacity:0;transform:translateY(14px) scale(.94);
+        animation:rise .5s cubic-bezier(.2,.8,.3,1) .05s forwards}
+  .dot{fill:var(--accent);transform-origin:228px 44px;transform:scale(0);
+        animation:pop .35s cubic-bezier(.3,1.8,.6,1) .25s forwards, beat .2s ease-in-out .55s 2, beat .28s ease-in-out 1.15s 1}
+  /* 2. Double pulse: two quick shots 0.2s apart, each sending a red sonar line across the invoice (0.55s to 1.6s) */
+  .ripple{fill:none;stroke:var(--accent);stroke-width:3;vector-effect:non-scaling-stroke;transform-origin:228px 44px;opacity:0;
+           animation:ripple .6s ease-out forwards}
+  .wave{fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;vector-effect:non-scaling-stroke;transform-origin:228px 44px;
+         transform:scale(15);opacity:0;animation:scan .85s linear forwards}
+  .p1{animation-delay:.55s} .p2{animation-delay:.75s}
+  /* 3. A beat later the last wave comes out of the dot and stops in place: the logo (1.15s) */
+  .arc{fill:none;stroke:var(--accent);stroke-width:var(--sw);stroke-linecap:round;vector-effect:non-scaling-stroke;
+        transform-origin:228px 44px;transform:scale(.3);opacity:0;animation:emerge .55s cubic-bezier(.2,.8,.3,1) 1.15s forwards}
+  /* 4. Name and tagline come in with that last wave (1.15s) */
+  .word{opacity:0;transform:translateY(12px);animation:fade .45s ease-out 1.15s forwards}
+  .tag{opacity:0;transform:translateY(12px);animation:fade .45s ease-out 1.15s forwards}
+
+  @keyframes rise{to{opacity:1;transform:none}}
+  @keyframes pop{to{transform:scale(1)}}
+  @keyframes beat{0%,100%{transform:scale(1)}40%{transform:scale(1.35)}}
+  @keyframes double{0%,40%,100%{transform:scale(1)}10%,30%{transform:scale(1.35)}20%{transform:scale(1.05)}}
+  @keyframes ripple{0%{transform:scale(1);opacity:.9}100%{transform:scale(3.4);opacity:0}}
+  @keyframes scan{0%{transform:scale(15);opacity:0}6%{opacity:1}85%{opacity:.9}100%{transform:scale(285);opacity:0}}
+  @keyframes emerge{0%{transform:scale(.3);opacity:1}100%{transform:scale(1);opacity:1}}
+  @keyframes fade{to{opacity:1;transform:none}}
+
+  /* Scanning mode (loading screen while an invoice is checked): add class="scanning" to the svg.
+     The dot keeps pulsing and sending sonar across the invoice until you remove the class. */
+  svg.scanning .dot{animation:double 1s ease-in-out infinite}
+  svg.scanning .ripple{animation:ripple 1s ease-out infinite}
+  svg.scanning .wave{animation:scan 1s linear infinite}
+  svg.scanning .p2{animation-delay:.2s}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}
+    .doc,.word,.tag,.arc{opacity:1;transform:none}.dot{transform:none}.wave,.ripple{opacity:0}}
+
+  .controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+  .controls button{font:600 13px Arial,sans-serif;color:var(--ink);background:transparent;border:1.5px solid var(--ink);
+                    border-radius:999px;padding:8px 16px;cursor:pointer;opacity:.7}
+  .controls button:hover{opacity:1}
+</style></head>
+<body>
+<div id="stage">
+<svg class="logo" viewBox="0 0 600 573" role="img" aria-label="Radar. Don’t let scams fly under the radar.">
+  <defs><clipPath id="paper"><rect x="72" y="44" width="156" height="218" rx="22"/><circle cx="228" cy="44" r="80"/></clipPath></defs>
+  <g transform="translate(97.5,0) scale(1.35)">
+    <g class="doc"><path d="M94 44 L140 44 A88 88 0 0 0 228 132 L228 240 Q228 262 206 262 L94 262 Q72 262 72 240 L72 66 Q72 44 94 44 Z"/>
+    </g>
+    <g clip-path="url(#paper)">
+      <path class="wave p1" d="M228.0000 45.0000 A1 1 0 0 1 227.0000 44.0000"/>
+      <path class="wave p2" d="M228.0000 45.0000 A1 1 0 0 1 227.0000 44.0000"/>
+    </g>
+    <path class="arc" d="M228.00 94.00 A50 50 0 0 1 178.00 44.00"/>
+    <circle class="ripple p1" cx="228" cy="44" r="15"/>
+    <circle class="ripple p2" cx="228" cy="44" r="15"/>
+    <circle class="dot" cx="228" cy="44" r="15"/>
+  </g>
+  <g class="word"><path fill="currentColor" transform="translate(120.00,493.42) scale(0.08517,-0.08517)" d="M75 0V687H474Q550 687 601.0 658.5Q652 630 677.5 580.5Q703 531 703 470Q703 404 672.5 352.5Q642 301 587 272L725 0H525L411 242H254V0ZM254 375H439Q476 375 498.5 399.5Q521 424 521 465Q521 492 511.0 511.0Q501 530 483.0 540.5Q465 551 439 551H254Z"/>
+<path fill="currentColor" transform="translate(194.10,493.42) scale(0.08517,-0.08517)" d="M8 0 266 687H481L739 0H548L507 119H233L192 0ZM276 253H463L414 398Q410 409 404.5 425.5Q399 442 393.5 460.5Q388 479 383.0 498.0Q378 517 373 531H366Q362 512 355 488L340 440Q332 416 326 398Z"/>
+<path fill="currentColor" transform="translate(267.85,493.42) scale(0.08517,-0.08517)" d="M75 0V687H362Q474 687 551.5 650.0Q629 613 669.5 537.5Q710 462 710 344Q710 227 669.5 150.5Q629 74 551.5 37.0Q474 0 362 0ZM254 140H360Q402 140 433.0 152.0Q464 164 485.0 187.0Q506 210 516.0 244.0Q526 278 526 322V364Q526 409 516.0 443.0Q506 477 485.0 500.0Q464 523 433.0 535.0Q402 547 360 547H254Z"/>
+<path fill="currentColor" transform="translate(342.37,493.42) scale(0.08517,-0.08517)" d="M8 0 266 687H481L739 0H548L507 119H233L192 0ZM276 253H463L414 398Q410 409 404.5 425.5Q399 442 393.5 460.5Q388 479 383.0 498.0Q378 517 373 531H366Q362 512 355 488L340 440Q332 416 326 398Z"/>
+<path fill="currentColor" transform="translate(416.12,493.42) scale(0.08517,-0.08517)" d="M75 0V687H474Q550 687 601.0 658.5Q652 630 677.5 580.5Q703 531 703 470Q703 404 672.5 352.5Q642 301 587 272L725 0H525L411 242H254V0ZM254 375H439Q476 375 498.5 399.5Q521 424 521 465Q521 492 511.0 511.0Q501 530 483.0 540.5Q465 551 439 551H254Z"/></g>
+  <g class="tag"><path fill="currentColor" transform="translate(80.00,544.95) scale(0.01385,-0.01385)" d="M1381 719Q1381 496 1294.5 335.0Q1208 174 1053.5 87.0Q899 0 695 0H168V1409H634Q992 1409 1186.5 1229.5Q1381 1050 1381 719ZM1189 719Q1189 981 1045.5 1118.5Q902 1256 630 1256H359V153H673Q830 153 945.5 222.0Q1061 291 1125.0 418.0Q1189 545 1189 719Z"/>
+<path fill="currentColor" transform="translate(100.49,544.95) scale(0.01385,-0.01385)" d="M1053 542Q1053 258 928.0 119.0Q803 -20 565 -20Q328 -20 207.0 124.5Q86 269 86 542Q86 822 207.5 962.0Q329 1102 571 1102Q819 1102 936.0 965.5Q1053 829 1053 542ZM864 542Q864 766 797.5 867.5Q731 969 574 969Q416 969 345.5 865.5Q275 762 275 542Q275 328 344.5 220.5Q414 113 563 113Q725 113 794.5 217.0Q864 321 864 542Z"/>
+<path fill="currentColor" transform="translate(116.27,544.95) scale(0.01385,-0.01385)" d="M322 627V0H142V851Q142 946 140.5 1003.5Q139 1061 136 1082H306Q308 1063 309.5 1034.0Q311 1005 312.0 970.0Q313 935 314 897H317Q379 1009 460.5 1055.5Q542 1102 663 1102Q841 1102 923.5 1011.0Q1006 920 1006 721V0H825V686Q825 841 775.0 902.0Q725 963 602 963Q472 963 397.0 874.0Q322 785 322 627Z"/>
+<path fill="currentColor" transform="translate(132.05,544.95) scale(0.01385,-0.01385)" d="M328 1264Q328 1159 309.0 1087.5Q290 1016 250 952H127Q221 1088 221 1212H133V1409H328Z"/>
+<path fill="currentColor" transform="translate(138.36,544.95) scale(0.01385,-0.01385)" d="M554 8Q466 -16 372 -16Q264 -16 210.0 45.5Q156 107 156 229V951H31V1082H163L216 1324H336V1082H536V951H336V268Q336 190 361.5 158.5Q387 127 450 127Q484 127 554 141Z"/>
+<path fill="currentColor" transform="translate(154.12,544.95) scale(0.01385,-0.01385)" d="M318 1484V0H138V1484Z"/>
+<path fill="currentColor" transform="translate(160.43,544.95) scale(0.01385,-0.01385)" d="M276 503Q276 317 353.0 216.0Q430 115 578 115Q695 115 765.5 162.0Q836 209 861 281L1019 236Q922 -20 578 -20Q338 -20 212.5 123.0Q87 266 87 548Q87 816 212.5 959.0Q338 1102 571 1102Q810 1102 929.0 958.0Q1048 814 1048 527V503ZM862 641Q847 812 775.0 890.5Q703 969 568 969Q437 969 360.5 881.5Q284 794 278 641Z"/>
+<path fill="currentColor" transform="translate(176.21,544.95) scale(0.01385,-0.01385)" d="M554 8Q466 -16 372 -16Q264 -16 210.0 45.5Q156 107 156 229V951H31V1082H163L216 1324H336V1082H536V951H336V268Q336 190 361.5 158.5Q387 127 450 127Q484 127 554 141Z"/>
+<path fill="currentColor" transform="translate(191.97,544.95) scale(0.01385,-0.01385)" d="M950 299Q950 146 834.5 63.0Q719 -20 511 -20Q309 -20 199.5 46.5Q90 113 57 254L216 285Q239 198 311.0 157.5Q383 117 511 117Q648 117 711.5 159.0Q775 201 775 285Q775 349 731.0 389.0Q687 429 589 455Q473 486 404.5 506.0Q336 526 299.0 540.5Q262 555 240 568Q174 606 137.0 661.0Q100 716 100 796Q100 944 205.5 1021.5Q311 1099 513 1099Q692 1099 797.5 1036.0Q903 973 931 834L769 814Q754 886 688.5 924.5Q623 963 513 963Q391 963 333.0 926.0Q275 889 275 814Q275 759 308.0 723.5Q341 688 434 665Q559 635 672.0 599.5Q785 564 834 529Q891 488 920.5 432.5Q950 377 950 299Z"/>
+<path fill="currentColor" transform="translate(206.16,544.95) scale(0.01385,-0.01385)" d="M553 -20Q326 -20 206.5 123.5Q87 267 87 542Q87 815 207.0 958.5Q327 1102 551 1102Q717 1102 826.5 1016.0Q936 930 964 779L779 765Q765 855 708.0 908.0Q651 961 546 961Q403 961 339.0 866.0Q275 771 275 546Q275 330 343.0 226.0Q411 122 548 122Q644 122 708.5 174.0Q773 226 788 334L970 322Q956 218 900.5 141.0Q845 64 756.5 22.0Q668 -20 553 -20Z"/>
+<path fill="currentColor" transform="translate(220.35,544.95) scale(0.01385,-0.01385)" d="M414 -20Q251 -20 169.0 66.0Q87 152 87 302Q87 470 197.5 560.0Q308 650 554 656L797 660V719Q797 851 741.0 908.0Q685 965 565 965Q444 965 389.0 924.0Q334 883 323 793L135 810Q181 1102 569 1102Q773 1102 876.0 1008.5Q979 915 979 738V272Q979 192 1000.0 151.5Q1021 111 1080 111Q1108 111 1139 118V6Q1105 -2 1070.0 -6.0Q1035 -10 1000 -10Q900 -10 854.5 42.5Q809 95 803 207H797Q728 83 636.5 31.5Q545 -20 414 -20ZM797 534 600 530Q474 529 408 504Q342 480 307.0 430.0Q272 380 272 299Q272 211 319.5 163.0Q367 115 455 115Q555 115 631 160Q708 205 752.5 283.5Q797 362 797 445Z"/>
+<path fill="currentColor" transform="translate(236.13,544.95) scale(0.01385,-0.01385)" d="M321 627V0H142V851Q142 946 140.5 1003.5Q139 1061 136 1082H306Q308 1060 310.0 1028.0Q312 996 313.0 961.5Q314 927 314 897H317Q375 1012 450.0 1057.0Q525 1102 633 1102Q756 1102 827.5 1053.0Q899 1004 927 897H930Q986 1006 1065.5 1054.0Q1145 1102 1258 1102Q1422 1102 1496.5 1013.0Q1571 924 1571 721V0H1393V686Q1393 843 1350.0 903.0Q1307 963 1195 963Q1077 963 1011.5 875.5Q946 788 946 627V0H768V686Q768 843 725.0 903.0Q682 963 570 963Q455 963 388.0 875.0Q321 787 321 627Z"/>
+<path fill="currentColor" transform="translate(259.77,544.95) scale(0.01385,-0.01385)" d="M950 299Q950 146 834.5 63.0Q719 -20 511 -20Q309 -20 199.5 46.5Q90 113 57 254L216 285Q239 198 311.0 157.5Q383 117 511 117Q648 117 711.5 159.0Q775 201 775 285Q775 349 731.0 389.0Q687 429 589 455Q473 486 404.5 506.0Q336 526 299.0 540.5Q262 555 240 568Q174 606 137.0 661.0Q100 716 100 796Q100 944 205.5 1021.5Q311 1099 513 1099Q692 1099 797.5 1036.0Q903 973 931 834L769 814Q754 886 688.5 924.5Q623 963 513 963Q391 963 333.0 926.0Q275 889 275 814Q275 759 308.0 723.5Q341 688 434 665Q559 635 672.0 599.5Q785 564 834 529Q891 488 920.5 432.5Q950 377 950 299Z"/>
+<path fill="currentColor" transform="translate(281.84,544.95) scale(0.01385,-0.01385)" d="M361 951V0H181V951H29V1082H181V1204Q181 1352 246.0 1417.0Q311 1482 445 1482Q520 1482 572 1470V1333Q524 1341 492 1341Q423 1341 392.0 1306.0Q361 1271 361 1179V1082H572V951Z"/>
+<path fill="currentColor" transform="translate(289.72,544.95) scale(0.01385,-0.01385)" d="M318 1484V0H138V1484Z"/>
+<path fill="currentColor" transform="translate(296.02,544.95) scale(0.01385,-0.01385)" d="M191 -425Q119 -425 67 -414V-279Q105 -285 151 -285Q235 -285 306.5 -222.5Q378 -160 434 5L5 1082H197L425 484Q450 420 478.5 339.0Q507 258 523 196Q548 267 573.5 337.0Q599 407 623 477L830 1082H1020L604 0Q570 -86 539.0 -150.5Q508 -215 479 -257Q421 -342 350.5 -383.5Q280 -425 191 -425Z"/>
+<path fill="currentColor" transform="translate(318.09,544.95) scale(0.01385,-0.01385)" d="M822 185Q760 73 678.5 26.5Q597 -20 476 -20Q298 -20 215.5 68.5Q133 157 133 361V1082H314V396Q314 234 364.5 176.5Q415 119 537 119Q667 119 742.0 208.0Q817 297 817 455V1082H997V231Q997 137 998.5 79.0Q1000 21 1003 0H833Q832 5 829.5 47.0Q827 89 825 185Z"/>
+<path fill="currentColor" transform="translate(333.87,544.95) scale(0.01385,-0.01385)" d="M322 627V0H142V851Q142 946 140.5 1003.5Q139 1061 136 1082H306Q308 1063 309.5 1034.0Q311 1005 312.0 970.0Q313 935 314 897H317Q379 1009 460.5 1055.5Q542 1102 663 1102Q841 1102 923.5 1011.0Q1006 920 1006 721V0H825V686Q825 841 775.0 902.0Q725 963 602 963Q472 963 397.0 874.0Q322 785 322 627Z"/>
+<path fill="currentColor" transform="translate(349.66,544.95) scale(0.01385,-0.01385)" d="M835 0Q833 11 830.5 41.5Q828 72 826.5 109.0Q825 146 825 174H821Q771 70 688.5 25.0Q606 -20 484 -20Q279 -20 182.5 118.0Q86 256 86 536Q86 819 185.5 960.5Q285 1102 484 1102Q607 1102 689.0 1057.0Q771 1012 821 914H823L821 1035V1484H1001V223Q1001 138 1002.5 82.5Q1004 27 1007 0ZM275 542Q275 315 335.0 217.0Q395 119 530 119Q683 119 752.0 225.0Q821 331 821 554Q821 769 752.0 869.0Q683 969 532 969Q396 969 335.5 868.5Q275 768 275 542Z"/>
+<path fill="currentColor" transform="translate(365.44,544.95) scale(0.01385,-0.01385)" d="M276 503Q276 317 353.0 216.0Q430 115 578 115Q695 115 765.5 162.0Q836 209 861 281L1019 236Q922 -20 578 -20Q338 -20 212.5 123.0Q87 266 87 548Q87 816 212.5 959.0Q338 1102 571 1102Q810 1102 929.0 958.0Q1048 814 1048 527V503ZM862 641Q847 812 775.0 890.5Q703 969 568 969Q437 969 360.5 881.5Q284 794 278 641Z"/>
+<path fill="currentColor" transform="translate(381.22,544.95) scale(0.01385,-0.01385)" d="M322 564V0H142V830Q142 887 140.5 950.0Q139 1013 136 1082H306Q308 1036 309.5 999.0Q311 962 312.0 934.5Q313 907 313.5 888.5Q314 870 314 861H318Q348 959 384 1013Q419 1063 464.0 1082.5Q509 1102 575 1102Q612 1102 648 1092V927Q614 937 552 937Q440 937 381.0 840.5Q322 744 322 564Z"/>
+<path fill="currentColor" transform="translate(398.55,544.95) scale(0.01385,-0.01385)" d="M554 8Q466 -16 372 -16Q264 -16 210.0 45.5Q156 107 156 229V951H31V1082H163L216 1324H336V1082H536V951H336V268Q336 190 361.5 158.5Q387 127 450 127Q484 127 554 141Z"/>
+<path fill="currentColor" transform="translate(406.43,544.95) scale(0.01385,-0.01385)" d="M317 897Q375 1003 456.5 1052.5Q538 1102 663 1102Q839 1102 922.5 1010.5Q1006 919 1006 721V0H825V686Q825 833 773.5 898.0Q722 963 602 963Q475 963 398.5 875.0Q322 787 322 638V0H142V1484H322V1098Q322 1058 320.0 1013.5Q318 969 316.5 936.5Q315 904 314 897Z"/>
+<path fill="currentColor" transform="translate(422.21,544.95) scale(0.01385,-0.01385)" d="M276 503Q276 317 353.0 216.0Q430 115 578 115Q695 115 765.5 162.0Q836 209 861 281L1019 236Q922 -20 578 -20Q338 -20 212.5 123.0Q87 266 87 548Q87 816 212.5 959.0Q338 1102 571 1102Q810 1102 929.0 958.0Q1048 814 1048 527V503ZM862 641Q847 812 775.0 890.5Q703 969 568 969Q437 969 360.5 881.5Q284 794 278 641Z"/>
+<path fill="currentColor" transform="translate(445.88,544.95) scale(0.01385,-0.01385)" d="M322 564V0H142V830Q142 887 140.5 950.0Q139 1013 136 1082H306Q308 1036 309.5 999.0Q311 962 312.0 934.5Q313 907 313.5 888.5Q314 870 314 861H318Q348 959 384 1013Q419 1063 464.0 1082.5Q509 1102 575 1102Q612 1102 648 1092V927Q614 937 552 937Q440 937 381.0 840.5Q322 744 322 564Z"/>
+<path fill="currentColor" transform="translate(455.33,544.95) scale(0.01385,-0.01385)" d="M414 -20Q251 -20 169.0 66.0Q87 152 87 302Q87 470 197.5 560.0Q308 650 554 656L797 660V719Q797 851 741.0 908.0Q685 965 565 965Q444 965 389.0 924.0Q334 883 323 793L135 810Q181 1102 569 1102Q773 1102 876.0 1008.5Q979 915 979 738V272Q979 192 1000.0 151.5Q1021 111 1080 111Q1108 111 1139 118V6Q1105 -2 1070.0 -6.0Q1035 -10 1000 -10Q900 -10 854.5 42.5Q809 95 803 207H797Q728 83 636.5 31.5Q545 -20 414 -20ZM797 534 600 530Q474 529 408 504Q342 480 307.0 430.0Q272 380 272 299Q272 211 319.5 163.0Q367 115 455 115Q555 115 631 160Q708 205 752.5 283.5Q797 362 797 445Z"/>
+<path fill="currentColor" transform="translate(471.11,544.95) scale(0.01385,-0.01385)" d="M835 0Q833 11 830.5 41.5Q828 72 826.5 109.0Q825 146 825 174H821Q771 70 688.5 25.0Q606 -20 484 -20Q279 -20 182.5 118.0Q86 256 86 536Q86 819 185.5 960.5Q285 1102 484 1102Q607 1102 689.0 1057.0Q771 1012 821 914H823L821 1035V1484H1001V223Q1001 138 1002.5 82.5Q1004 27 1007 0ZM275 542Q275 315 335.0 217.0Q395 119 530 119Q683 119 752.0 225.0Q821 331 821 554Q821 769 752.0 869.0Q683 969 532 969Q396 969 335.5 868.5Q275 768 275 542Z"/>
+<path fill="currentColor" transform="translate(486.89,544.95) scale(0.01385,-0.01385)" d="M414 -20Q251 -20 169.0 66.0Q87 152 87 302Q87 470 197.5 560.0Q308 650 554 656L797 660V719Q797 851 741.0 908.0Q685 965 565 965Q444 965 389.0 924.0Q334 883 323 793L135 810Q181 1102 569 1102Q773 1102 876.0 1008.5Q979 915 979 738V272Q979 192 1000.0 151.5Q1021 111 1080 111Q1108 111 1139 118V6Q1105 -2 1070.0 -6.0Q1035 -10 1000 -10Q900 -10 854.5 42.5Q809 95 803 207H797Q728 83 636.5 31.5Q545 -20 414 -20ZM797 534 600 530Q474 529 408 504Q342 480 307.0 430.0Q272 380 272 299Q272 211 319.5 163.0Q367 115 455 115Q555 115 631 160Q708 205 752.5 283.5Q797 362 797 445Z"/>
+<path fill="currentColor" transform="translate(502.67,544.95) scale(0.01385,-0.01385)" d="M322 564V0H142V830Q142 887 140.5 950.0Q139 1013 136 1082H306Q308 1036 309.5 999.0Q311 962 312.0 934.5Q313 907 313.5 888.5Q314 870 314 861H318Q348 959 384 1013Q419 1063 464.0 1082.5Q509 1102 575 1102Q612 1102 648 1092V927Q614 937 552 937Q440 937 381.0 840.5Q322 744 322 564Z"/>
+<path fill="currentColor" transform="translate(512.12,544.95) scale(0.01385,-0.01385)" d="M382 219V0H187V219Z"/></g>
+</svg>
+</div>
+<div class="controls">
+  <button type="button" onclick="replay()">Replay</button>
+  <button type="button" onclick="document.body.classList.toggle('dark')">Light / dark</button>
+</div>
+<script>
+  // Keep the sonar lines exactly as thick as the logo's red wave at any screen size
+  function setStroke(){const svg=document.querySelector('svg.logo');
+    const k=svg.getBoundingClientRect().width/600*1.35;
+    document.documentElement.style.setProperty('--sw',(16*k)+'px');}
+  function replay(){const s=document.getElementById('stage');s.replaceWith(s.cloneNode(true));setStroke();}
+  window.addEventListener('resize',setStroke); setStroke();
+</script>
+</body></html>

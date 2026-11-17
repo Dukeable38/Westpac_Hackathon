@@ -11,6 +11,11 @@
 
 Source: "Branding Kit Lauren VIP" (Canva, comment access). This file transcribes it so code and AI agents can use it. The Canva page is the master; update this file if it changes.
 
+## Opening animation (Delvin, 17 Nov 2026)
+- File: `docs/brand/radar-opening-animation.html` (self-contained SVG + CSS, about 1.6s; light/dark toggle; respects reduced motion).
+- Sequence: invoice rises in with the red dot → dot double-pulses, sending two sonar lines across the invoice → final arc settles into the v5 logo → **RADAR** wordmark and tagline fade in.
+- **Loading state:** add `class="scanning"` to the `svg.logo` and the dot keeps pulsing and sweeping until you remove it. Use this while a Radar check runs.
+
 ## Name
 - **Radar**. Usage: "Radar check", "Radar score 94/100", "Checked by Radar". Never "verified", "protected" or "safe".
 - Subtitle on title cards: "2026 Westpac Hackathon · QUT Dean's Scholars"
