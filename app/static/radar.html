@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Radar debug screen. Data: GET /api/signals (catalogue.json). Live: SSE GET /api/check/{id}/events.
+   Brand: docs/brand-kit.md (Radar logo v6, navy + Westpac red). */
+:root{--bg:#0B0A22;--bg2:#13123A;--panel:#16154A;--line:#2B2A6B;--ring:#2E2C7A;--text:#E9E8F7;--muted:#9A98C8;--dim:#4A4890;
+  --red:#DA1710;--ping:#FF4438;--purple:#B44DF0;--low:#34C77B;--med:#F2B21B;--high:#FF4438;--crit:#FF2E63;--neutral:#C9C8E8}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:radial-gradient(ellipse at 35% 50%,#1A1950 0%,var(--bg) 70%);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh}
+header{display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px}
+.logo svg{width:34px;height:34px}
+.logo b{font-family:'Arial Black',Arial,sans-serif;font-weight:900;letter-spacing:.2em;font-size:18px}
+.logo span{font-family:'Fira Code',monospace;font-size:11px;color:var(--ping);letter-spacing:.15em;border:1px solid var(--ping);border-radius:3px;padding:1px 6px}
+.status{font-family:'Fira Code',monospace;font-size:12px;letter-spacing:.12em;padding:4px 10px;border-radius:12px;background:var(--panel);color:var(--muted)}
+.status.scan{color:#fff;background:var(--red);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.6}}
+.controls{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.controls button,.controls label.up{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:5px 11px;font:inherit;font-size:12px;cursor:pointer}
+.controls button:hover,.controls label.up:hover{border-color:var(--purple)}
+.controls button.on{border-color:var(--ping);color:#fff}
+.controls .sep{width:1px;height:20px;background:var(--line)}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 380px;min-height:0}
+@media (max-width:1000px){.main{grid-template-columns:1fr}}
+.scope{position:relative;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px}
+svg#scope{width:100%;height:100%;max-height:calc(100vh - 80px)}
+.ring{fill:none;stroke:var(--ring);stroke-width:1.2}
+.ring.active{stroke:var(--ping);stroke-width:2;filter:url(#glow)}
+.ring.skipped{stroke-dasharray:4 6;opacity:.5}
+.cross{stroke:#211F5A;stroke-width:1}
+.tierlbl{font-family:'Fira Code',monospace;font-size:11px;fill:var(--dim);letter-spacing:.1em}
+.tierlbl.active{fill:var(--ping)}
+.edge{fill:none;stroke:#2A2870;stroke-width:1}
+.edge.lit{stroke:var(--purple);stroke-width:1.6;opacity:.9}
+.edge.hov{stroke:#fff;stroke-width:1.6}
+.node{cursor:pointer}
+.node .dot{fill:#24226A;stroke:#3B3990;stroke-width:1.2;transition:fill .3s}
+.node.unbuilt .dot{fill:none;stroke-dasharray:2 2}
+.node text{font-family:'Fira Code',monospace;font-size:9px;fill:var(--dim);text-anchor:middle;pointer-events:none}
+.node.seen text{fill:var(--text)}
+.node.s-risk .dot{fill:var(--high);stroke:#fff}
+.node.s-locked .dot{fill:var(--crit);stroke:#fff;stroke-width:2}
+.node.s-reassuring .dot{fill:var(--low);stroke:#fff}
+.node.s-neutral .dot{fill:var(--neutral);stroke:#fff}
+.node.s-unknown .dot{fill:#3A3880}
+.node.sel .dot{stroke:var(--ping);stroke-width:3}
+.blip{fill:none;stroke-width:2;animation:blip 1.4s ease-out forwards;pointer-events:none}
+@keyframes blip{from{r:6;opacity:1}to{r:34;opacity:0}}
+.wave{fill:none;stroke:var(--ping);stroke-width:2;pointer-events:none}
+.sweep{transform-origin:500px 500px;animation:spin 6s linear infinite}
+.scanning .sweep{animation-duration:1.6s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.center text{text-anchor:middle}
+.side{border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:rgba(19,18,58,.6)}
+.box{padding:14px 16px;border-bottom:1px solid var(--line)}
+.box h3{margin:0 0 8px;font-size:11px;letter-spacing:.15em;color:var(--muted);font-weight:700;font-family:'Fira Code',monospace}
+.result{display:none}
+.result.on{display:block}
+.lvl{font-family:Anton,Arial;font-size:26px;letter-spacing:.06em}
+.meta{font-size:12px;color:var(--muted);line-height:1.5}
+.detail h4{margin:0 0 4px;font-size:15px}
+.detail p{margin:4px 0;font-size:13px;line-height:1.45;color:#CFCEEA}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:3px 8px;font-size:12px;margin-top:8px}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+.ev{margin-top:8px;padding:8px 10px;border-left:3px solid var(--purple);background:#1C1B55;font-size:12px;line-height:1.4}
+.log{flex:1;overflow:auto;padding:8px 16px 16px;font-family:'Fira Code',monospace;font-size:11.5px}
+.log div{padding:5px 0;border-bottom:1px solid #1F1E58;line-height:1.4;animation:in .3s}
+@keyframes in{from{opacity:0;transform:translateX(8px)}}
+.log .t{color:var(--dim)}
+.log .risk{color:var(--high)}.log .locked{color:var(--crit);font-weight:700}.log .reassuring{color:var(--low)}.log .neutral{color:var(--neutral)}.log .unknown{color:var(--dim)}
+.log .sys{color:var(--ping)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.hint{color:var(--muted);font-size:12px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 56 64" aria-hidden="true"><path d="M10 14H26.4A22 22 0 0 0 40 30.5V54a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z" fill="#fff"/><path d="M48 19A9 9 0 0 1 39 10M48 25A15 15 0 0 1 33 10" fill="none" stroke="#DA1710" stroke-width="4" stroke-linecap="round"/><circle cx="48" cy="10" r="4.2" fill="#DA1710"/></svg>
+    <b>RADAR</b><span>LIVE</span>
+  </div>
+  <div class="status" id="status">STANDBY</div>
+  <div class="controls">
+    <button id="follow" class="on" title="Automatically track the newest check started anywhere in the app">● Follow app</button>
+    <span class="sep"></span>
+    <label class="up">Upload PDF<input type="file" id="file" accept="application/pdf" hidden></label>
+    <span id="demos"></span>
+  </div>
+</header>
+<div class="main">
+  <div class="scope" id="scopeWrap"><svg id="scope" viewBox="0 0 1000 1000" role="img" aria-label="Radar scope of invoice checks"></svg></div>
+  <aside class="side">
+    <div class="box result" id="result"></div>
+    <div class="box detail" id="detail"><h3>CONTACT</h3><p class="hint">Hover or click a contact to see what it checks. Upload an invoice, or start a check in the main app with <b>Follow app</b> on, and watch Radar work through it.</p>
+      <div class="legend" style="margin-top:10px"><span><i style="background:var(--low)"></i>Reassuring</span><span><i style="background:var(--neutral)"></i>Clear</span><span><i style="background:var(--high)"></i>Risk</span><span><i style="background:var(--crit);box-shadow:0 0 0 2px #fff"></i>Confirmed risk</span><span><i style="background:#3A3880"></i>No data</span><span><i style="border:1px dashed #6A68B0"></i>Not built</span></div></div>
+    <div class="box" style="padding-bottom:6px"><h3>CONTACT LOG</h3></div>
+    <div class="log" id="log"></div>
+  </aside>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const NS='http://www.w3.org/2000/svg';
+const R=[150,265,365,445], C=500;
+const LVL={low:['LOW','var(--low)'],check:['MEDIUM','var(--med)'],genuine:['LOW','var(--low)'],high_risk:['HIGH','var(--high)'],medium:['MEDIUM','var(--med)'],high:['HIGH','var(--high)'],critical:['CRITICAL','var(--crit)']};
+const DEMOS=[['01-tallowwood-clean.pdf','01'],['02-tallowwood-changed-bank.pdf','02'],['03-brightwater-sloppy-fake.pdf','03'],['04-fernhill-new-business.pdf','04'],['nathan/n1-larana-consulting.pdf','N1'],['nathan/n2-bowing-aviation.pdf','N2'],['nathan/n3-skype-catering.pdf','N3'],['nathan/n4-fusion-markets.pdf','N4']];
+let SIG=[],TIERS=[],byId={},state={},queue=[],playing=false,es=null,current=null,follow=true,lastSeen=null,selected=null,feedsInto={};
+
+function rank(s){return s.hard_stop?0:/^High/.test(s.weight_class)?1:/Med/.test(s.weight_class)?2:3;}
+function layout(){
+  for(let t=0;t<4;t++){
+    const L=SIG.filter(s=>s.tier===t).sort((a,b)=>rank(a)-rank(b)||(b.weight||0)-(a.weight||0)||(+a.id.slice(1))-(+b.id.slice(1)));
+    L.forEach((s,i)=>{const a=-Math.PI/2+i/L.length*2*Math.PI+(t%2?Math.PI/L.length:0);s.x=C+R[t]*Math.cos(a);s.y=C+R[t]*Math.sin(a);s.order=i+1;});
+  }
+  feedsInto={};SIG.forEach(s=>(s.feeds||[]).forEach(f=>{(feedsInto[f]=feedsInto[f]||[]).push(s.id);}));
+}
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function draw(){
+  const s=$('#scope');s.innerHTML='';
+  const defs=el('defs',{},s);
+  defs.innerHTML=`<radialGradient id="bgG"><stop offset="0" stop-color="#1D1C5C"/><stop offset="1" stop-color="#0E0D2E"/></radialGradient>
+   <linearGradient id="sweepG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF4438" stop-opacity="0"/><stop offset="1" stop-color="#FF4438" stop-opacity=".35"/></linearGradient>
+   <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  el('circle',{cx:C,cy:C,r:490,fill:'url(#bgG)',stroke:'#2B2A6B'},s);
+  [[C,10,C,990],[10,C,990,C]].forEach(([a,b,c,d])=>el('line',{x1:a,y1:b,x2:c,y2:d,class:'cross'},s));
+  R.forEach((r,t)=>el('circle',{cx:C,cy:C,r,class:'ring',id:'ring'+t},s));
+  const key=el('g',{},s);el('text',{x:14,y:944,class:'tierlbl'},key).textContent='RINGS · INNER → OUTER';
+  TIERS.forEach((t,i)=>{el('text',{x:14,y:962+i*0,class:'tierlbl',id:'tl'+i,dx:i*118},key).textContent=`T${i} ${t.name.toUpperCase()}`;});
+  const sw=el('g',{class:'sweep'},s);el('path',{d:`M${C} ${C} L${C+490} ${C} A490 490 0 0 0 ${C+490*Math.cos(-0.55)} ${C+490*Math.sin(-0.55)} Z`,fill:'url(#sweepG)'},sw);el('line',{x1:C,y1:C,x2:C+490,y2:C,stroke:'#FF4438','stroke-width':1.5,opacity:.7},sw);
+  const eg=el('g',{id:'edges'},s);
+  SIG.forEach(a=>(a.feeds||[]).forEach(b=>{const B=byId[b];if(!B)return;const mx=(a.x+B.x)/2,my=(a.y+B.y)/2;el('path',{class:'edge',id:`e-${a.id}-${b}`,d:`M${a.x} ${a.y} Q${mx+(C-mx)*.3} ${my+(C-my)*.3} ${B.x} ${B.y}`},eg);}));
+  el('g',{id:'fx'},s);
+  SIG.forEach(n=>{const g=el('g',{class:'node'+(n.built===true?'':' unbuilt'),id:'n-'+n.id,tabindex:0},s);const r=n.hard_stop?11:rank(n)===1?9.5:8;el('circle',{class:'dot',cx:n.x,cy:n.y,r},g);const t=el('text',{x:n.x,y:n.y-r-5},g);t.textContent=n.id;
+    g.addEventListener('mouseenter',()=>{showDetail(n.id);hov(n.id,true);});g.addEventListener('mouseleave',()=>{hov(n.id,false);if(selected)showDetail(selected);});
+    g.addEventListener('click',()=>{selected=selected===n.id?null:n.id;document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.id==='n-'+selected));showDetail(selected||n.id);});});
+  const cg=el('g',{class:'center',id:'center'},s);
+  el('circle',{cx:C,cy:C,r:62,fill:'#0E0D2E',stroke:'#3B3990','stroke-width':1.5,id:'core'},cg);
+  const t1=el('text',{x:C,y:C-4,'font-family':'Anton,Arial','font-size':30,fill:'#fff',id:'coreBig'},cg);t1.textContent='—';
+  const t2=el('text',{x:C,y:C+20,'font-family':'Fira Code','font-size':11,fill:'#9A98C8','letter-spacing':'.12em',id:'coreSmall'},cg);t2.textContent='AWAITING INVOICE';
+}
+function hov(id,on){const n=byId[id];[...(n.feeds||[]).map(b=>`e-${id}-${b}`),...(feedsInto[id]||[]).map(a=>`e-${a}-${id}`)].forEach(e=>{const x=document.getElementById(e);if(x)x.classList.toggle('hov',on);});}
+function showDetail(id){
+  if(!id)return;const n=byId[id],st=state[id];
+  $('#detail').innerHTML=`<h3>CONTACT · ${n.id} · TIER ${n.tier} · #${n.order}</h3><h4>${n.name}</h4><p>${n.description||''}</p>
+  <dl class="kv"><dt>Weight</dt><dd>${n.weight_class}${n.weight!=null?' · '+n.weight:''}${n.hard_stop?' · <b style="color:var(--crit)">HARD STOP</b>':''}</dd><dt>Runs by</dt><dd>${n.exec}</dd><dt>Chat softens</dt><dd>${n.chat_adjustable}</dd><dt>Status</dt><dd>${n.built===true?'Built':n.built==='skeleton'?'Skeleton (returns unknown)':'Not built yet'}</dd>${n.feeds&&n.feeds.length?`<dt>Feeds</dt><dd>${n.feeds.join(', ')}</dd>`:''}</dl>
+  ${st?`<div class="ev"><b class="${st.locked&&st.state==='risk'?'locked':st.state}" style="text-transform:uppercase">${st.locked&&st.state==='risk'?'confirmed risk':st.state}</b> · ${st.evidence}</div>`:''}`;
+}
+function log(html,cls){const d=document.createElement('div');d.innerHTML=html;if(cls)d.className=cls;$('#log').prepend(d);}
+function ts(){return new Date().toLocaleTimeString('en-AU',{hour12:false});}
+function wave(t,colour){const fx=$('#fx');const c=el('circle',{cx:C,cy:C,r:62,class:'wave',stroke:colour||'#FF4438'},fx);c.animate([{r:62,opacity:.9},{r:R[t]+8,opacity:0}],{duration:900,easing:'ease-out'}).onfinish=()=>c.remove();}
+function blip(n,colour){const fx=$('#fx');const c=el('circle',{cx:n.x,cy:n.y,class:'blip',stroke:colour},fx);setTimeout(()=>c.remove(),1500);}
+function reset(){
+  state={};queue=[];document.querySelectorAll('.node').forEach(g=>{g.classList.remove('seen','s-risk','s-locked','s-reassuring','s-neutral','s-unknown');});
+  document.querySelectorAll('.edge').forEach(e=>e.classList.remove('lit'));document.querySelectorAll('.ring').forEach(r=>r.classList.remove('active','skipped'));
+  document.querySelectorAll('.tierlbl').forEach(r=>r.classList.remove('active'));
+  $('#result').classList.remove('on');$('#core').setAttribute('stroke','#3B3990');$('#coreBig').textContent='…';$('#coreSmall').textContent='SCANNING';
+}
+function setStatus(t,scan){$('#status').textContent=t;$('#status').classList.toggle('scan',!!scan);$('#scopeWrap').classList.toggle('scanning',!!scan);}
+
+// --- live stream: queue SSE events and play them at a readable pace ---
+function watch(id,label){
+  if(es)es.close();reset();current=id;setStatus('SCANNING',true);
+  log(`<span class="t">${ts()}</span> <span class="sys">CONTACT · ${label||id}</span>`);
+  es=new EventSource('/api/check/'+encodeURIComponent(id)+'/events');
+  ['tier_start','signal','tier_end','tier_skipped','complete'].forEach(type=>es.addEventListener(type,ev=>{let d={};try{d=JSON.parse(ev.data);}catch{}queue.push([type,d]);if(type==='complete')es.close();pump();}));
+  es.onerror=()=>{if(es)es.close();};
+}
+const PACE={tier_start:650,signal:170,signal_unknown:25,tier_end:250,tier_skipped:500,complete:0};
+function pump(){if(playing)return;const next=queue.shift();if(!next)return;playing=true;const [type,d]=next;let wait=PACE[type];
+  if(type==='tier_start'){const t=d.tier;$('#ring'+t).classList.add('active');$('#tl'+t).classList.add('active');wave(t);log(`<span class="t">${ts()}</span> <span class="sys">▶ TIER ${t} ${TIERS[t]?TIERS[t].name.toUpperCase():''}</span>${t>0&&d.reason?` <span class="t">· ${d.reason}</span>`:''}`);}
+  if(type==='signal'){const s=d.signal||d;const n=byId[s.id];if(n){state[s.id]=s;const g=document.getElementById('n-'+s.id);const locked=s.locked&&s.state==='risk';
+    g.classList.add('seen','s-'+(locked?'locked':s.state));
+    if(s.state==='unknown'){wait=PACE.signal_unknown;}
+    else{const col={risk:locked?'#FF2E63':'#FF4438',reassuring:'#34C77B',neutral:'#C9C8E8'}[s.state];blip(n,col);
+      if(s.state==='risk'||s.state==='reassuring')(feedsInto[s.id]||[]).forEach(a=>{if(state[a]&&state[a].state!=='unknown'){const e=document.getElementById(`e-${a}-${s.id}`);if(e)e.classList.add('lit');}});
+      log(`<span class="t">${ts()}</span> <b>${s.id}</b> ${n.name} · <span class="${locked?'locked':s.state}">${locked?'CONFIRMED RISK':s.state.toUpperCase()}</span><br><span class="t">${s.evidence}</span>`);
+      if(!selected)showDetail(s.id);}}}
+  if(type==='tier_end'){$('#ring'+d.tier).classList.remove('active');$('#tl'+d.tier).classList.remove('active');}
+  if(type==='tier_skipped'){$('#ring'+d.tier).classList.add('skipped');log(`<span class="t">${ts()}</span> <span class="sys">⏸ TIER ${d.tier} SKIPPED · ${d.reason||'not needed'}</span>`);}
+  if(type==='complete')finish(d);
+  setTimeout(()=>{playing=false;pump();},wait);
+}
+function finish(r){
+  setStatus('COMPLETE',false);
+  for(let t=0;t<4;t++)if(!(r.tiers_run||[]).includes(t))$('#ring'+t).classList.add('skipped');
+  const key=r.level||r.band;const [name,col]=LVL[key]||['—','#fff'];
+  $('#core').setAttribute('stroke',col);$('#core').setAttribute('stroke-width',4);$('#coreBig').textContent=r.score;$('#coreSmall').textContent=name+' RISK';
+  const risks=(r.signals||[]).filter(s=>s.state==='risk').length, ran=(r.signals||[]).filter(s=>s.state!=='unknown').length;
+  $('#result').innerHTML=`<h3>RESULT · ${r.file_name||''}</h3><div class="lvl" style="color:${col}">${name} RISK · ${r.score}/100</div><div class="meta">${ran} checks returned evidence · ${risks} risk signals · tiers run ${(r.tiers_run||[]).join(', ')}<br>${r.escalation_reason||''}</div><div class="meta" style="margin-top:6px;color:#fff">${r.advice||''}</div>`;
+  $('#result').classList.add('on');
+  log(`<span class="t">${ts()}</span> <span class="sys">■ COMPLETE · ${name} · ${r.score}/100</span>`);
+}
+
+// --- inputs ---
+async function upload(file,label){
+  setStatus('UPLOADING',true);const f=new FormData();f.append('file',file);f.append('customer_id','cust_greenline');
+  try{const r=await fetch('/api/check',{method:'POST',body:f});const d=await r.json();if(!r.ok)throw new Error(d.detail||r.status);lastSeen=d.check_id;watch(d.check_id,label||file.name);}
+  catch(e){setStatus('ERROR',false);log(`<span class="t">${ts()}</span> <span class="risk">Upload failed: ${e.message}</span>`);}
+}
+async function demo(path){const r=await fetch('/demo/invoices/'+path);const b=await r.blob();upload(new File([b],path.split('/').pop(),{type:'application/pdf'}),path.split('/').pop());}
+$('#file').onchange=e=>{if(e.target.files[0])upload(e.target.files[0]);e.target.value='';};
+$('#demos').innerHTML=DEMOS.map(([p,l])=>`<button data-demo="${p}" title="${p}">${l}</button>`).join('');
+$('#demos').onclick=e=>{const b=e.target.closest('[data-demo]');if(b)demo(b.dataset.demo);};
+$('#follow').onclick=()=>{follow=!follow;$('#follow').classList.toggle('on',follow);$('#follow').textContent=(follow?'● ':'○ ')+'Follow app';};
+async function poll(){if(follow){try{const r=await fetch('/api/checks/latest');if(r.ok){const d=await r.json();if(lastSeen===null){lastSeen=d.check_id;}else if(d.check_id!==lastSeen){lastSeen=d.check_id;watch(d.check_id,d.file_name);}}else if(lastSeen===null)lastSeen='';}catch{}}setTimeout(poll,1200);}
+
+(async function init(){
+  const d=await (await fetch('/api/signals')).json();SIG=d.signals;TIERS=d.tiers;byId=Object.fromEntries(SIG.map(s=>[s.id,s]));
+  layout();draw();
+  log(`<span class="t">${ts()}</span> <span class="sys">RADAR ONLINE · ${SIG.length} checks loaded · ${SIG.filter(s=>s.built===true).length} built</span>`);
+  const q=new URLSearchParams(location.search).get('check');if(q){lastSeen=q;watch(q);}
+  poll();
+})();
+</script>
+</body>
+</html>

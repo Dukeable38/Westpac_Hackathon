@@ -1,5 +1,7 @@
 # Instructions for AI coding agents
 
+> **START HERE (updated 17 Nov 2026):** read `collab/README.md` first. Work now arrives as task files in `collab/tasks/`, one branch per task. `collab/DECISIONS.md` overrides anything below that conflicts with it: the product is now **Radar**, there are **four risk levels**, and `mockups/index.html` is **no longer the UI target**. The "work autonomously until Done" loop below applies only within the scope of your assigned task.
+
 You are building the **Invoice Scam Checker**, a hackathon MVP for the Westpac AI Hackathon.
 Demo feature freeze: **Tue 17 Nov 2026, 12:30pm AEST**. Optimise for a reliable demo, not for completeness.
 

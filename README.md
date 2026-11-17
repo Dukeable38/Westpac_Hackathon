@@ -34,7 +34,7 @@ For #2, “They told me they changed banks” does not improve the score and rec
 
 ## Model configuration
 
-Copy `.env.example` to `.env`, uncomment one provider block and restart the server. Never commit `.env` or real keys. Process environment variables take precedence over `.env`.
+Copy `.env.example` to `.env`, uncomment one provider block and restart the server. **The team is using OpenRouter** (the first block): one key gives access to many models, so comparing models is a one-line `LLM_MODEL` change. Model shortlist and eval: `collab/tasks/TASK-002-extraction-eval.md`, `TASK-004`. Never commit `.env` or real keys. Process environment variables take precedence over `.env`.
 
 | Variable | Purpose/default |
 |---|---|

@@ -18,6 +18,8 @@ app = FastAPI(title='Invoice Scam Checker')
 RESULTS={}
 app.mount('/static',StaticFiles(directory=ROOT/'app/static'),name='static')
 app.mount('/demo/invoices',StaticFiles(directory=ROOT/'demo/invoices'),name='invoices')
+from .radar_debug import router as radar_router
+app.include_router(radar_router)
 
 @app.get('/')
 def index():

@@ -1,166 +1,508 @@
 {
-  "C1": {
-    "name": "Changed bank details for a known supplier ABN",
-    "tier": 0
-  },
-  "C2": {
-    "name": "Flag register hit (account/PayID/ABN/email)",
-    "tier": 0
-  },
-  "C3": {
-    "name": "Confirmation of Payee result",
-    "tier": 0
-  },
-  "C4": {
-    "name": "New payee + high amount",
-    "tier": 0
-  },
-  "C5": {
-    "name": "Invoice hash / template seen before (fraud or duplicate)",
-    "tier": 0
-  },
-  "C6": {
-    "name": "Duplicate invoice number or amount",
-    "tier": 0
-  },
-  "C7": {
-    "name": "Amount anomaly vs supplier history",
-    "tier": 0
-  },
-  "C8": {
-    "name": "ABN checksum (mod 89)",
-    "tier": 0
-  },
-  "C9": {
-    "name": "ACN checksum",
-    "tier": 0
-  },
-  "C10": {
-    "name": "GST maths and tax-invoice validity",
-    "tier": 0
-  },
-  "C11": {
-    "name": "BSB validity and bank-name match (AusPayNet)",
-    "tier": 0
-  },
-  "C12": {
-    "name": "PDF metadata (online editor, mod \u226b create date)",
-    "tier": 0
-  },
-  "C13": {
-    "name": "Incremental updates editing payment fields",
-    "tier": 0
-  },
-  "C14": {
-    "name": "Hidden text, zero-width chars, homoglyphs",
-    "tier": 0
-  },
-  "C15": {
-    "name": "Overlay or annotation over the bank details",
-    "tier": 0
-  },
-  "C16": {
-    "name": "Embedded JS, launch actions, odd links",
-    "tier": 0
-  },
-  "C17": {
-    "name": "Structured extraction + internal consistency",
-    "tier": 1
-  },
-  "C18": {
-    "name": "Payment-method inconsistency (BPAY vs BSB, two accounts)",
-    "tier": 1
-  },
-  "C19": {
-    "name": "\"Bank details have changed\" language",
-    "tier": 1
-  },
-  "C20": {
-    "name": "Urgency / pressure / secrecy language",
-    "tier": 1
-  },
-  "C21": {
-    "name": "ABN Lookup: active, name match, entity type",
-    "tier": 1
-  },
-  "C22": {
-    "name": "GST charged but not GST-registered",
-    "tier": 1
-  },
-  "C23": {
-    "name": "ABN age vs claimed history",
-    "tier": 1
-  },
-  "C24": {
-    "name": "Real ABN, but payee or email belongs to someone else",
-    "tier": 1
-  },
-  "C25": {
-    "name": "ATO / government official payment-details allowlist",
-    "tier": 1
-  },
-  "C26": {
-    "name": "Contact consistency (email vs website domain, free-mail, area code)",
-    "tier": 1
-  },
-  "C27": {
-    "name": "Directory / domain-renewal offer disguised as invoice",
-    "tier": 1
-  },
-  "C28": {
-    "name": "Relationship plausibility (fits the customer's business?)",
-    "tier": 1
-  },
-  "C29": {
-    "name": "Spelling / formatting quality",
-    "tier": 1
-  },
-  "C30": {
-    "name": "Lookalike domain (dnstwist-style)",
-    "tier": 2
-  },
-  "C31": {
-    "name": "Domain age (RDAP; for .au use crt.sh / Wayback)",
-    "tier": 2
-  },
-  "C32": {
-    "name": ".au registrant eligibility ID \u2260 invoice ABN",
-    "tier": 2
-  },
-  "C33": {
-    "name": "Email DNS posture (MX/SPF/DMARC)",
-    "tier": 2
-  },
-  "C34": {
-    "name": "Official contact details cross-check",
-    "tier": 2
-  },
-  "C35": {
-    "name": "Web presence / scam reports",
-    "tier": 2
-  },
-  "C36": {
-    "name": "ASIC company status",
-    "tier": 2
-  },
-  "C37": {
-    "name": "Logo provenance",
-    "tier": 2
-  },
-  "C38": {
-    "name": "Render-vs-text OCR forensics on payment fields",
-    "tier": 3
-  },
-  "C39": {
-    "name": "Prior-revision recovery (\"original details were\u2026\")",
-    "tier": 3
-  },
-  "C40": {
-    "name": "Director / officeholder checks",
-    "tier": 3
-  },
-  "C41": {
-    "name": "Human call-back / fraud-team referral",
-    "tier": 3
-  }
+ "C1": {
+  "name": "Changed bank details for a known supplier ABN",
+  "tier": 0,
+  "description": "Compares the invoice's BSB and account with the accounts you've paid this supplier (same ABN) before. A new account for a known supplier is the classic invoice-scam move.",
+  "exec": "C (supplier profile)",
+  "weight_class": "High",
+  "chat_adjustable": "Only by known-number call-back (≤50%)",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C3",
+   "C19",
+   "C39"
+  ]
+ },
+ "C2": {
+  "name": "Flag register hit (account/PayID/ABN/email)",
+  "tier": 0,
+  "description": "Looks up the account, PayID, ABN and email in the bank's register of details already reported in scams.",
+  "exec": "C",
+  "weight_class": "High, hard stop",
+  "chat_adjustable": "No",
+  "hard_stop": true,
+  "built": true,
+  "feeds": [
+   "C41"
+  ]
+ },
+ "C3": {
+  "name": "Confirmation of Payee result",
+  "tier": 0,
+  "description": "The bank's existing Confirmation of Payee result (Westpac Verify): does the account name match who holds the account?",
+  "exec": "M",
+  "weight_class": "High (no match) / Med (close)",
+  "chat_adjustable": "Close match via TRADING_NAME",
+  "hard_stop": false,
+  "built": true,
+  "feeds": []
+ },
+ "C4": {
+  "name": "New payee + high amount",
+  "tier": 0,
+  "description": "First payment to this payee, weighted up when the amount is large. New isn't bad on its own, but it removes the safety of history.",
+  "exec": "C",
+  "weight_class": "Med",
+  "chat_adjustable": "Slightly",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C28"
+  ]
+ },
+ "C5": {
+  "name": "Invoice hash / template seen before (fraud or duplicate)",
+  "tier": 0,
+  "description": "Fingerprints the PDF and its layout to spot an invoice or template already seen in a reported scam, or one you've already paid.",
+  "exec": "C",
+  "weight_class": "High / Med",
+  "chat_adjustable": "No / yes for retainer",
+  "hard_stop": true,
+  "built": false,
+  "feeds": [
+   "C6"
+  ]
+ },
+ "C6": {
+  "name": "Duplicate invoice number or amount",
+  "tier": 0,
+  "description": "Same invoice number or amount as one already paid to this supplier: a duplicate payment or a recycled fake.",
+  "exec": "C",
+  "weight_class": "Med",
+  "chat_adjustable": "Yes",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C7": {
+  "name": "Amount anomaly vs supplier history",
+  "tier": 0,
+  "description": "Compares the amount with what you usually pay this supplier. Far above the usual (over 3× the median) is unusual.",
+  "exec": "C",
+  "weight_class": "Low–Med",
+  "chat_adjustable": "Yes",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C28"
+  ]
+ },
+ "C8": {
+  "name": "ABN checksum (mod 89)",
+  "tier": 0,
+  "description": "Runs the official ABN checksum. A made-up ABN fails it instantly, before any lookup.",
+  "exec": "C",
+  "weight_class": "High if invalid",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C21"
+  ]
+ },
+ "C9": {
+  "name": "ACN checksum",
+  "tier": 0,
+  "description": "Runs the ACN checksum for company numbers printed on the invoice.",
+  "exec": "C",
+  "weight_class": "Med",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": false,
+  "feeds": [
+   "C36"
+  ]
+ },
+ "C10": {
+  "name": "GST maths and tax-invoice validity",
+  "tier": 0,
+  "description": "Recalculates GST (10% of the taxable subtotal) and the total. Sloppy fakes often get the maths wrong.",
+  "exec": "C",
+  "weight_class": "Med",
+  "chat_adjustable": "GST-free items",
+  "hard_stop": false,
+  "built": true,
+  "feeds": []
+ },
+ "C11": {
+  "name": "BSB validity and bank-name match (AusPayNet)",
+  "tier": 0,
+  "description": "Checks the BSB exists in the AusPayNet directory and belongs to the bank the invoice names.",
+  "exec": "C",
+  "weight_class": "Med (mismatch High)",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": true,
+  "feeds": []
+ },
+ "C12": {
+  "name": "PDF metadata (online editor, mod ≫ create date)",
+  "tier": 0,
+  "description": "Reads PDF metadata: which app made it, and whether it was modified long after creation or by an online editor.",
+  "exec": "C",
+  "weight_class": "Med",
+  "chat_adjustable": "\"I re-saved it\"",
+  "hard_stop": false,
+  "built": false,
+  "feeds": [
+   "C13"
+  ]
+ },
+ "C13": {
+  "name": "Incremental updates editing payment fields",
+  "tier": 0,
+  "description": "Looks for later edits saved on top of the original PDF that touch the payment fields. Strong evidence of tampering.",
+  "exec": "C",
+  "weight_class": "High",
+  "chat_adjustable": "No",
+  "hard_stop": true,
+  "built": true,
+  "feeds": [
+   "C39"
+  ]
+ },
+ "C14": {
+  "name": "Hidden text, zero-width chars, homoglyphs",
+  "tier": 0,
+  "description": "Finds text a person can't see: white or tiny text, zero-width characters, look-alike letters. Often instructions aimed at AI.",
+  "exec": "C",
+  "weight_class": "Med–High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C29"
+  ]
+ },
+ "C15": {
+  "name": "Overlay or annotation over the bank details",
+  "tier": 0,
+  "description": "Detects new text or boxes drawn over the original bank details, a common way to alter a genuine invoice.",
+  "exec": "C",
+  "weight_class": "High",
+  "chat_adjustable": "No",
+  "hard_stop": true,
+  "built": true,
+  "feeds": [
+   "C38",
+   "C39"
+  ]
+ },
+ "C16": {
+  "name": "Embedded JS, launch actions, odd links",
+  "tier": 0,
+  "description": "Flags embedded scripts, auto-launch actions or odd links inside the PDF.",
+  "exec": "C",
+  "weight_class": "Med",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C17": {
+  "name": "Structured extraction + internal consistency",
+  "tier": 1,
+  "description": "AI reads the invoice into structured fields (supplier, ABN, amounts, bank details) and code checks they agree with each other. Most Tier 1 checks depend on it.",
+  "exec": "L + C",
+  "weight_class": "enabler",
+  "chat_adjustable": "n/a",
+  "hard_stop": false,
+  "built": false,
+  "feeds": [
+   "C18",
+   "C19",
+   "C20",
+   "C21",
+   "C22",
+   "C24",
+   "C25",
+   "C26",
+   "C27",
+   "C28",
+   "C29"
+  ]
+ },
+ "C18": {
+  "name": "Payment-method inconsistency (BPAY vs BSB, two accounts)",
+  "tier": 1,
+  "description": "Payment details that contradict themselves: says BPAY but gives a BSB, or lists two different accounts.",
+  "exec": "C + J",
+  "weight_class": "Med–High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": true,
+  "feeds": []
+ },
+ "C19": {
+  "name": "\"Bank details have changed\" language",
+  "tier": 1,
+  "description": "Wording like \"our bank details have changed\". Weighted up when the account really has changed.",
+  "exec": "J",
+  "weight_class": "High with C1",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": true,
+  "feeds": []
+ },
+ "C20": {
+  "name": "Urgency / pressure / secrecy language",
+  "tier": 1,
+  "description": "Pressure language: pay within 24 hours, urgent, don't call, keep this confidential.",
+  "exec": "J",
+  "weight_class": "Med",
+  "chat_adjustable": "\"genuinely overdue\"",
+  "hard_stop": false,
+  "built": true,
+  "feeds": []
+ },
+ "C21": {
+  "name": "ABN Lookup: active, name match, entity type",
+  "tier": 1,
+  "description": "Official ABN Lookup: is the ABN active, and does the registered name match the supplier on the invoice?",
+  "exec": "A",
+  "weight_class": "High (cancelled) / Med",
+  "chat_adjustable": "TRADING_NAME",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C22",
+   "C23",
+   "C24",
+   "C36"
+  ]
+ },
+ "C22": {
+  "name": "GST charged but not GST-registered",
+  "tier": 1,
+  "description": "Invoice charges GST but the ABN isn't registered for GST.",
+  "exec": "A + C",
+  "weight_class": "Med–High",
+  "chat_adjustable": "Just registered",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C23": {
+  "name": "ABN age vs claimed history",
+  "tier": 1,
+  "description": "How long the ABN has existed compared with how established the business claims to be.",
+  "exec": "A + C + J",
+  "weight_class": "Low–Med",
+  "chat_adjustable": "NEW_BUSINESS",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C35"
+  ]
+ },
+ "C24": {
+  "name": "Real ABN, but payee or email belongs to someone else",
+  "tier": 1,
+  "description": "The ABN is real, but the account name or email belongs to someone else: a real business being impersonated.",
+  "exec": "C",
+  "weight_class": "High",
+  "chat_adjustable": "Factoring → check new entity",
+  "hard_stop": false,
+  "built": false,
+  "feeds": [
+   "C40"
+  ]
+ },
+ "C25": {
+  "name": "ATO / government official payment-details allowlist",
+  "tier": 1,
+  "description": "Invoices claiming to be the ATO or government must use the official published payment details. Anything else is a hard stop.",
+  "exec": "C",
+  "weight_class": "High, hard stop",
+  "chat_adjustable": "No",
+  "hard_stop": true,
+  "built": false,
+  "feeds": []
+ },
+ "C26": {
+  "name": "Contact consistency (email vs website domain, free-mail, area code)",
+  "tier": 1,
+  "description": "Do the email, website and phone fit together? Free-mail addresses and mismatched domains are weak warning signs.",
+  "exec": "C",
+  "weight_class": "Low–Med",
+  "chat_adjustable": "SOLE_TRADER",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C30",
+   "C34"
+  ]
+ },
+ "C27": {
+  "name": "Directory / domain-renewal offer disguised as invoice",
+  "tier": 1,
+  "description": "Spots directory listings or domain renewals dressed up as invoices for services you never ordered.",
+  "exec": "J + C",
+  "weight_class": "High",
+  "chat_adjustable": "\"I have a listing\"",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C28": {
+  "name": "Relationship plausibility (fits the customer's business?)",
+  "tier": 1,
+  "description": "Does this purchase fit the customer's business and normal suppliers? A landscaper buying aviation surveys is odd.",
+  "exec": "J + C",
+  "weight_class": "Med",
+  "chat_adjustable": "ORDERED_THIS",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C29": {
+  "name": "Spelling / formatting quality",
+  "tier": 1,
+  "description": "Spelling and formatting quality compared with a professional invoice. Weak on its own.",
+  "exec": "L → J",
+  "weight_class": "Low",
+  "chat_adjustable": "Yes",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C30": {
+  "name": "Lookalike domain (dnstwist-style)",
+  "tier": 2,
+  "description": "Looks for email or web domains one letter off the real supplier's (tallowoodmulch vs tallowwoodmulch).",
+  "exec": "C + search",
+  "weight_class": "High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C31"
+  ]
+ },
+ "C31": {
+  "name": "Domain age (RDAP; for .au use crt.sh / Wayback)",
+  "tier": 2,
+  "description": "How old the sender's domain is, from certificate and web-archive history. Days-old domains are a red flag.",
+  "exec": "A",
+  "weight_class": "Med",
+  "chat_adjustable": "NEW_BUSINESS",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C33"
+  ]
+ },
+ "C32": {
+  "name": ".au registrant eligibility ID ≠ invoice ABN",
+  "tier": 2,
+  "description": "For .au domains, checks the registrant's ABN matches the ABN on the invoice.",
+  "exec": "A/M",
+  "weight_class": "Med–High",
+  "chat_adjustable": "Agency-registered",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C33": {
+  "name": "Email DNS posture (MX/SPF/DMARC)",
+  "tier": 2,
+  "description": "Email security setup (MX, SPF, DMARC) on the sender's domain. Missing records make spoofing easier.",
+  "exec": "A",
+  "weight_class": "Low",
+  "chat_adjustable": "Yes",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C34": {
+  "name": "Official contact details cross-check",
+  "tier": 2,
+  "description": "Finds the supplier's official contact details independently and compares them with the invoice.",
+  "exec": "L + search",
+  "weight_class": "Med–High",
+  "chat_adjustable": "\"they moved\" (address only)",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C35": {
+  "name": "Web presence / scam reports",
+  "tier": 2,
+  "description": "Searches for reviews, an established web presence, and scam reports about the business.",
+  "exec": "L + search",
+  "weight_class": "Med (scam hits High)",
+  "chat_adjustable": "Absence only",
+  "hard_stop": false,
+  "built": true,
+  "feeds": []
+ },
+ "C36": {
+  "name": "ASIC company status",
+  "tier": 2,
+  "description": "Checks ASIC: is the company registered, and is it deregistered or in administration?",
+  "exec": "data.gov.au CSV",
+  "weight_class": "Med–High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C37": {
+  "name": "Logo provenance",
+  "tier": 2,
+  "description": "Checks whether the logo was lifted from the real supplier's website.",
+  "exec": "C",
+  "weight_class": "Low–Med",
+  "chat_adjustable": "Yes",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C38": {
+  "name": "Render-vs-text OCR forensics on payment fields",
+  "tier": 3,
+  "description": "Compares what the page shows with the text hidden underneath, to catch payment fields that render differently from their text.",
+  "exec": "C (+L vision)",
+  "weight_class": "High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C39": {
+  "name": "Prior-revision recovery (\"original details were…\")",
+  "tier": 3,
+  "description": "Recovers the original bank details from earlier versions inside the PDF, so the report can say \"the real account was…\".",
+  "exec": "C + L",
+  "weight_class": "High",
+  "chat_adjustable": "No",
+  "hard_stop": false,
+  "built": true,
+  "feeds": [
+   "C41"
+  ]
+ },
+ "C40": {
+  "name": "Director / officeholder checks",
+  "tier": 3,
+  "description": "Checks directors and officeholders for links to known scams or phoenix companies.",
+  "exec": "M",
+  "weight_class": "Low–Med",
+  "chat_adjustable": "—",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ },
+ "C41": {
+  "name": "Human call-back / fraud-team referral",
+  "tier": 3,
+  "description": "Hands the case to a person: a call-back on a known number or a fraud-team referral.",
+  "exec": "workflow",
+  "weight_class": "resolves",
+  "chat_adjustable": "—",
+  "hard_stop": false,
+  "built": false,
+  "feeds": []
+ }
 }
