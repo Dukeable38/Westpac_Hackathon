@@ -1,6 +1,6 @@
 # TASK-002 · Extraction eval on Nathan's real-style invoices
 
-- **Status:** ready
+- **Status:** in-review
 - **Assignee:** Paul's agent (results go to Delvin + Paul for the model choice)
 - **Branch:** `task/TASK-002-extraction-eval`
 
@@ -26,6 +26,11 @@ New: `scripts/extract_eval.py`, `demo/invoices/nathan/expected.json`. Edit: `REA
 
 ## Log
 - 2026-11-17 · opened by Kiel's side.
+- 2026-11-17 · claimed by Paul's Codex agent; building the evaluator test-first on the prescribed branch.
+- 2026-11-17 · evaluator and ground truth complete; fake baseline and full test suite verified on Windows.
 
 ## Handback
-_(assignee fills in: baseline table, any real-provider tables, observations)_
+- Fake/replay baseline: **48/148 fields = 32.4%**. It mainly succeeds on absent fields, one shared email/website, and the Skype BSB/account; it misses line items and most identities, dates and totals.
+- No real-provider table: no `.env`, `LLM_API_KEY`, or `ANTHROPIC_API_KEY` was available. No keys were created or committed.
+- Ground truth captures the Fusion discrepancy (`Total Due $2624.00` versus `Total $2624.40`) and does not misattribute the billed-to Gmail address to the supplier.
+- Verify with `$env:LLM_PROVIDER='fake'; $env:DEMO_MODE='replay'; .\.venv\Scripts\python.exe scripts\extract_eval.py`, then `.\.venv\Scripts\python.exe -m pytest tests\ -q`.

@@ -72,3 +72,11 @@ PDF uploads are limited to 10 MB / 20 pages. Encrypted, malformed and unsupporte
 - The front end (`app/static/index.html`, `radar.css`, `app.js`) is the signed-off `mockups/radar/index.html` wired to the real API. It was checked in a browser on 17 Nov 2026 with all four fixtures (pay flow, standalone check, chat re-score, pay and report receipts) and two of Nathan's invoices. Bank chrome, balances and upcoming payments are fictional static demo content.
 
 See `PROGRESS.md` for precise verification and the final handover. `mockups/` and original acceptance assertions remain unchanged.
+
+## Comparing models
+
+Configure `LLM_PROVIDER`, `LLM_MODEL`, endpoint and key in `.env` as described above.
+Run `.\.venv\Scripts\python.exe scripts\extract_eval.py` from the repository root.
+The evaluator sanitises each Nathan PDF, calls the configured extractor and prints ✓/✗ per field.
+Money is compared to the cent; BSB and account formatting differences are ignored.
+Use `LLM_PROVIDER=fake` for the offline baseline; keys and `.env` must never be committed.
