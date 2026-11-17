@@ -77,3 +77,4 @@ python -m venv .venv
 Open http://127.0.0.1:8000. Default fake/replay needs no key. For cloud/Linux replace the executable with `.venv/bin/python`. The smoke server is automatically stopped. All implementation work took place in the cloud, not the user's Windows clone.
 
 - 2026-11-17 · TASK-001 · Added additive Low/Medium/High/Critical API levels to check, GET, chat, and receipt responses while preserving legacy bands. New fixture/chat/receipt tests pass; full suite **45 passed** and demo smoke passed on Windows.
+- 2026-11-17 · TASK-002 · Added verified ground truth for four Nathan invoices and `scripts/extract_eval.py`. Fake/replay baseline scored **48/148 fields (32.4%)**; no real provider was available locally. Money compares to cents and payment identifiers ignore spaces/dashes.
