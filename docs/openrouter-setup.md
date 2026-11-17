@@ -33,3 +33,5 @@ Free limits: **50 requests per day** across all `:free` models (1,000/day once t
 | `fake` (offline regex) | 48/148 = 32.4% |
 | `nvidia/nemotron-3.5-super-vl:free` | 116/148 = **78.4%** |
 | `anthropic/claude-haiku-5.5` | not yet run (needs credit) |
+
+Demo fixtures with `nemotron-3.5-super-vl:free` (after `extract.normalise`): all four levels match the offline run (96 / 0 / 0 / 59; chat 59 → 84). About 15–20 s per check.
