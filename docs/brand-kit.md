@@ -7,7 +7,7 @@
 - Mark: a document/phone shape (navy `#1F1C4F`, or white on navy) with a radar "ping" (dot + arc) cut from its top-right corner. Ping in Westpac red `#DA1710` or purple `#991AD6`.
 - Wordmark: **RADAR** in a heavy, wide, letter-spaced sans; tagline **"Don't let scams fly under the radar."**
 - Lock-ups: horizontal (mark left, wordmark right) and stacked; light and dark backgrounds.
-- **Open:** which version (v5 / v6) and which ping colour (red / purple) is final; the wordmark font name; clean SVG/PNG exports (these files are preview sheets).
+- **Leaning v5** (dot + one arc): the mark is often shown small and v6's extra arc gets muddy (Kiel, 17 Nov). **Open:** final ping colour (red / purple); the wordmark font name; clean SVG/PNG exports (these files are preview sheets).
 
 Source: "Branding Kit Lauren VIP" (Canva, comment access). This file transcribes it so code and AI agents can use it. The Canva page is the master; update this file if it changes.
 
