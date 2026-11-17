@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoice Scam Checker</title>
+
+
+<style>
+/* Colours from Westpac's public GEL design system (WBC). No Westpac logo or name used. */
+:root{
+  --red:#da1710; --red-dk:#a8130d; --red-soft:#fff0f0;
+  --navy:#1f1c4f; --navy-2:#2d2a6e; --navy-soft:#f1f0fa;
+  --ink:#161619; --muted:#5b5b6a; --line:#dedee1; --pale:#f5f5f6; --bg:#f3f4f6; --card:#fff;
+  --ok:#008000; --ok-soft:#f2f9f2; --warn:#c53b00; --warn-soft:#fcf5f2; --bad:#c40000; --bad-soft:#fcf2f2; --info:#0074c4; --info-soft:#f2f8fc;
+  --display:"Archivo",Arial,sans-serif; --body:"Inter",Arial,sans-serif; --mono:"JetBrains Mono",Consolas,monospace;
+  --r:10px; --shadow:0 1px 2px rgba(20,20,40,.06),0 4px 16px rgba(20,20,40,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body)}
+button{font:inherit;cursor:pointer}
+h1,h2,h3{font-family:var(--display);color:var(--navy);margin:0;line-height:1.2}
+.mono{font-family:var(--mono);font-size:.88em}
+
+/* bank chrome */
+.top{background:#fff;border-bottom:1px solid var(--line)}
+.top-in{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;gap:28px}
+.brand{display:flex;align-items:center;gap:10px;font:700 17px var(--display);color:var(--navy);white-space:nowrap}
+.brand i{width:30px;height:30px;border-radius:7px;background:var(--red);display:block;position:relative}
+.brand i::after{content:"";position:absolute;inset:9px 7px;border:3px solid #fff;border-top:none;border-radius:0 0 6px 6px}
+.nav{display:flex;gap:22px;font-weight:500;color:var(--muted);font-size:14px;align-self:stretch}
+.nav span{display:flex;align-items:center}
+.nav span.on{color:var(--navy);box-shadow:inset 0 -3px 0 var(--red)}
+.who{margin-left:auto;text-align:right;font-size:13px;color:var(--muted);line-height:1.3}
+.who b{display:block;color:var(--ink);font-weight:600}
+.sub{background:var(--navy);color:#fff}
+.sub-in{max-width:1200px;margin:0 auto;padding:18px 24px 20px}
+.crumb{font-size:13px;opacity:.75}
+.sub h1{color:#fff;font-size:26px;margin-top:2px}
+
+/* demo controls */
+.demo{background:#fffbe6;border-bottom:1px solid #f0e2a0;font-size:13px}
+.demo-in{max-width:1200px;margin:0 auto;padding:8px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.demo b{font-weight:700;color:#7a5b00;margin-right:6px;letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+.demo button{border:1px solid #e3d48c;background:#fff;border-radius:999px;padding:4px 12px;font-size:13px}
+.demo button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.demo .hint{margin-left:auto;color:#8a7a3a}
+body.clean .demo{display:none}
+
+/* steps */
+.steps{max-width:1200px;margin:20px auto 0;padding:0 24px;display:flex;gap:6px;list-style:none}
+.steps li{flex:1;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);padding:8px 0;border-top:3px solid var(--line)}
+.steps li i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--line);color:var(--muted);font-size:12px}
+.steps li.on{color:var(--navy);border-color:var(--red)}
+.steps li.on i{background:var(--red);color:#fff}
+.steps li.done{color:var(--navy);border-color:var(--navy)}
+.steps li.done i{background:var(--navy);color:#fff}
+
+main{max-width:1200px;margin:0 auto;padding:20px 24px 60px}
+.screen{display:none}
+.screen.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.label{font:600 11px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* buttons */
+.btn{border:none;border-radius:8px;padding:11px 18px;font-weight:600;font-size:15px;display:inline-flex;gap:8px;align-items:center;justify-content:center}
+.btn.primary{background:var(--red);color:#fff}
+.btn.primary:hover{background:var(--red-dk)}
+.btn.secondary{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+.btn.ghost{background:none;color:var(--navy);text-decoration:underline;padding:6px 0}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* screen 1 */
+.form .row{margin-bottom:16px}
+.field{border:1px solid #b8b8c0;border-radius:6px;padding:10px 12px;background:#fff;display:flex;justify-content:space-between;align-items:center;min-height:44px;color:var(--ink)}
+.field.empty{color:#9a9aa6}
+.drop{display:block;border:2px dashed #b9b6e0;background:var(--navy-soft);border-radius:var(--r);padding:34px 22px;text-align:center;transition:.15s;cursor:pointer}
+.drop.over{border-color:var(--red);background:var(--red-soft)}
+.drop svg{width:44px;height:44px;color:var(--navy)}
+.drop h3{margin:10px 0 4px;font-size:19px}
+.drop p{margin:0;color:var(--muted);font-size:14px}
+.privacy{display:flex;gap:10px;margin-top:16px;font-size:13px;color:var(--muted);align-items:flex-start}
+.privacy svg{flex:none;width:18px;height:18px;color:var(--ok);margin-top:1px}
+.samples{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.samples button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 10px;font-size:13px}
+.why{margin-top:18px;padding:14px 16px;border-left:4px solid var(--red);background:var(--red-soft);border-radius:0 8px 8px 0;font-size:14px}
+
+/* screen 2 */
+.chk-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}
+.filepill{display:flex;gap:10px;align-items:center;background:var(--pale);border-radius:8px;padding:8px 12px;font-size:13px}
+.filepill svg{width:22px;height:22px;color:var(--red)}
+.tiers{display:grid;gap:12px}
+.tier{border:1px solid var(--line);border-radius:var(--r);background:#fff;overflow:hidden}
+.tier-h{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--pale)}
+.tier-h .tn{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.tier-h h3{font-size:15px}
+.tier-h .meta{font-size:12.5px;color:var(--muted)}
+.tier-h .st{margin-left:auto;font-size:12.5px;font-weight:600;white-space:nowrap}
+.tier.skip{opacity:.6}
+.tier.skip .tier-h .tn{background:#9a9aa6}
+.tier ul{list-style:none;margin:0;padding:6px 16px 10px;display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+.tier li{display:flex;gap:8px;align-items:center;padding:5px 0;font-size:13.5px;opacity:0;transform:translateX(-4px);transition:.2s}
+.tier li.in{opacity:1;transform:none}
+.ico{width:18px;height:18px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
+.ico.ok{background:var(--ok)} .ico.risk{background:var(--bad)} .ico.med{background:var(--warn)} .ico.neu{background:#9a9aa6}
+.esc{margin:0 16px 12px;padding:8px 12px;border-radius:6px;font-size:13px;background:var(--info-soft);color:#00467a;display:none}
+.esc.show{display:block}
+.spin{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:-3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* screen 3 */
+.res{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+.res.nochat{grid-template-columns:minmax(0,1fr)}
+.res.nochat .chat{display:none}
+.verdict{display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center}
+.ring{position:relative;width:150px;height:150px}
+.ring svg{width:150px;height:150px;transform:rotate(-90deg)}
+.ring .n{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .n b{font:800 44px/1 var(--display);color:var(--ink);display:block}
+.ring .n small{font-size:12px;color:var(--muted)}
+.band{display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:14px;padding:5px 12px;border-radius:999px}
+.band.genuine{background:var(--ok-soft);color:var(--ok)}
+.band.check{background:var(--warn-soft);color:var(--warn)}
+.band.high_risk{background:var(--bad-soft);color:var(--bad)}
+.verdict h2{font-size:24px;margin:10px 0 6px}
+.verdict p{margin:0;color:var(--muted)}
+.advice{margin-top:18px;padding:14px 16px;border-radius:8px;display:flex;gap:12px;align-items:flex-start;font-size:15px}
+.advice svg{flex:none;width:22px;height:22px;margin-top:1px}
+.advice.genuine{background:var(--ok-soft);border:1px solid #b5dbb5}
+.advice.check{background:var(--warn-soft);border:1px solid #efc6ae}
+.advice.high_risk{background:var(--bad-soft);border:1px solid #efb5b5}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:18px}
+.facts div{background:#fff;padding:10px 12px}
+.facts b{display:block;font-size:14px;font-weight:600;margin-top:2px;overflow-wrap:anywhere}
+.facts b.strike{color:var(--bad)}
+.sigs h3{font-size:16px;margin:22px 0 8px;display:flex;align-items:center;gap:8px}
+.sigs h3 .cnt{font:600 12px var(--body);color:var(--muted)}
+.sig{display:grid;grid-template-columns:22px 1fr auto;gap:4px 10px;padding:11px 0;border-top:1px solid var(--line);align-items:start}
+.sig .ico{margin-top:2px}
+.sig .nm{font-weight:600;font-size:14.5px}
+.sig .ev{grid-column:2/4;font-size:13.5px;color:var(--muted)}
+.sig .pts{font:500 13px var(--mono);text-align:right;white-space:nowrap;transition:.3s}
+.pts.neg{color:var(--bad)} .pts.pos{color:var(--ok)} .pts.zero{color:var(--muted)}
+.tag{display:inline-block;font:600 10px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;padding:4px 6px;border-radius:4px;margin-left:6px;vertical-align:2px}
+.tag.lock{background:var(--bad-soft);color:var(--bad)}
+.tag.soft{background:var(--info-soft);color:var(--info)}
+.tag.tier{background:var(--pale);color:var(--muted)}
+.sig.flash{animation:flash 1.4s ease}
+@keyframes flash{0%,100%{background:transparent}30%{background:var(--info-soft)}}
+.more{margin-top:6px}
+.cov{display:flex;gap:16px;align-items:center;font-size:13px;color:var(--muted);margin-top:16px;flex-wrap:wrap}
+.bar{height:6px;width:140px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--navy)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:18px;border-top:1px solid var(--line);align-items:center}
+.actions .spacer{flex:1}
+.confirm{display:none;width:100%;font-size:13.5px;background:var(--bad-soft);border-radius:8px;padding:10px 12px;gap:8px;align-items:flex-start}
+.confirm.show{display:flex}
+
+/* chat */
+.chat{position:sticky;top:16px;display:flex;flex-direction:column;height:calc(100vh - 40px);max-height:720px;padding:0;overflow:hidden}
+.chat-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.chat-h .av{width:32px;height:32px;border-radius:50%;background:var(--navy);display:grid;place-items:center;color:#fff}
+.chat-h .av svg{width:18px;height:18px}
+.chat-h b{display:block;font-size:14px}
+.chat-h small{color:var(--muted);font-size:12px}
+.msgs{flex:1;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:88%;padding:10px 13px;border-radius:12px;font-size:14px}
+.m.bot{background:var(--pale);border-bottom-left-radius:4px}
+.m.me{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.m .delta{display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.m .delta b{color:var(--ink)}
+.typing{display:inline-flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#9a9aa6;animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,100%{opacity:.3}50%{opacity:1}}
+.sugg{padding:0 18px 10px;display:flex;flex-wrap:wrap;gap:6px}
+.sugg button{border:1px solid #b9b6e0;background:var(--navy-soft);color:var(--navy);border-radius:999px;padding:6px 11px;font-size:13px;text-align:left}
+.composer{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
+.composer input{flex:1;border:1px solid #b8b8c0;border-radius:8px;padding:10px 12px;font:inherit;font-size:14px}
+.composer .btn{padding:10px 14px}
+.rule{font-size:11.5px;color:var(--muted);padding:0 18px 10px}
+
+/* receipt */
+.receipt{max-width:720px;margin:0 auto}
+.rc-top{display:flex;gap:14px;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.rc-top .big{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:none}
+.rc-top .big svg{width:26px;height:26px}
+.rc-top h2{font-size:22px}
+.rc-top p{margin:2px 0 0;color:var(--muted);font-size:14px}
+dl.kv{display:grid;grid-template-columns:180px 1fr;margin:16px 0;gap:0}
+dl.kv dt,dl.kv dd{padding:9px 0;border-bottom:1px solid var(--line);margin:0;font-size:14px}
+dl.kv dt{color:var(--muted)}
+dl.kv dd{font-weight:500;overflow-wrap:anywhere}
+.fp{font-family:var(--mono);font-size:12.5px;background:var(--pale);padding:3px 6px;border-radius:4px;word-break:break-all}
+.note{display:flex;gap:10px;padding:12px 14px;border-radius:8px;font-size:14px;margin-top:10px}
+.note svg{flex:none;width:20px;height:20px}
+.note.info{background:var(--info-soft)} .note.okn{background:var(--ok-soft)} .note.badn{background:var(--bad-soft)}
+.verify{display:block;margin-top:18px;border:2px dashed var(--line);border-radius:8px;padding:14px;text-align:center;font-size:14px;color:var(--muted);cursor:pointer}
+.verify.over{border-color:var(--navy)}
+.vres{margin-top:10px;font-size:14px}
+
+@media (max-width:900px){
+  .grid2,.res{grid-template-columns:1fr}
+  .chat{position:static;height:560px}
+  .nav,.who{display:none}
+  .tier ul{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr 1fr}
+  .verdict{grid-template-columns:1fr;justify-items:start}
+  .steps li span{display:none}
+  dl.kv{grid-template-columns:1fr} dl.kv dt{border:none;padding-bottom:0}
+}
+@media (max-width:560px){
+  .top-in,.sub-in,.demo-in,main,.steps{padding-left:16px;padding-right:16px}
+  .card{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="top-in">
+  <div class="brand"><i></i>Invoice Scam Checker</div>
+  <nav class="nav"><span>Accounts</span><span class="on">Pay &amp; transfer</span><span>Payees</span><span>Statements</span><span>Help</span></nav>
+  <div class="who"><b>Greenline Landscaping Pty Ltd</b>Mia Tran</div>
+</div></header>
+<div class="sub"><div class="sub-in">
+  <div class="crumb">Pay &amp; transfer › Pay an invoice</div>
+  <h1>Check before you pay</h1>
+</div></div>
+
+<div class="demo"><div class="demo-in">
+  <b>Demo</b>
+  <button data-sc="1">1 · Clean</button>
+  <button data-sc="2">2 · Changed bank details</button>
+  <button data-sc="3">3 · Sloppy fake</button>
+  <button data-sc="4">4 · New business</button>
+  <button id="reset">↺ Reset</button>
+  <span class="hint">Fictional demo · no money is moved</span>
+</div></div>
+
+<ol class="steps" id="steps">
+  <li data-s="1"><i>1</i><span>Upload invoice</span></li>
+  <li data-s="2"><i>2</i><span>Checking</span></li>
+  <li data-s="3"><i>3</i><span>Result</span></li>
+  <li data-s="4"><i>4</i><span>Explain</span></li>
+  <li data-s="5"><i>5</i><span>Pay &amp; receipt</span></li>
+</ol>
+
+<main>
+<div id="error" role="alert" hidden style="padding:14px;margin-bottom:16px;background:var(--bad-soft);border:1px solid var(--bad);border-radius:8px"></div>
+
+<!-- 1 · UPLOAD -->
+<section class="screen on" id="s1">
+  <div class="grid2">
+    <div class="card form">
+      <div class="label" style="margin-bottom:14px">Payment details</div>
+      <div class="row"><div class="label">From</div><div class="field">Greenline Landscaping · fictional demo customer</div></div>
+      <div class="row"><div class="label">To</div><div class="field empty" id="f-to">Filled in from your invoice</div></div>
+      <div class="row"><div class="label">Amount</div><div class="field empty" id="f-amt">Filled in from your invoice</div></div>
+      <div class="row"><div class="label">Reference</div><div class="field empty" id="f-ref">Filled in from your invoice</div></div>
+      <div class="why"><b>Did you know?</b> Invoices with changed bank details are one of the most common ways businesses lose money to scams. The email can look exactly like your real supplier.</div>
+    </div>
+    <div class="card">
+      <div class="label" style="margin-bottom:14px">Check the invoice before you pay</div>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept="application/pdf" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg>
+        <h3>Drop your invoice PDF here</h3>
+        <p>or <u>choose a file</u>. The demo checks seeded payment history and public-record evidence. PDF only, up to 10 MB.</p>
+      </label>
+      <div class="privacy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+        <span>PDF uploads are not retained after processing. The demo retains extracted fields and results during this session; saved receipts contain the file name, fingerprint, score and signal summary. Use fictional invoices only.</span></div>
+      <div class="samples">Sample invoices:
+        <button data-sc="1">Tallowwood (usual)</button><button data-sc="2">Tallowwood (new bank)</button><button data-sc="3">Brightwater</button><button data-sc="4">Fernhill</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · CHECKING -->
+<section class="screen" id="s2">
+  <div class="card">
+    <div class="chk-head">
+      <div><h2 style="font-size:22px">Checking your invoice</h2><div style="color:var(--muted);font-size:14px" id="chk-sub" aria-live="polite">Quick checks run on every invoice. We only dig deeper if something looks off.</div></div>
+      <div class="filepill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><div><b id="chk-file">invoice.pdf</b><div class="mono" style="color:var(--muted)" id="chk-hash">fingerprint …</div></div></div>
+    </div>
+    <div class="tiers" id="tiers"></div>
+  </div>
+</section>
+
+<!-- 3/4 · RESULT + CHAT -->
+<section class="screen" id="s3">
+  <div class="res nochat" id="res">
+    <div class="card">
+      <div class="verdict">
+        <div class="ring"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="64" fill="none" stroke="var(--line)" stroke-width="12"/><circle id="arc" cx="75" cy="75" r="64" fill="none" stroke="var(--ok)" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 402" style="transition:stroke-dasharray .8s ease,stroke .3s"/></svg>
+          <div class="n"><div><b id="score">0</b><small>out of 100</small></div></div></div>
+        <div>
+          <span class="band" id="band"></span>
+          <h2 id="headline"></h2>
+          <p id="sub"></p>
+        </div>
+      </div>
+      <div class="advice" id="advice"></div>
+      <div class="facts" id="facts"></div>
+      <div class="sigs" id="sigs"></div>
+      <div class="cov" id="cov"></div>
+      <div class="actions" id="actions">
+        <button class="btn secondary" id="open-chat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg>Tell us more about this supplier</button>
+        <span class="spacer"></span>
+        <button class="btn secondary" data-dec="report">Record report decision</button>
+        <button class="btn secondary" data-dec="hold">Record hold decision</button>
+        <button class="btn primary" data-dec="pay" id="paybtn">Record pay decision</button>
+        <label class="confirm" id="confirm"><input type="checkbox" id="confirm-cb"> <span id="confirm-txt"></span></label>
+      </div>
+    </div>
+    <aside class="card chat" id="chat">
+      <div class="chat-h"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/></svg></div>
+        <div><b>Invoice assistant</b><small>Explains the result. Can't override red flags.</small></div></div>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <div class="sugg" id="sugg"></div>
+      <div class="rule">Your answers can soften some signals. Red flags marked <span class="tag lock" style="margin:0">locked</span> never change.</div>
+      <form class="composer" id="composer"><input aria-label="Message to invoice assistant" maxlength="2000" id="msg" placeholder="e.g. They're a new business I met at an expo" autocomplete="off"><button class="btn primary" type="submit">Send</button></form>
+    </aside>
+  </div>
+</section>
+
+<!-- 5 · RECEIPT -->
+<section class="screen" id="s5">
+  <div class="card receipt" id="receipt"></div>
+</section>
+
+</main>
+
+
+<script src="/static/classic.js" defer></script>
+</body>
+</html>

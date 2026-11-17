@@ -15,7 +15,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Open **http://127.0.0.1:8000**. Choose a sample invoice or upload a PDF from `demo/invoices/`. Stop the interactive demo server with Ctrl+C. The smoke script starts a background server, tests it and always shuts it down itself. No Node build or system software is required. A `.env` file is optional: defaults are `LLM_PROVIDER=fake`, `DEMO_MODE=replay`.
+Open **http://127.0.0.1:8000**. The Radar UI sits inside a mock Westpac Online Banking page (layout from `docs/westpac-reference/`). Use **Make a payment → Attach invoice** or **Payments → Check an invoice**, or click a sample invoice in the dark demo bar along the top (it runs the real checks). `/radar` is the live debug view; the previous UI is kept at `/static/classic.html`. Stop the interactive demo server with Ctrl+C. The smoke script starts a background server, tests it and always shuts it down itself. No Node build or system software is required. A `.env` file is optional: defaults are `LLM_PROVIDER=fake`, `DEMO_MODE=replay`.
 
 Linux/macOS: use `.venv/bin/python` instead of `.\.venv\Scripts\python.exe`.
 
@@ -69,6 +69,6 @@ PDF uploads are limited to 10 MB / 20 pages. Encrypted, malformed and unsupporte
 - Fake extraction is deterministic regex extraction for readable text PDFs. It is not production-grade document understanding; line items are not yet populated and GST assumes a 10% taxable subtotal. Real provider extraction validates the declared schema.
 - All unimplemented checks return `unknown`; coverage is intentionally partial, not a claim of complete verification. P1/P2 IDs remain unknown unless specifically documented in `PROGRESS.md`.
 - A follow-up official ABN Lookup audit found one original seed collision and replaced it: Corella now uses **93 270 000 491**. [Official lookup](https://abr.business.gov.au/ABN/View?abn=93270000491) returned no matching record. All eight checksum-valid seeded ABNs were checked and now returned no record; dated URLs/results are in `demo/seed/abn-audit.json`. This is a point-in-time check, not a permanent reservation. Domain ownership remains unverified; recheck before a public video and never use real invoices or personal data.
-- Browser visual QA is not claimed: the user's requested scripted smoke replaces it. The frontend preserves the mock-up layout and has JavaScript syntax/API integration checks.
+- The front end (`app/static/index.html`, `radar.css`, `app.js`) is the signed-off `mockups/radar/index.html` wired to the real API. It was checked in a browser on 17 Nov 2026 with all four fixtures (pay flow, standalone check, chat re-score, pay and report receipts) and two of Nathan's invoices. Bank chrome, balances and upcoming payments are fictional static demo content.
 
 See `PROGRESS.md` for precise verification and the final handover. `mockups/` and original acceptance assertions remain unchanged.

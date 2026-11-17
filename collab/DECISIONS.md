@@ -14,7 +14,7 @@ Newest first. These override older docs where they conflict. Each line: date · 
 
 - **2026-11-17 · Real Westpac screenshots are the UI source of truth.** `docs/westpac-reference/` (Kiel's own Online Banking, redacted). Every Radar screen is built on top of these pages; where the mock-up differs, the screenshots win.
 - **2026-11-17 · Delvin's opening animation is the Radar intro and loading state.** `docs/brand/radar-opening-animation.html`; `class="scanning"` on the svg loops the sonar while an invoice is being checked.
-- **2026-11-17 · UI target is `mockups/radar/index.html`** (Kiel: "seems ok right now"; restyle it against `docs/westpac-reference/`). The old `mockups/index.html` is kept only as history.
+- **2026-11-17 · UI target is `mockups/radar/index.html`, signed off by Kiel and now live at `/`** (`app/static/`). Plain-English signal titles are a display layer in `app.js`; the server still decides level, score and findings. The old `mockups/index.html` is kept only as history.
 
 ## AI
 - **2026-11-17 · LLM access via OpenRouter**, through the existing `openai_compatible` provider (`LLM_BASE_URL=https://openrouter.ai/api/v1`). Model choice is open: Delvin + Paul decide using the TASK-002 eval and TASK-004 research.

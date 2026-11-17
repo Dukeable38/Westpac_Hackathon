@@ -10,6 +10,8 @@ Snapshot for anyone (human or agent) picking up the work. Update it at the end o
 - `mockups/radar/index.html`: **current UI mock-up**, rebuilt on Kiel's real Westpac screenshots (`docs/westpac-reference/`, the UI source of truth) with Delvin's logo animation as the loading state. Kiel: OK as of 17 Nov. Covers: Radar as "Attach invoice" inside Make a payment; standalone "Check an invoice" with "Pay this invoice"; 4 risk levels; Report first for High/Critical; context-aware Report wording; Westpac Verify shown as the bank's existing check. Not wired to the backend. Awaiting Kiel's sign-off.
 - Brand: `docs/brand-kit.md`, logo previews in `docs/brand/` (leaning v5).
 
+- **Main app UI = Radar** (`/`): the mock-up wired to the real API. Sample invoices in the demo bar run real checks. Old UI at `/static/classic.html`.
+
 ## In flight (Paul's agent, see `collab/tasks/`)
 - TASK-004: signal research, **final call on the checking strategy**, OpenRouter model shortlist, building checks (full or skeleton), confidence measure.
 - TASK-002: extraction scorecard on Nathan's invoices (model choice).
@@ -19,7 +21,6 @@ Merge their `task/*` branches after review; they may arrive on `origin` or on Pa
 ## Not started / next
 - Before the repo goes public: delete or redact `docs/westpac-reference/01-overview-dashboard.png`.
 - Unmerged: `paul/invoice-scam-checker` eb5e975 (LLM timeout + Retry-After backoff). Review and merge if useful.
-- Wire the main app UI (`app/static/index.html` + `app.js`) to the Radar mock-up once it's signed off (needs TASK-001's `level`).
 - Real LLM: put an OpenRouter key in `.env` (never commit), pick a model from TASK-002/004, run `scripts/llm_smoke.py` and the 4 Nathan invoices.
 - Lauren: tone of voice, final logo colour, clean logo exports.
 - Pitch stats: verify the $2.0M small-business figure and the "<10% reimbursement" claim before they go in the deck (see chat notes; `docs/research-checks.md` has sourced stats).
