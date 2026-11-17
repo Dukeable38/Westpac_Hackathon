@@ -1,6 +1,6 @@
 # TASK-001 · Four risk levels in the API
 
-- **Status:** in-review
+- **Status:** done
 - **Assignee:** Paul's agent
 - **Branch:** `task/TASK-001-four-risk-levels`
 
