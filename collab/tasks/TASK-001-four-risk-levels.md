@@ -1,6 +1,6 @@
 # TASK-001 · Four risk levels in the API
 
-- **Status:** ready
+- **Status:** in-review
 - **Assignee:** Paul's agent
 - **Branch:** `task/TASK-001-four-risk-levels`
 
@@ -31,6 +31,12 @@ Add `level` to every result (`POST /api/check`, `GET /api/check/{id}`, the chat 
 
 ## Log
 - 2026-11-17 · opened by Kiel's side.
+- 2026-11-17 · claimed by Paul's Codex agent; implementing test-first on the prescribed task branch.
+- 2026-11-17 · implementation complete; 45 tests and `scripts/smoke_demo.py` pass on Windows.
 
 ## Handback
-_(assignee fills in: what changed, how to verify, anything left)_
+- Added deterministic `level` mapping without changing the existing `band` rules.
+- Included `level` in initial/GET results, chat responses and nested results, and stored receipts.
+- Added `tests/test_levels.py` covering all four fixtures, chat transitions, critical locking, GET persistence, and receipts.
+- Verify with `.\.venv\Scripts\python.exe -m pytest tests\ -q` and `.\.venv\Scripts\python.exe scripts\smoke_demo.py`.
+- Nothing left in TASK-001; ready for review and merge.

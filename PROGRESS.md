@@ -75,3 +75,5 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 Open http://127.0.0.1:8000. Default fake/replay needs no key. For cloud/Linux replace the executable with `.venv/bin/python`. The smoke server is automatically stopped. All implementation work took place in the cloud, not the user's Windows clone.
+
+- 2026-11-17 · TASK-001 · Added additive Low/Medium/High/Critical API levels to check, GET, chat, and receipt responses while preserving legacy bands. New fixture/chat/receipt tests pass; full suite **45 passed** and demo smoke passed on Windows.

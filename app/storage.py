@@ -16,7 +16,7 @@ def connect():
     return db
 
 def receipt(result,decision):
-    record={k:result[k] for k in ['customer_id','file_name','sha256','score','band']}
+    record={k:result[k] for k in ['customer_id','file_name','sha256','score','band','level']}
     record.update(receipt_id=uuid.uuid4().hex,decision=decision,decided_at=datetime.now(timezone.utc).isoformat(),signals_summary=result['signals'],pdf_stored=False)
     with connect() as db: db.execute('INSERT INTO receipts VALUES (?,?)',(record['receipt_id'],json.dumps(record)))
     return record
