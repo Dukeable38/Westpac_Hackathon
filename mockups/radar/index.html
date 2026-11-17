@@ -4,204 +4,304 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Radar Mock-up</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Radar desktop mock-up inside Westpac Online Banking for Business.
-   Layout reference: Westpac how-to images (2024-25) and desktop video (2020). Brand: docs/brand-kit.md (Radar, logo v5).
+/* Radar desktop mock-up, built on Kiel's real Westpac Online Banking screenshots (docs/westpac-reference/).
+   Those screenshots are the source of truth for layout, chrome, buttons and forms. Radar adds to them.
+   Logo animation: Delvin's docs/brand/radar-opening-animation.html (intro + "scanning" loading state).
    Decisions: collab/DECISIONS.md. All data fictional. Not wired to the backend. */
 :root{
-  --red:#DA1710; --maroon:#621A4B; --navy:#1F1C4F; --purple:#991AD6; --grey:#706F7C;
-  --text:#2B2B2B; --muted:#6B6B73; --line:#DEDEE1; --bg:#F3F4F6; --info:#E6F4F7; --info-b:#9FD1DC;
+  --red:#DA1710; --navy:#1F1C4F; --text:#2B2B2B; --muted:#5E5E66; --line:#D5D5DA; --tileb:#A9A9B0;
+  --field:#F3F3F5; --fieldb:#5E5E66; --grey:#F3F3F4; --gbtn:#F4F4F5; --gbtnb:#CFCFD4;
+  --info:#D9ECF5; --warn:#FFF1EA; --warnb:#F08A5D;
   --low:#1B7F4B; --med:#F2A900; --high:#DA1811; --crit:#7A0C09;
-  --low-t:#E3F2EA; --med-t:#FDF3D9; --high-t:#FCE3E2; --crit-t:#F1DEDD; --radar-t:#F2F1F8;
+  --low-t:#E3F2EA; --med-t:#FDF3D9; --high-t:#FCE3E2; --crit-t:#F1DEDD;
 }
 *{box-sizing:border-box}
 body{margin:0;background:#E9E8EE;font-family:Arial,Helvetica,sans-serif;color:var(--text);font-size:14px}
 button{font-family:inherit}
+a{color:inherit}
+.mono{font-variant-numeric:tabular-nums}
+
+/* ---------- demo switcher (not part of the bank UI) ---------- */
 .demo{background:var(--navy);color:#fff;padding:9px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:50}
-.demo .brand{display:flex;align-items:center;gap:8px;font-family:'Arial Black',Arial;font-weight:900;letter-spacing:.18em;font-size:15px;margin-right:6px}
+.demo .brand{display:flex;align-items:center;gap:8px;font-weight:900;letter-spacing:.18em;font-size:15px;margin-right:6px}
 .demo .brand svg{width:22px;height:24px}
 .demo .grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .demo .lbl{font-size:10px;letter-spacing:1.5px;color:#A9A6C9;text-transform:uppercase}
 .demo button{background:#38345F;border:1px solid #4A4677;color:#fff;border-radius:16px;padding:5px 11px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px}
 .demo button.on{border-color:#FF6B61;background:#4A3F78}
-.demo .dot{width:9px;height:9px;border-radius:50%}
+.demo .sw{width:9px;height:9px;border-radius:50%}
 .demo .sep{width:1px;height:22px;background:#4A4677}
-.browser{max-width:1240px;margin:22px auto 40px;background:#fff;border-radius:10px;box-shadow:0 12px 40px rgba(31,28,79,.18);overflow:hidden}
+
+/* ---------- browser frame ---------- */
+.browser{max-width:1240px;margin:22px auto 40px;background:#fff;border-radius:10px;box-shadow:0 12px 40px rgba(31,28,79,.18);overflow:hidden;position:relative}
 .chrome{background:#ECEBF0;padding:8px 14px;display:flex;align-items:center;gap:12px}
 .chrome .dots{display:flex;gap:6px}.chrome .dots i{width:11px;height:11px;border-radius:50%;background:#C9C8D1;display:block}
 .chrome .url{flex:1;background:#fff;border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted)}
-.ob{min-height:760px}
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 40px 10px}
-.logo svg{width:44px;height:26px;display:block}
-.hdr .right{display:flex;gap:8px;align-items:center}
-.hbtn{border:1px solid var(--line);border-radius:3px;padding:5px 10px;font-size:12px;background:#fff;position:relative}
-.hbtn .n{position:absolute;top:-7px;right:-6px;background:var(--red);color:#fff;border-radius:9px;font-size:10px;padding:1px 5px}
-.tabs{display:flex;gap:28px;padding:0 40px;border-bottom:1px solid var(--line)}
-.tabs a{padding:12px 0 10px;font-size:14px;border-bottom:3px solid transparent;cursor:pointer;position:relative}
-.tabs a.on{border-color:var(--red)}
-.menu{position:absolute;top:100%;left:-10px;background:#fff;border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.08);display:none;z-index:5;min-width:220px}
-.tabs a:hover .menu{display:block}
-.menu div{padding:9px 14px;font-size:13px;white-space:nowrap}
-.menu div:hover{background:var(--bg)}
+.ob{min-height:820px;padding:0 40px 40px}
+
+/* ---------- Westpac header (screenshot 01/02) ---------- */
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;padding-top:16px}
+.logo svg{width:70px;height:30px;display:block}
+.hright{display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.hbtns{display:flex;gap:16px}
+.gbtn{background:var(--gbtn);border:1px solid var(--gbtnb);border-radius:3px;padding:6px 12px;font-size:13px;color:var(--text);cursor:pointer;position:relative;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.gbtn .n{position:absolute;top:-10px;right:-8px;background:var(--red);color:#fff;border-radius:10px;font-size:11px;font-weight:700;padding:2px 6px;border:2px solid #fff}
+.chev{font-size:10px}
+.srch{display:flex;gap:16px}
+.srch .box{width:360px;height:38px;border:1px solid #555;display:flex;align-items:center;padding:0 10px}
+.srch .box svg{width:18px;height:18px}
+.srch .gbtn{height:38px}
+.nav{display:flex;gap:26px;white-space:nowrap;margin-top:22px;border-bottom:1px solid var(--line)}
+.nav a{font-size:18px;padding:0 8px 10px;border-bottom:4px solid transparent;cursor:pointer;position:relative;color:#222}
+.nav a.on{border-color:var(--red)}
+.menu{position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.1);display:none;z-index:5;min-width:240px;margin-top:4px}
+.nav a:hover .menu{display:block}
+.menu div{padding:10px 16px;font-size:14px;white-space:nowrap}
+.menu div:hover{background:var(--grey)}
 .menu .rad{display:flex;align-items:center;gap:8px;color:var(--navy);font-weight:700;border-top:1px solid var(--line)}
 .menu .rad svg{width:16px;height:18px}
-.page{padding:22px 40px 40px}
-.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
-.ph h1{font-size:24px;font-weight:400;margin:0}
-.back{color:var(--red);font-size:13px;cursor:pointer;margin-bottom:6px;display:inline-block}
-.btn{border:0;border-radius:3px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer}
+
+/* ---------- common ---------- */
+.page{padding-top:22px}
+.btn{border:0;border-radius:3px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .btn.red{background:var(--red);color:#fff}
-.btn.ghost{background:#fff;color:var(--text);border:1px solid #9C9BA6}
-.btn.navy{background:var(--navy);color:#fff;display:inline-flex;align-items:center;gap:8px}
-.btn.navy svg{width:14px;height:16px}
-.btn.big{padding:13px 18px;font-size:15px;width:100%;margin-bottom:8px;justify-content:center}
-.btn.link{background:none;color:var(--muted);text-decoration:underline;font-weight:400;padding:6px;width:100%}
+.btn.sm{padding:7px 12px;font-size:12px}
+.btn.big{padding:13px 18px;font-size:15px;width:100%;margin-bottom:8px}
+.btn.ghost{background:var(--gbtn);border:1px solid var(--gbtnb);color:var(--text);font-weight:400}
+.btn.link{background:none;color:var(--text);text-decoration:underline;font-weight:400;padding:6px;width:100%}
 .btn[disabled]{opacity:.45;cursor:default}
-/* Radar mark */
-.rmark{display:inline-flex;align-items:center;gap:7px;font-family:'Arial Black',Arial;font-weight:900;letter-spacing:.16em;color:var(--navy)}
-.rmark svg{width:18px;height:20px}
-.rtag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--navy);background:var(--radar-t);border:1px solid #D9D7EA;border-radius:10px;padding:2px 8px}
-.rtag svg{width:11px;height:12px}
-/* Overview */
-.promo{border:1px solid var(--line);border-left:4px solid var(--navy);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:16px;background:linear-gradient(90deg,var(--radar-t),#fff 65%)}
-.promo p{margin:2px 0 0;color:var(--muted);font-size:13px}
-.secth{display:flex;align-items:center;gap:8px;font-size:17px;margin:6px 0 8px}
-.secth .c{width:16px;height:16px;border:1.5px solid var(--text);border-radius:50%;display:grid;place-items:center;font-size:10px}
-table{width:100%;border-collapse:collapse;margin-bottom:20px}
-th{background:var(--maroon);color:#fff;text-align:left;font-size:12px;padding:9px 12px}
-th.r,td.r{text-align:right}
-td{padding:11px 12px;border-bottom:1px solid var(--line);font-size:13px}
-td small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
-.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.tile{border:1px solid var(--line);min-height:150px;padding:14px;display:flex;flex-direction:column}
-.tile h4{margin:0 0 4px;font-size:14px}
-.tile p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}
-.tile .btn{margin-top:auto;align-self:flex-start}
-.tile.add{background:var(--bg);align-items:center;justify-content:center;color:var(--muted);font-size:12px}
-.tile.add b{font-size:30px;color:var(--text);font-weight:400}
-.tile.radar{border:2px solid var(--navy);background:linear-gradient(160deg,#fff 50%,var(--radar-t))}
-.small-up{font-size:12px;line-height:1.7}
-.small-up b{display:flex;justify-content:space-between}
-/* Forms */
-.cols{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;align-items:start}
-.panel{border:1px solid var(--line);margin-bottom:16px}
-.panel>.h{padding:12px 16px;font-size:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-.panel>.b{padding:14px 16px}
-.ptabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
-.ptabs span{border:1px solid var(--line);padding:5px 10px;font-size:12px;background:#F7F7F9;border-radius:2px;cursor:pointer}
-.ptabs span.on{background:#fff;font-weight:700;border-color:#9C9BA6}
-.attach{display:flex;align-items:center;gap:12px;border:1.5px dashed #B9B6D6;background:var(--radar-t);border-radius:4px;padding:10px 14px;margin-bottom:14px;cursor:pointer}
-.attach svg.clip{width:20px;height:20px;color:var(--navy);flex:none}
-.attach b{color:var(--navy)}
-.attach span{font-size:12px;color:var(--muted);display:block;margin-top:2px}
-.attach .btn{margin-left:auto;white-space:nowrap}
-.attached{display:flex;align-items:center;gap:10px;border:1px solid #D9D7EA;background:var(--radar-t);border-radius:4px;padding:9px 12px;margin-bottom:14px;font-size:13px}
-.attached a{margin-left:auto;color:var(--red);cursor:pointer;font-size:12px}
-.field{margin-bottom:12px}
-.field label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
-.field .in{border:1px solid #A6A5AF;padding:7px 9px;font-size:13px;min-height:33px;background:#fff;border-radius:2px}
-.field .in.filled{background:#FBFAFD}
-.field .src{font-size:11px;color:var(--navy);margin-top:3px}
-.mono{font-family:'Fira Code',monospace}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ph-txt{color:#A6A5AF}
-.verify{display:flex;gap:10px;padding:10px 12px;border:1px solid;border-radius:3px;font-size:13px;line-height:1.4;margin-top:4px}
+.titlebar{display:flex;align-items:baseline;gap:40px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:24px}
+.titlebar h1{font-size:28px;font-weight:400;color:var(--navy);margin:0}
+.titlebar .right{margin-left:auto;font-size:12px;color:var(--muted)}
+.back{font-size:15px;cursor:pointer;white-space:nowrap}
+.back::before{content:'‹ ';color:var(--red);font-weight:700;font-size:20px}
+.ricon{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:var(--navy)}
+.ricon svg{width:16px;height:18px}
+
+/* ---------- Overview (screenshot 01) ---------- */
+.accbar{display:flex;align-items:center;gap:48px;margin:6px 0 28px}
+.accbar h1{font-size:34px;font-weight:400;color:var(--navy);margin:0}
+.accbar .ev{font-size:16px;text-decoration:underline}
+.accbar .vw{display:flex;gap:14px;align-items:center}
+.accbar .vw svg{width:20px;height:20px}
+.accbar .acts{margin-left:auto;display:flex;gap:12px}
+.notice{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);padding:14px 16px;font-size:16px;margin-bottom:32px;cursor:pointer}
+.notice b{color:var(--navy)}
+.notice .cv{color:var(--red);font-size:26px;line-height:16px}
+.notice .ricon{margin-right:10px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;margin-bottom:22px}
+.acc{border:1px solid var(--tileb);height:262px;display:flex;flex-direction:column}
+.acc .top{position:relative;padding:12px 14px;height:152px}
+.acc .top h3{margin:0;font-size:20px;font-weight:400;color:#222;line-height:1.2;padding-right:44px}
+.acc .top .num{font-size:14px;margin-top:6px;color:#222}
+.acc .top .add{color:var(--red);font-weight:700;font-size:14px;margin-top:8px;line-height:1.5}
+.cbtn{position:absolute;top:12px;right:12px;width:34px;height:32px;border:1px solid var(--gbtnb);background:var(--gbtn);border-radius:3px;display:grid;place-items:center}
+.cbtn svg{width:14px;height:14px}
+.wm{position:absolute;right:12px;bottom:6px;width:48px;height:20px}
+.acc .bot{background:var(--grey);flex:1;padding:22px 14px;font-size:21px;color:#222}
+.tile{border:1px solid var(--tileb);height:262px;padding:14px;display:flex;flex-direction:column;background:#fff}
+.tile h3{margin:0 0 12px;font-size:19px;gap:8px;font-weight:400;color:#222;display:flex;justify-content:space-between;align-items:center}
+.tile h3 svg{width:20px;height:20px}
+.tile .up{font-size:14px;line-height:1.6}
+.tile .up b{display:block}
+.tile .up .r{display:flex;align-items:center;justify-content:space-between;gap:8px;white-space:nowrap}
+.tile.cent{align-items:center;text-align:center;justify-content:center;gap:8px}
+.tile.cent svg.ic{width:28px;height:32px}
+.tile.cent h3{margin:0;font-size:21px;justify-content:center}
+.tile.cent p{margin:0 0 6px;font-size:14px;line-height:1.5;color:#333}
+.tile.add{background:var(--grey);font-size:14px}
+.tile.add b{font-size:56px;line-height:44px;font-weight:700;color:#222}
+.tile.radar{border:2px solid var(--navy)}
+.chatpop{position:absolute;right:28px;bottom:0;width:440px;background:#fff;box-shadow:0 -2px 14px rgba(0,0,0,.18);display:flex;align-items:center;gap:12px;padding:14px 20px;font-size:18px}
+.chatpop svg{width:30px;height:30px}
+.chatpop .x{margin-left:auto;color:var(--red);font-size:26px}
+
+/* ---------- forms (screenshots 02-04) ---------- */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:26px;align-items:start}
+.mand{font-size:12px;margin:0 0 8px}
+.opt{display:inline-block;background:#E6EFE6;color:#333;font-size:11px;font-weight:400;padding:1px 5px;border-radius:2px;margin-left:4px}
+.form{border:1px solid var(--line)}
+.fs{padding:22px 26px 26px;border-bottom:1px solid var(--line)}
+.fs:last-child{border-bottom:0}
+.fs h2{font-size:22px;font-weight:400;color:var(--navy);margin:0 0 18px}
+.ftabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.ftabs span{border:1px solid var(--line);border-bottom:0;padding:7px 14px;font-size:13px;background:var(--grey);border-radius:3px 3px 0 0;display:flex;align-items:center;gap:5px}
+.ftabs span.on{background:#fff;margin-bottom:-1px;padding-bottom:8px}
+.ftabs svg{width:14px;height:14px}
+.payrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sbox{width:330px;max-width:100%;height:40px;border:1px solid #555;display:flex;align-items:center;gap:8px;padding:0 10px;font-size:13px;color:#555}
+.sbox svg{width:16px;height:16px;color:#222}
+.payrow .gbtn{height:40px}
+.rbtn{border-color:var(--navy);color:var(--navy);font-weight:700;background:#fff}
+.rbtn svg{width:15px;height:17px}
+.attached{display:inline-flex;align-items:center;gap:8px;height:40px;border:1px solid var(--navy);border-radius:3px;padding:0 12px;font-size:13px;color:var(--navy)}
+.attached svg{width:15px;height:17px}
+.attached a{color:var(--red);cursor:pointer;margin-left:6px;text-decoration:underline;font-size:12px}
+.attrow{display:flex;align-items:center;gap:14px;margin-top:12px;font-size:13px;color:#333}
+.newpayee{background:var(--grey);margin:14px -26px 0;padding:18px 26px 20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:relative}
+.newpayee::before{content:'';position:absolute;top:-8px;left:var(--tip,520px);width:14px;height:14px;background:var(--grey);border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field label{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;margin-bottom:6px}
+.in{background:var(--field);border:1px solid var(--fieldb);height:40px;padding:0 10px;font-size:14px;display:flex;align-items:center;border-radius:2px}
+.newpayee .in{background:#fff}
+.in.sel{justify-content:space-between;background:var(--field)}
+.in.sel svg{width:14px;height:14px}
+.in.ph{color:#8A8A92}
+.w25{width:160px}.w40{width:260px}.w60{width:420px;max-width:100%}
+.frow{display:flex;align-items:center;gap:12px}
+.src{display:inline-block;font-size:11px;color:var(--navy);background:#ECEBF5;border-radius:2px;padding:1px 6px;margin-top:4px}
+.q{display:inline-grid;place-items:center;width:13px;height:13px;border:1px solid #555;border-radius:50%;font-size:9px;font-weight:700}
+.sub{font-size:11px;color:var(--muted);margin-top:4px}
+.verify{display:flex;gap:10px;padding:10px 12px;border:1px solid;border-radius:2px;font-size:13px;line-height:1.4;margin:-4px 0 16px;width:520px;max-width:100%}
 .verify svg{width:18px;height:18px;flex:none}
 .verify.ok{background:var(--low-t);border-color:#A9D5BC}.verify.no{background:var(--high-t);border-color:#F0B2AF}
 .verify .s{font-size:11px;color:var(--muted)}
-.info{background:var(--info);border:1px solid var(--info-b);padding:9px 12px;font-size:12px;line-height:1.4}
-.formfoot{display:flex;justify-content:flex-end;gap:10px;padding-top:6px}
-.drop{border:2px dashed #B9B6D6;background:var(--radar-t);border-radius:6px;padding:34px;text-align:center;cursor:pointer}
-.drop svg{width:40px;height:44px}
-.drop h3{margin:10px 0 4px;font-size:18px;color:var(--navy)}
-.drop p{margin:0;color:var(--muted);font-size:13px}
-/* Radar side panel */
-.rp{border:1px solid var(--line);border-top:4px solid var(--navy)}
+/* Radar result banner: same shape as the BPAY "Stay safe from scams" banner, in the level colour */
+.rban{display:flex;gap:10px;padding:12px 14px;font-size:13px;line-height:1.45;border-top:1.5px solid;border-bottom:1.5px solid;margin-top:18px}
+.rban svg{width:18px;height:18px;flex:none;margin-top:1px}
+.rban a{text-decoration:underline;cursor:pointer;white-space:nowrap}
+.rban.lv-low{background:var(--low-t);border-color:var(--low)} .rban.lv-low svg{color:var(--low)}
+.rban.lv-med{background:var(--med-t);border-color:var(--med)} .rban.lv-med svg{color:#B57F00}
+.rban.lv-high{background:var(--high-t);border-color:var(--high)} .rban.lv-high svg{color:var(--high)}
+.rban.lv-crit{background:var(--crit-t);border-color:var(--crit)} .rban.lv-crit svg{color:var(--crit)}
+.warn{display:flex;gap:10px;background:var(--warn);border-top:1.5px solid var(--warnb);border-bottom:1.5px solid var(--warnb);padding:12px 14px;font-size:12px;line-height:1.5;margin-top:16px}
+.warn svg{width:16px;height:16px;flex:none;color:#D9541E}
+.amt{display:flex;align-items:center;gap:4px}
+.dater{display:flex;align-items:flex-start;gap:14px}
+.dater .in{width:150px;justify-content:space-between}
+.dater .in svg{width:18px;height:18px}
+.limit{background:var(--info);padding:8px 12px;font-size:12px;line-height:1.5;position:relative;width:250px}
+.limit::before{content:'';position:absolute;left:-7px;top:14px;border:7px solid transparent;border-left:0;border-right-color:var(--info)}
+.limit u{cursor:pointer}
+.radios label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;margin-bottom:8px}
+.radios i{width:16px;height:16px;border:1.5px solid #555;border-radius:50%;display:inline-block}
+.radios i.on{border:5px solid var(--navy)}
+.formfoot{display:flex;justify-content:flex-end;align-items:center;gap:30px;padding:16px 0}
+.formfoot a{font-size:13px;text-decoration:underline;cursor:pointer}
+/* side boxes (the grey "Multiple Payment" panel) */
+.sidebox{background:var(--grey);padding:16px 18px;font-size:13px;line-height:1.5;margin-bottom:16px}
+.sidebox h4{margin:0 0 6px;font-size:15px;display:flex;align-items:center;gap:7px;color:#222}
+.sidebox h4 .i{width:16px;height:16px;border-radius:50%;background:#222;color:#fff;display:grid;place-items:center;font-size:11px}
+.sidebox p{margin:0 0 10px}
+.sidebox a{text-decoration:underline;cursor:pointer}
+.rp{background:#fff;border:1px solid var(--line);border-top:4px solid var(--navy);padding:0}
 .rp .h{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.rp .h h4{margin:0}
 .rp .b{padding:12px 16px}
-.idle{color:var(--muted);font-size:13px;line-height:1.55}
+.rtag{font-size:11px;font-weight:700;color:var(--navy);background:#ECEBF5;border-radius:10px;padding:2px 8px}
+.idle{color:#333;font-size:13px;line-height:1.55}
+.idle ul{margin:6px 0 10px;padding-left:18px}
+.scanning-box{display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 0 12px;border-bottom:1px solid var(--line);margin-bottom:4px;font-size:12px;color:var(--muted)}
 .step{display:flex;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
 .step:last-child{border-bottom:0}
-.step .ic{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--bg);color:var(--muted);font-size:12px;font-weight:700}
+.step .ic{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--grey);color:var(--muted);font-size:12px;font-weight:700}
 .step .d{font-size:12px;color:var(--muted);margin-top:1px}
-.step.run .ic{background:var(--radar-t);color:var(--navy);animation:pulse 1s infinite}
+.step.run .ic{background:#ECEBF5;color:var(--navy);animation:pulse 1s infinite}
 .step.st-g .ic{background:var(--low);color:#fff}.step.st-w .ic{background:var(--med);color:var(--navy)}.step.st-r .ic{background:var(--high);color:#fff}
 .step.st-skip{color:var(--muted)}
 @keyframes pulse{50%{box-shadow:0 0 0 5px rgba(31,28,79,.12)}}
-.mini{margin-top:12px;border-radius:6px;overflow:hidden}
-.mini .t{padding:7px 12px;color:#fff;font-family:Anton,Arial;font-size:15px;letter-spacing:.5px;display:flex;justify-content:space-between}
-.mini .t span{font-family:'Fira Code';font-size:13px}
+.mini{margin-top:12px;overflow:hidden;border-radius:3px}
+.mini .t{padding:7px 12px;color:#fff;font-weight:700;font-size:13px;letter-spacing:.06em;display:flex;justify-content:space-between}
 .mini .m{padding:10px 12px;font-size:13px;line-height:1.4}
-/* Result */
-.level{border-radius:6px;overflow:hidden;margin-bottom:16px}
-.level .h{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;color:#fff;font-family:Anton,Arial;font-size:22px;letter-spacing:.6px}
-.level .h small{font-family:'Arial Black',Arial;font-size:11px;letter-spacing:.2em;opacity:.85}
+.drop{border:2px dashed #A9A6C9;background:#FAFAFC;border-radius:3px;padding:30px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.drop h3{margin:12px 0 4px;font-size:19px;font-weight:400;color:var(--navy)}
+.drop p{margin:0 0 14px;color:var(--muted);font-size:13px;max-width:440px}
+.limitinfo{background:var(--info);padding:10px 14px;font-size:12px;line-height:1.5;margin-top:16px}
+
+/* ---------- Radar logo animation (Delvin) ---------- */
+svg.ra{overflow:visible;display:block}
+svg.ra .doc{fill:var(--navy);transform-origin:150px 262px;opacity:0;transform:translateY(14px) scale(.94);animation:ra-rise .5s cubic-bezier(.2,.8,.3,1) .05s forwards}
+svg.ra .pt{fill:var(--red);transform-origin:228px 44px;transform:scale(0);animation:ra-pop .35s cubic-bezier(.3,1.8,.6,1) .25s forwards,ra-beat .2s ease-in-out .55s 2,ra-beat .28s ease-in-out 1.15s 1}
+svg.ra .rip{fill:none;stroke:var(--red);stroke-width:2;vector-effect:non-scaling-stroke;transform-origin:228px 44px;opacity:0;animation:ra-ripple .6s ease-out forwards}
+svg.ra .wave{fill:none;stroke:var(--red);stroke-width:var(--sw);stroke-linecap:round;vector-effect:non-scaling-stroke;transform-origin:228px 44px;transform:scale(15);opacity:0;animation:ra-scan .85s linear forwards}
+svg.ra .p1{animation-delay:.55s} svg.ra .p2{animation-delay:.75s}
+svg.ra .arc{fill:none;stroke:var(--red);stroke-width:var(--sw);stroke-linecap:round;vector-effect:non-scaling-stroke;transform-origin:228px 44px;transform:scale(.3);opacity:0;animation:ra-emerge .55s cubic-bezier(.2,.8,.3,1) 1.15s forwards}
+svg.ra.scanning .pt{transform:scale(1);animation:ra-double 1s ease-in-out infinite}
+svg.ra.scanning .rip{animation:ra-ripple 1s ease-out infinite}
+svg.ra.scanning .wave{animation:ra-scan 1s linear infinite}
+svg.ra.scanning .p2{animation-delay:.2s}
+@keyframes ra-rise{to{opacity:1;transform:none}}
+@keyframes ra-pop{to{transform:scale(1)}}
+@keyframes ra-beat{0%,100%{transform:scale(1)}40%{transform:scale(1.35)}}
+@keyframes ra-double{0%,40%,100%{transform:scale(1)}10%,30%{transform:scale(1.35)}20%{transform:scale(1.05)}}
+@keyframes ra-ripple{0%{transform:scale(1);opacity:.9}100%{transform:scale(3.4);opacity:0}}
+@keyframes ra-scan{0%{transform:scale(15);opacity:0}6%{opacity:1}85%{opacity:.9}100%{transform:scale(285);opacity:0}}
+@keyframes ra-emerge{0%{transform:scale(.3);opacity:1}100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){svg.ra *{animation:none!important}svg.ra .doc,svg.ra .arc{opacity:1;transform:none}svg.ra .pt{transform:none}svg.ra .wave,svg.ra .rip{opacity:0}}
+
+/* ---------- Result ---------- */
+.level{overflow:hidden;margin-bottom:16px;border-radius:3px}
+.level .h{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;color:#fff;font-weight:700;font-size:17px;letter-spacing:.08em}
+.level .h small{font-size:11px;letter-spacing:.2em;opacity:.85}
 .level .b{padding:18px;display:flex;gap:18px;align-items:center}
 .level .b>svg{width:40px;height:40px;flex:none}
-.level .b h2{margin:0 0 4px;font-size:22px;color:var(--navy)}
+.level .b h2{margin:0 0 4px;font-size:22px;font-weight:700;color:var(--navy)}
 .level .b p{margin:0;font-size:15px;line-height:1.45;color:var(--navy)}
 .ring{width:96px;height:96px;position:relative;flex:none;margin-left:auto}
 .ring svg{width:96px;height:96px;transform:rotate(-90deg)}
-.ring .n{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-family:Anton,Arial;font-size:32px;color:var(--navy);line-height:1}
-.ring .n small{display:block;font-family:Arial;font-size:10px;color:var(--muted)}
+.ring .n{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-weight:700;font-size:30px;color:var(--navy);line-height:1}
+.ring .n small{display:block;font-weight:400;font-size:10px;color:var(--muted)}
 .lv-low .h{background:var(--low)} .lv-low .b{background:var(--low-t)} .lv-low .b>svg{color:var(--low)}
 .lv-med .h{background:var(--med);color:var(--navy)} .lv-med .b{background:var(--med-t)} .lv-med .b>svg{color:#B57F00}
 .lv-high .h{background:var(--high)} .lv-high .b{background:var(--high-t)} .lv-high .b>svg{color:var(--high)}
 .lv-crit .h{background:var(--crit)} .lv-crit .b{background:var(--crit-t)} .lv-crit .b>svg{color:var(--crit)}
-.find{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.panel{border:1px solid var(--line);margin-bottom:16px}
+.panel>.h{padding:14px 18px;font-size:19px;color:var(--navy);border-bottom:1px solid var(--line)}
+.panel>.b{padding:14px 18px}
+.find{display:flex;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line)}
 .find:last-child{border-bottom:0}
 .find .ic{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700}
 .find .ic.r{background:var(--high)} .find .ic.w{background:var(--med);color:var(--navy)} .find .ic.g{background:var(--low)} .find .ic.v{background:var(--navy)}
 .find b{font-size:14px;display:block;margin-bottom:2px;color:var(--navy)}
 .find p{margin:0;font-size:13px;color:var(--muted);line-height:1.4}
 .find .lock{display:inline-block;margin-top:5px;font-size:11px;color:var(--crit);background:var(--crit-t);border-radius:3px;padding:1px 6px;font-weight:700}
-.find .soft{display:inline-block;margin-top:5px;font-size:11px;color:var(--navy);background:var(--radar-t);border-radius:3px;padding:1px 6px;font-weight:700}
+.find .soft{display:inline-block;margin-top:5px;font-size:11px;color:var(--navy);background:#ECEBF5;border-radius:3px;padding:1px 6px;font-weight:700}
 .find .tier{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
 .note{font-size:12px;color:var(--muted);margin:8px 0 0}
-.verifyline{display:flex;gap:10px;align-items:center;font-size:13px;padding:10px 14px;border:1px solid var(--line);margin-bottom:16px;border-radius:4px}
+.verifyline{display:flex;gap:10px;align-items:center;font-size:13px;padding:10px 14px;border:1px solid var(--line);margin-bottom:16px}
 .verifyline svg{width:18px;height:18px}
-.callout{background:var(--navy);color:#fff;border-radius:6px;padding:14px 16px;display:flex;gap:12px;margin:6px 0 14px}
+.callout{background:var(--navy);color:#fff;border-radius:3px;padding:14px 16px;display:flex;gap:12px;margin:6px 0 14px}
 .callout svg{width:22px;height:22px;flex:none}
 .callout b{display:block;margin-bottom:3px}
 .callout span{font-size:13px;color:#D6D4EA;line-height:1.4}
-.callout .num{display:block;font-family:'Fira Code';font-size:18px;color:#fff;margin-top:4px}
-.ctx{font-size:12px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.chatbox{border:1px solid var(--line);border-radius:6px;margin-top:12px}
+.callout .num{display:block;font-size:18px;color:#fff;margin-top:4px;font-weight:700}
+.ctx{font-size:13px;color:#333;margin-bottom:10px;background:var(--grey);padding:10px 12px}
+.chatbox{border:1px solid var(--line);margin-top:12px}
 .chatbox .h{padding:10px 14px;border-bottom:1px solid var(--line);font-weight:700;color:var(--navy)}
 .chat{padding:12px 14px;display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto}
 .msg{max-width:90%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.4}
-.msg.bot{background:var(--bg);border-bottom-left-radius:3px}
+.msg.bot{background:var(--grey);border-bottom-left-radius:3px}
 .msg.me{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
-.msg .delta{display:block;font-family:'Fira Code';font-size:12px;margin-top:5px;color:var(--navy);font-weight:500}
+.msg .delta{display:block;font-size:12px;margin-top:5px;color:var(--navy);font-weight:700}
 .chips{display:flex;flex-direction:column;gap:6px;padding:0 14px 12px}
-.chip{border:1.5px solid var(--navy);color:var(--navy);border-radius:16px;padding:7px 12px;font-size:12px;background:#fff;cursor:pointer;text-align:left}
+.chip{border:1px solid var(--navy);color:var(--navy);border-radius:3px;padding:8px 12px;font-size:12px;background:#fff;cursor:pointer;text-align:left}
 .composer{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line)}
-.composer input{flex:1;border:1px solid var(--line);border-radius:16px;padding:7px 12px;font:inherit;font-size:13px}
-/* Modal + confirmations */
+.composer input{flex:1;border:1px solid var(--fieldb);background:var(--field);padding:7px 10px;font:inherit;font-size:13px}
+
+/* ---------- modal + confirmations ---------- */
 .scrim{position:fixed;inset:0;background:rgba(43,43,43,.45);display:none;align-items:center;justify-content:center;z-index:60}
 .scrim.on{display:flex}
-.modal{background:#fff;width:520px;border:2px solid var(--maroon);border-radius:3px}
-.modal .h{display:flex;justify-content:space-between;padding:12px 16px;font-size:17px;border-bottom:1px solid var(--line)}
-.modal .b{padding:14px 16px}
-.kv{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:13px;margin:6px 0 12px}
+.modal{background:#fff;width:520px;border-top:4px solid var(--red)}
+.modal .h{display:flex;justify-content:space-between;padding:14px 18px;font-size:19px;color:var(--navy);border-bottom:1px solid var(--line)}
+.modal .b{padding:14px 18px}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:13px;margin:6px 0 14px}
 .kv dt{color:var(--muted)}.kv dd{margin:0;font-weight:700}
-.okbar{background:var(--low-t);border:1px solid #A9D5BC;padding:7px 10px;font-size:12px;margin-bottom:10px;display:flex;gap:6px;align-items:center}
-.conf{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:24px}
-.sent{border:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;gap:10px;font-size:15px;margin-bottom:14px}
+.okbar{background:var(--low-t);border:1px solid #A9D5BC;padding:8px 10px;font-size:12px;margin-bottom:10px;display:flex;gap:6px;align-items:center}
+.conf{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:26px}
+.sent{border:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;gap:10px;font-size:16px;margin-bottom:14px}
 .sent .t{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff}
 .sum{border:1px solid var(--line);margin-bottom:14px}
-.sum .h{padding:10px 14px;font-size:15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-.sum .r{display:grid;grid-template-columns:200px 1fr;padding:8px 14px;font-size:13px;border-bottom:1px solid var(--line)}
+.sum .h{padding:12px 16px;font-size:17px;color:var(--navy);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.sum .r{display:grid;grid-template-columns:200px 1fr;padding:9px 16px;font-size:13px;border-bottom:1px solid var(--line)}
 .sum .r:last-child{border-bottom:0}
 .sum .r span:first-child{color:var(--muted)}
-.side{background:var(--bg);padding:12px;font-size:13px}
-.side div{padding:8px 4px}
-.radio{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;line-height:1.4}
+.side div{padding:6px 0;text-decoration:underline;cursor:pointer;font-size:13px}
+.radio{display:flex;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line);cursor:pointer;line-height:1.4}
 .radio:last-child{border-bottom:0}
-.radio .o{width:18px;height:18px;border-radius:50%;border:2px solid #9C9BA6;flex:none;margin-top:1px}
-.radio.on .o{border:6px solid var(--red)}
+.radio .o{width:18px;height:18px;border-radius:50%;border:1.5px solid #555;flex:none;margin-top:1px}
+.radio.on .o{border:6px solid var(--navy)}
 .radio small{display:block;color:var(--muted)}
 .disclaim{font-size:11px;color:var(--muted);margin-top:10px}
 .view{display:none}.view.on{display:block}
@@ -210,6 +310,9 @@ td small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 <body>
 <svg width="0" height="0" style="position:absolute"><defs>
   <symbol id="radar" viewBox="0 0 56 64"><path d="M10 14H26.4A22 22 0 0 0 40 30.5V54a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z" fill="currentColor"/><path d="M48 22A12 12 0 0 1 36 10" fill="none" stroke="#DA1710" stroke-width="5" stroke-linecap="round"/><circle cx="48" cy="10" r="4.6" fill="#DA1710"/></symbol>
+  <symbol id="wbank" viewBox="0 0 44 26"><path d="M0 0h9l4 26H6zM14.5 0h14l-2.5 26h-9zM34 0h10l-7 26h-7z" fill="currentColor"/></symbol>
+  <symbol id="chev" viewBox="0 0 16 16"><path d="M3 5.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+  <symbol id="mag" viewBox="0 0 20 20"><circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M12 12l5 5" stroke="currentColor" stroke-width="2.8"/></symbol>
 </defs></svg>
 
 <div class="demo">
@@ -220,71 +323,99 @@ td small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 </div>
 
 <div class="browser">
-  <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">banking.westpac.com.au/business</div></div>
+  <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">banking.westpac.com.au/secure/banking/overview</div></div>
   <div class="ob">
     <div class="hdr">
-      <div class="logo"><svg viewBox="0 0 44 26"><path d="M0 0h9l4 26H6zM14.5 0h14l-2.5 26h-9zM34 0h10l-7 26h-7z" fill="#DA1710"/></svg></div>
-      <div class="right"><span class="hbtn">GREENLINE LANDSCAPING PTY LTD · Business banking ▾</span><span class="hbtn">Approvals</span><span class="hbtn">Notifications ▾<span class="n">3</span></span><span class="hbtn">Sign Out</span></div>
+      <div class="logo"><svg style="color:var(--red)"><use href="#wbank"/></svg></div>
+      <div class="hright">
+        <div class="hbtns"><span class="gbtn">Greenline Landscaping - Business banking <svg class="chev" width="12" height="12"><use href="#chev"/></svg></span><span class="gbtn">Requests</span><span class="gbtn">Notifications <svg width="12" height="12"><use href="#chev"/></svg><span class="n">3</span></span><span class="gbtn">Sign Out</span></div>
+        <div class="srch"><div class="box"><svg><use href="#mag"/></svg></div><span class="gbtn">Search</span></div>
+      </div>
     </div>
-    <div class="tabs">
+    <div class="nav">
       <a data-go="overview" id="t-ov">Overview</a>
-      <a id="t-pay">Payments<div class="menu"><div data-start="pay">Make a payment</div><div>Transfer funds</div><div>Payees &amp; BPAY® billers</div><div>Recurring payments</div><div>Payments list</div><div class="rad" data-start="check"><svg><use href="#radar"/></svg>Check an invoice</div></div></a>
-      <a>Services &amp; Preferences</a><a>Administration</a><a>Business Hub</a><a>Products</a>
+      <a id="t-pay">Payments<div class="menu"><div data-start="pay">Make a payment</div><div>Transfer funds</div><div>Payees &amp; BPAY® billers</div><div>Multiple payments</div><div>Payments list</div><div class="rad" data-start="check"><svg><use href="#radar"/></svg>Check an invoice</div></div></a>
+      <a>Service</a><a>Westpac Rewards</a><a>Business Hub</a><a>Products</a><a>Home loans</a>
     </div>
 
-    <!-- OVERVIEW -->
+    <!-- OVERVIEW (screenshot 01) -->
     <section class="view page" id="v-overview">
-      <div class="ph"><h1>Your accounts</h1><div style="display:flex;gap:8px"><button class="btn red">Transfer funds</button><button class="btn red" data-start="pay">Make a payment</button></div></div>
-      <div class="promo"><div><span class="rmark"><svg><use href="#radar"/></svg>RADAR</span> <b style="color:var(--navy)">&nbsp;New: check an invoice before you pay it.</b><p>Attach the invoice when you make a payment, or check one on its own first. Radar looks for changed bank details, edited PDFs and other scam signs.</p></div><button class="btn navy" data-start="check"><svg><use href="#radar"/></svg>Check an invoice</button></div>
-      <div class="secth"><span class="c">$</span>Cash</div>
-      <table><tr><th>Account</th><th class="r">Available</th><th class="r">Current balance</th></tr>
-        <tr><td>Westpac Business One<small class="mono">032-000 004321</small></td><td class="r">$12,480.22</td><td class="r">$12,480.22</td></tr>
-        <tr><td>Business Cash Reserve<small class="mono">032-000 009876</small></td><td class="r">$31,050.00</td><td class="r">$31,050.00</td></tr>
-        <tr><td></td><td class="r" style="color:var(--muted)">Cash accounts total</td><td class="r"><b>$43,530.22</b></td></tr></table>
-      <div class="tiles">
-        <div class="tile radar"><span class="rmark" style="font-size:13px;margin-bottom:8px"><svg><use href="#radar"/></svg>RADAR</span><h4>Check an invoice</h4><p>Not ready to pay? Check it first. If it looks right, turn it into a payment in one step.</p><button class="btn navy" data-start="check">Check an invoice</button></div>
-        <div class="tile"><h4>Biz Invoice</h4><p>Create and manage invoices</p><button class="btn ghost">Go to Biz Invoice</button></div>
-        <div class="tile"><h4>Upcoming payments</h4><div class="small-up"><b><span>Kestrel Fuel</span><span>$612.40</span></b><b><span>Saltbush Stone</span><span>$1,840.00</span></b><span style="color:var(--muted)">2 awaiting approval</span></div></div>
-        <div class="tile add"><b>+</b>Add accounts</div>
+      <div class="accbar">
+        <h1>Your accounts</h1>
+        <span class="ev">Edit view <svg width="12" height="12"><use href="#chev"/></svg></span>
+        <span class="vw"><svg viewBox="0 0 20 20" fill="#DA1710"><rect x="1" y="1" width="5" height="5"/><rect x="7.5" y="1" width="5" height="5"/><rect x="14" y="1" width="5" height="5"/><rect x="1" y="7.5" width="5" height="5"/><rect x="7.5" y="7.5" width="5" height="5"/><rect x="14" y="7.5" width="5" height="5"/><rect x="1" y="14" width="5" height="5"/><rect x="7.5" y="14" width="5" height="5"/><rect x="14" y="14" width="5" height="5"/></svg><svg viewBox="0 0 20 20" fill="#222"><rect x="1" y="3" width="18" height="2.6"/><rect x="1" y="8.7" width="18" height="2.6"/><rect x="1" y="14.4" width="18" height="2.6"/></svg></span>
+        <div class="acts"><button class="btn red">Transfer funds</button><button class="btn red" data-start="pay">Make a payment</button></div>
       </div>
+      <div class="notice" data-start="check"><span><span class="ricon"><svg><use href="#radar"/></svg></span><b>New: Radar checks an invoice before you pay it.</b> Attach it when you make a payment, or check one on its own.</span><span class="cv">›</span></div>
+      <div class="tiles">
+        <div class="acc"><div class="top"><h3>Westpac Business One</h3><div class="num mono">032-000 004321</div><span class="cbtn"><svg><use href="#chev"/></svg></span><svg class="wm" style="color:#E3E3E7"><use href="#wbank"/></svg></div><div class="bot mono">$12,480.22</div></div>
+        <div class="acc"><div class="top"><h3>Business Cash Reserve</h3><div class="num mono">032-000 009876</div><span class="cbtn"><svg><use href="#chev"/></svg></span><svg class="wm" style="color:#E3E3E7"><use href="#wbank"/></svg></div><div class="bot mono">$31,050.00</div></div>
+        <div class="acc"><div class="top"><h3>Business Low Rate Visa</h3><div class="num mono">4564 •••• •••• 2210</div><span class="cbtn"><svg><use href="#chev"/></svg></span><svg class="wm" style="color:#E3E3E7"><use href="#wbank"/></svg></div><div class="bot mono">-$1,204.65</div></div>
+        <div class="acc"><div class="top"><h3>Biz Invoice</h3><div class="add">Create and send<br>invoices</div><span class="cbtn"><svg><use href="#chev"/></svg></span><svg class="wm" style="color:#E3E3E7"><use href="#wbank"/></svg></div><div class="bot"></div></div>
+      </div>
+      <div class="tiles">
+        <div class="tile"><h3>Upcoming payments <svg viewBox="0 0 20 20" fill="#222"><path d="M8.6 1h2.8l.4 2.4 1.6.7 2-1.4 2 2-1.4 2 .7 1.6 2.4.4v2.8l-2.4.4-.7 1.6 1.4 2-2 2-2-1.4-1.6.7-.4 2.4H8.6l-.4-2.4-1.6-.7-2 1.4-2-2 1.4-2-.7-1.6L1 11.4V8.6l2.4-.4.7-1.6-1.4-2 2-2 2 1.4 1.6-.7z"/><circle cx="10" cy="10" r="3" fill="#fff"/></svg></h3>
+          <div class="up"><b>KESTREL FUEL</b><div class="r"><span>19 Nov 2026</span><span>$612.40</span><span class="gbtn">View</span></div><b style="margin-top:6px">SALTBUSH STONE</b><div class="r"><span>21 Nov 2026</span><span>$1,840.00</span><span class="gbtn">View</span></div><u>View more</u></div></div>
+        <div class="tile cent radar"><svg class="ic" style="color:var(--navy)"><use href="#radar"/></svg><h3>Radar invoice check</h3><p>Check an invoice before you pay it. Radar spots edited bank details and fake suppliers.</p><span class="gbtn" data-start="check">Check an invoice</span></div>
+        <div class="tile cent"><svg class="ic" viewBox="0 0 24 28" fill="none" stroke="#222" stroke-width="2"><rect x="3" y="11" width="18" height="15" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4M8.5 18l2.5 2.5 4.5-5"/></svg><h3>SafeBlock account lock</h3><p>Protect your accounts and cards while you check everything is okay.</p><span class="gbtn">Go to SafeBlock</span></div>
+        <div class="tile cent add"><b>+</b>Add accounts</div>
+      </div>
+      <div style="height:60px"></div>
+      <div class="chatpop"><svg viewBox="0 0 30 30"><path d="M3 4h18v12H10l-5 4v-4H3z" fill="#DA1710"/><path d="M12 18h9l4 4v-4h2V8h-3" fill="none" stroke="#DA1710" stroke-width="2"/></svg>Need help? Chat with us<span class="x">✕</span></div>
     </section>
 
-    <!-- MAKE A PAYMENT (Radar as an attach action) -->
+    <!-- MAKE A PAYMENT (screenshots 02-04) with Radar as "Attach invoice" -->
     <section class="view page" id="v-pay">
-      <div class="ph"><div><span class="back" data-go="overview">‹ Back</span><h1>Make a payment</h1></div></div>
+      <div class="titlebar"><span class="back" data-go="overview">Back</span><h1>Make a payment</h1></div>
       <div class="cols">
         <div>
-          <div class="panel"><div class="h">Pay to</div><div class="b">
-            <div class="ptabs" id="ptabs"><span>All</span><span class="on" data-pt="bsb">Payees</span><span data-pt="bpay">BPAY®</span><span data-pt="payid">PayID</span><span>International</span></div>
-            <div id="attachBox"></div>
-            <div id="payeeForm"></div>
-          </div></div>
-          <div class="panel"><div class="h">From</div><div class="b"><div class="field"><label>From account</label><div class="in">Westpac Business One · <span class="mono">032-000 004321</span> · $12,480.22</div></div>
-            <div class="field" style="margin:0"><label>Payer name</label><div class="in">GREENLINE LANDSCAPING</div></div></div></div>
-          <div class="panel"><div class="h">Payment details</div><div class="b"><div class="grid2"><div class="field"><label>Amount</label><div class="in mono" id="f-amt"></div></div><div class="field"><label>Date</label><div class="in mono">17/11/2026</div></div></div>
-            <div class="field" style="margin:0"><label>Description (appears on their statement)</label><div class="in mono" id="f-ref"></div></div></div></div>
-          <div class="formfoot"><button class="btn ghost" data-go="overview">Cancel</button><button class="btn red" id="cont">Continue</button></div>
+          <p class="mand">All fields are mandatory unless marked <span class="opt">optional</span></p>
+          <div class="form">
+            <div class="fs"><h2>Pay to</h2>
+              <div class="ftabs"><span>All</span><span class="on"><svg viewBox="0 0 16 16" fill="#555"><circle cx="6" cy="5" r="3"/><path d="M0 15c0-4 3-6 6-6s6 2 6 6z"/><circle cx="12" cy="6" r="2.2"/></svg>Payees</span><span>BPAY®</span><span><svg viewBox="0 0 16 16" fill="none" stroke="#555" stroke-width="1.6"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c-3 3.5-3 9.5 0 13M8 1.5c3 3.5 3 9.5 0 13"/></svg>International</span></div>
+              <div class="payrow"><div class="sbox"><svg><use href="#mag"/></svg>Select payee or type to search</div><span>Or</span><span class="gbtn">Pay new payee</span></div>
+              <div class="attrow"><span id="attachSlot"></span><span id="attachHint"></span></div>
+
+              <div id="payeeForm"></div>
+              <div class="field" style="margin-top:18px"><label>Description (appears on their statement) <span class="opt">optional</span></label><div class="in w60" id="f-ref"></div></div>
+            </div>
+            <div class="fs"><h2>From</h2>
+              <div class="field"><label>From account</label><div class="in sel w60" id="f-from"></div></div>
+              <div class="field"><label>Description (appears on your statement) <span class="opt">optional</span></label><div class="in w60" id="f-ref2"></div></div>
+            </div>
+            <div class="fs"><h2>Payment details</h2>
+              <div class="field"><label>Amount <span class="q">?</span></label><div class="amt"><span>$</span><div class="in w25 mono" id="f-amt"></div></div><div id="amtsrc"></div></div>
+              <div class="field"><label>Date <span class="q">?</span></label><div class="dater"><div><div class="in mono">17/11/2026 <svg viewBox="0 0 18 18" fill="none" stroke="#333" stroke-width="1.6"><rect x="2" y="3" width="14" height="13"/><path d="M2 7h14M6 1v4M12 1v4M5 10h2M8 10h2M11 10h2M5 13h2M8 13h2"/></svg></div><div class="sub">dd/mm/yyyy</div></div><div class="limit">$25,000.00 remaining today. <span class="q">?</span><br>Payment limit: $25,000.00. <u>Change your limit</u></div></div></div>
+              <div class="field radios"><label style="font-size:12px">Payment frequency <span class="q">?</span></label><label><i class="on"></i>Pay once</label><label style="font-weight:400"><i></i>Recurring payment</label></div>
+            </div>
+          </div>
+          <div class="formfoot"><a data-go="overview">Cancel</a><button class="btn red" id="cont">Continue</button></div>
         </div>
-        <aside class="rp" id="rpanel"></aside>
+        <aside>
+          <div class="rp" id="rpanel"></div>
+          <div class="sidebox"><h4><span class="i">i</span>Multiple Payment</h4><p>Want to pay <b>multiple payees</b> in a single payment? You can do this via <b>Payments &gt; Multiple Payments</b></p><a>Make a multiple payment</a></div>
+        </aside>
       </div>
     </section>
 
     <!-- CHECK AN INVOICE (standalone) -->
     <section class="view page" id="v-check">
-      <div class="ph"><div><span class="back" data-go="overview">‹ Back</span><h1>Check an invoice</h1></div><span class="rmark"><svg><use href="#radar"/></svg>RADAR</span></div>
+      <div class="titlebar"><span class="back" data-go="overview">Back</span><h1>Check an invoice</h1></div>
       <div class="cols">
         <div>
-          <div id="checkDrop" class="drop"><svg style="color:var(--navy)"><use href="#radar"/></svg><h3>Drop an invoice PDF to check it</h3><p>Nothing is paid. You'll see what Radar finds, and can turn it into a payment afterwards if you're happy.</p></div>
-          <div class="info" style="margin-top:14px">Radar checks the invoice itself (edits to the PDF, hidden text, maths), the supplier (ABN, website, reports from other businesses) and your history with them. The PDF isn't stored; we keep a fingerprint so you can prove which invoice you checked.</div>
+          <div class="form"><div class="fs"><h2>Invoice</h2>
+            <div id="checkDrop" class="drop"><span id="dropLogo"></span><h3>Drop an invoice PDF here to check it</h3><p>Nothing is paid. You'll see what Radar finds, and you can turn it into a payment afterwards if you're happy.</p><span class="btn red">Choose a file</span></div>
+            <div class="limitinfo">Radar checks the invoice itself (edits to the PDF, hidden text, maths), the supplier (ABN, website, reports from other businesses) and your history with them. The PDF isn't stored; we keep a fingerprint so you can prove which invoice you checked.</div>
+          </div></div>
         </div>
-        <aside class="rp" id="rpanel2"></aside>
+        <aside><div class="rp" id="rpanel2"></div></aside>
       </div>
     </section>
 
     <!-- RESULT -->
     <section class="view page" id="v-result">
-      <div class="ph"><div><span class="back" id="resBack">‹ Back</span><h1>Radar check result</h1></div><span class="mono" style="color:var(--muted);font-size:12px" id="rid"></span></div>
-      <div class="cols">
+      <div class="titlebar"><span class="back" id="resBack">Back</span><h1>Radar check result</h1><span class="right" id="rid"></span></div>
+      <div class="cols" style="grid-template-columns:minmax(0,1fr) 340px">
         <div>
           <div id="level"></div>
           <div id="verifyline"></div>
@@ -295,30 +426,30 @@ td small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
           <div class="ctx" id="ctx"></div>
           <div id="actions"></div>
           <div id="callout"></div>
-          <div class="chatbox" id="chatbox"><div class="h">Tell us about this supplier</div><div class="chat" id="chat"></div><div class="chips" id="chips"></div><div class="composer"><input placeholder="Type your answer"><button class="btn red">Send</button></div></div>
+          <div class="chatbox" id="chatbox"><div class="h">Tell us about this supplier</div><div class="chat" id="chat"></div><div class="chips" id="chips"></div><div class="composer"><input placeholder="Type your answer"><button class="btn red sm">Send</button></div></div>
         </aside>
       </div>
     </section>
 
     <!-- REPORT -->
     <section class="view page" id="v-report">
-      <div class="ph"><div><span class="back" data-go="result">‹ Back to Radar result</span><h1>Report this invoice</h1></div></div>
+      <div class="titlebar"><span class="back" data-go="result">Back to Radar result</span><h1>Report this invoice</h1></div>
       <div class="cols">
         <div>
           <div class="panel"><div class="h">You're doing the right thing</div><div class="b" style="line-height:1.5" id="repIntro"></div></div>
           <div class="panel" id="paidQ"><div class="h">Have you already paid this invoice?</div>
             <div class="radio on" data-r="no"><span class="o"></span><div>No, I haven't paid it<small>We'll flag the receiving account so it can't be used against other customers.</small></div></div>
             <div class="radio" data-r="yes"><span class="o"></span><div>Yes, I've paid it already<small>Report now. The sooner we know, the better the chance of recovering the money.</small></div></div></div>
-          <div class="panel"><div class="h">Anything else? <span style="font-size:12px;color:var(--muted)">optional</span></div><div class="b"><div style="border:1px solid #A6A5AF;min-height:70px;padding:8px;color:var(--muted);font-size:13px">e.g. how the invoice arrived, who sent it</div></div></div>
-          <div class="formfoot"><button class="btn ghost" data-go="result">Cancel</button><button class="btn red" data-go="reported">Send report</button></div>
+          <div class="panel"><div class="h">Anything else? <span class="opt">optional</span></div><div class="b"><div class="in" style="height:80px;align-items:flex-start;padding-top:8px;color:#8A8A92;font-size:13px">e.g. how the invoice arrived, who sent it</div></div></div>
+          <div class="formfoot"><a data-go="result">Cancel</a><button class="btn red" data-go="reported">Send report</button></div>
         </div>
-        <aside class="panel"><div class="h">What we send</div><div class="b" style="font-size:13px;line-height:1.6">• The invoice details and its fingerprint (SHA-256)<br>• Every Radar finding and the score<br>• The receiving BSB and account<br><br>The PDF itself is not stored.</div></aside>
+        <aside class="sidebox"><h4><span class="i">i</span>What we send</h4><p>• The invoice details and its fingerprint (SHA-256)<br>• Every Radar finding and the score<br>• The receiving BSB and account</p><p style="margin:0">The PDF itself is not stored.</p></aside>
       </div>
     </section>
 
     <!-- REPORTED -->
     <section class="view page" id="v-reported">
-      <div class="ph"><h1>Confirmation</h1></div>
+      <div class="titlebar"><h1>Confirmation</h1></div>
       <div class="conf"><div>
         <div class="sent"><span class="t" style="background:var(--navy)">✓</span><span id="repHead"></span></div>
         <div class="sum"><div class="h">Report summary</div>
@@ -329,12 +460,12 @@ td small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
           <div class="r"><span>Money sent</span><span id="repMoney"></span></div></div>
         <div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2"/></svg><div><b>Let your supplier know</b><span>Call them on a number you already have, not one on this invoice. Their email may have been compromised.</span></div></div>
         <p class="disclaim">Demo only: no report is sent and no payment is cancelled.</p>
-      </div><div class="side"><div>🖶 Print</div><div>⬇ Save as PDF</div><div>✉ Email</div></div></div>
+      </div><div class="sidebox side"><div>Print</div><div>Save as PDF</div><div>Email</div></div></div>
     </section>
 
     <!-- PAID -->
     <section class="view page" id="v-paid">
-      <div class="ph"><h1>Confirmation</h1></div>
+      <div class="titlebar"><h1>Confirmation</h1></div>
       <div class="conf"><div>
         <div class="sent"><span class="t" style="background:var(--low)">✓</span>Sent</div>
         <div class="sum"><div class="h">Payment summary</div>
@@ -342,12 +473,12 @@ td small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
           <div class="r"><span>To</span><span data-f="name"></span></div>
           <div class="r"><span>Account</span><span class="mono" data-f="bsbacc"></span></div>
           <div class="r"><span>Amount</span><span class="mono" data-f="amt"></span></div></div>
-        <div class="sum" style="border-color:var(--navy)"><div class="h"><span class="rmark" style="font-size:13px"><svg><use href="#radar"/></svg>RADAR RECEIPT</span></div>
+        <div class="sum" style="border-color:var(--navy)"><div class="h"><span class="ricon"><svg><use href="#radar"/></svg>Radar receipt</span></div>
           <div class="r"><span>Radar result</span><span data-f="lvtext"></span></div>
           <div class="r"><span>Invoice fingerprint</span><span class="mono" style="font-size:12px">9f3c…a41e (SHA-256)</span></div>
           <div class="r"><span>Checked</span><span>17 Nov 2026, 10:42 AEDT</span></div></div>
         <p class="disclaim">Demo only: no money is moved.</p>
-      </div><div class="side"><div>🖶 Print</div><div>⬇ Save as PDF</div><div>✉ Email</div></div></div>
+      </div><div class="sidebox side"><div>Print</div><div>Save as PDF</div><div>Email</div></div></div>
     </section>
   </div>
 </div>
@@ -357,7 +488,7 @@ td small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
   <div class="b">
     <div class="okbar" id="mbar"></div>
     <dl class="kv"><dt>To</dt><dd data-f="name"></dd><dt>Pay to</dt><dd class="mono" data-f="bsbacc"></dd><dt>From</dt><dd>Westpac Business One</dd><dt>Amount</dt><dd class="mono" data-f="amt"></dd><dt>Date</dt><dd>17 Nov 2026</dd></dl>
-    <div style="display:flex;justify-content:flex-end;gap:10px;align-items:center"><a style="font-size:13px;text-decoration:underline;cursor:pointer" data-close>Go back and edit</a><button class="btn red" data-go="paid">Confirm</button></div>
+    <div style="display:flex;justify-content:flex-end;gap:24px;align-items:center"><a style="font-size:13px;text-decoration:underline;cursor:pointer" data-close>Go back and edit</a><button class="btn red" data-go="paid">Confirm</button></div>
   </div>
 </div></div>
 
@@ -365,14 +496,23 @@ td small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
 const ICON={
   ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg>',
   bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></svg>',
-  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>',
+  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>',
   stop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>',
   phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2"/></svg>',
   vok:'<svg viewBox="0 0 24 24" fill="none" stroke="#1B7F4B" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg>',
   vno:'<svg viewBox="0 0 24 24" fill="none" stroke="#DA1811" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
-  clip:'<svg class="clip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7L14 4.5a3.5 3.5 0 0 1 5 5L10.5 18a2 2 0 0 1-3-3L15 7.5"/></svg>',
-  rd:'<svg><use href="#radar"/></svg>'
+  rd:'<svg><use href="#radar"/></svg>',
+  chev:'<svg><use href="#chev"/></svg>'
 };
+// Delvin's Radar logo animation. scan=true loops the sonar (loading state); otherwise it plays the intro once.
+let RAID=0;
+function radarAnim(w,scan){const id='raclip'+(++RAID),sw=(16*w/222).toFixed(2);
+  return `<svg class="ra${scan?' scanning':''}" style="width:${w}px;--sw:${sw}px" viewBox="62 -12 222 284" aria-hidden="true">
+  <defs><clipPath id="${id}"><rect x="72" y="44" width="156" height="218" rx="22"/><circle cx="228" cy="44" r="80"/></clipPath></defs>
+  <path class="doc" d="M94 44 L140 44 A88 88 0 0 0 228 132 L228 240 Q228 262 206 262 L94 262 Q72 262 72 240 L72 66 Q72 44 94 44 Z"/>
+  <g clip-path="url(#${id})"><path class="wave p1" d="M228 45 A1 1 0 0 1 227 44"/><path class="wave p2" d="M228 45 A1 1 0 0 1 227 44"/></g>
+  <path class="arc" d="M228 94 A50 50 0 0 1 178 44"/>
+  <circle class="rip p1" cx="228" cy="44" r="15"/><circle class="rip p2" cx="228" cy="44" r="15"/><circle class="pt" cx="228" cy="44" r="15"/></svg>`;}
 const LV={
   low:{cls:'lv-low',name:'Low',hex:'#1B7F4B',icon:'ok',title:'Looks good',msg:"Radar checked this invoice and the supplier's details match what we have on file. You're right to go ahead."},
   lowNew:{cls:'lv-low',name:'Low',hex:'#1B7F4B',icon:'ok',title:'Looks good',msg:"With what you've told us, nothing on this invoice looks like a scam. Radar can't confirm a new supplier, so pay the amount you agreed."},
@@ -381,31 +521,32 @@ const LV={
   crit:{cls:'lv-crit',name:'Critical',hex:'#7A0C09',icon:'stop',title:"Don't pay this invoice",msg:"Someone has changed the bank details on this invoice. This is how invoice scams work. Please report it."}
 };
 const S={
-  1:{label:'Tallowwood · usual',file:'01-tallowwood-clean.pdf',lv:'low',score:96,name:'Tallowwood Mulch & Soil Co.',pt:'bsb',bsb:'064-118',acc:'1048 2291',amt:'$3,179.00',ref:'INV-2041',
+  1:{label:'Tallowwood · usual',file:'01-tallowwood-clean.pdf',lv:'low',score:96,name:'Tallowwood Mulch & Soil Co.',nick:'Tallowwood',bsb:'064-118',acc:'1048 2291',amt:'$3,179.00',ref:'INV-2041',
      verify:['ok','Account name matches','Tallowwood Mulch & Soil Co Pty Ltd'],
      tiers:[['Quick checks','Bank details, invoice maths, PDF edits','g'],['Common red flags','Wording, ABN, contact details','g'],['Deeper research',"Not needed: you've paid this account 14 times",'skip'],['Specialist review','Not needed','skip']],
      finds:[['g','Same account you always pay',"You've paid Tallowwood 14 times at this BSB and account.",0,0],['g','ABN active and name matches','Registered to Tallowwood Mulch & Soil Co. Pty Ltd.',0,1],['g',"Invoice hasn't been edited",'No changes to the bank details since the PDF was created.',0,0]],
      more:'13 other checks passed. Deeper research was skipped because nothing needed it.'},
-  4:{label:'Fernhill · new business',file:'04-fernhill-new-business.pdf',lv:'med',score:59,name:'Fernhill Irrigation Co Pty Ltd',pt:'bsb',bsb:'082-140',acc:'5530 1187',amt:'$4,620.00',ref:'INV-0009',
+  4:{label:'Fernhill · new business',file:'04-fernhill-new-business.pdf',lv:'med',score:59,name:'Fernhill Irrigation Co Pty Ltd',nick:'Fernhill Irrigation',bsb:'082-140',acc:'5530 1187',amt:'$4,620.00',ref:'INV-0009',
      verify:['ok','Account name matches','Fernhill Irrigation Co Pty Ltd'],
      tiers:[['Quick checks','First payment to this supplier','w'],['Common red flags','ABN only 7 weeks old','w'],['Deeper research','Website 6 weeks old, 2 reviews','w'],['Specialist review','Not needed','skip']],
      finds:[['w','First time paying this supplier','$4,620 is a large first payment.',0,0],['w','Business is very new','ABN registered 49 days ago. Website first seen 42 days ago.',0,1],['w','Hardly any online presence','2 reviews found. No scam reports.',0,2],['g','ABN active and name matches','Registered to Fernhill Irrigation Co. Pty Ltd.',0,1]],
      more:"New isn't the same as fake. Tell us how you know them and Radar will re-check."},
-  3:{label:'Brightwater · fake',file:'03-brightwater-sloppy-fake.pdf',lv:'high',score:3,name:'Brightwater Equipmant Hire',pt:'bsb',bsb:'083-004',acc:'6620 1945',amt:'$2,034.00',ref:'(none on invoice)',
+  3:{label:'Brightwater · fake',file:'03-brightwater-sloppy-fake.pdf',lv:'high',score:3,name:'Brightwater Equipmant Hire',nick:'Brightwater',bsb:'083-004',acc:'6620 1945',amt:'$2,034.00',ref:'',
      verify:['no',"Account name doesn't match",'Account is held by A Nguyen-Price'],
      tiers:[['Quick checks','ABN invalid, GST wrong','r'],['Common red flags','Urgency, Gmail address, hidden text','r'],['Deeper research','Reported by 2 businesses','r'],['Specialist review','Not needed','skip']],
      finds:[['r','Reported by 2 other businesses','This account was reported in the last 30 days.',1,0],['r',"The ABN isn't real",'It fails the official ABN checksum.',1,0],['r','Hidden instructions in the PDF','Invisible text tried to tell software to approve the payment.',1,0],['r','Pressure to pay fast','"Pay within 24 hours. Do not call."',0,1],['w',"GST doesn't add up",'Shows $194.00. 10% of the subtotal is $184.00.',0,0],['w','Free email address','Sent from a Gmail address, not a business domain.',0,1]],
      more:'Also: says BPAY but gives a BSB; spelling errors; no web presence.'},
-  2:{label:'Tallowwood · bank changed',file:'02-tallowwood-changed-bank.pdf',lv:'crit',score:0,name:'Tallowwood Mulch & Soil Co.',pt:'bsb',bsb:'033-157',acc:'4471 0932',amt:'$3,179.00',ref:'INV-2041',
+  2:{label:'Tallowwood · bank changed',file:'02-tallowwood-changed-bank.pdf',lv:'crit',score:0,name:'Tallowwood Mulch & Soil Co.',nick:'Tallowwood',bsb:'033-157',acc:'4471 0932',amt:'$3,179.00',ref:'INV-2041',
      verify:['no',"Account name doesn't match",'Account is held by J & K Holdings Group'],
      tiers:[['Quick checks','Bank details differ from your past payments','r'],['Common red flags','"Our bank details have changed"','r'],['Deeper research','Lookalike email domain, 18 days old','r'],['Specialist review','Original bank details recovered','r']],
      finds:[['r','The bank details were edited after the invoice was made','New details were placed over the original ones in the PDF.',1,0],['v','Radar found the original details',"064-118 · 1048 2291, the account you've paid 14 times.",1,3],['r','Lookalike email address','Sent from tallowoodmulch.com.au, one letter off the real tallowwoodmulch.com.au. Set up 18 days ago.',1,2],['w','"Our bank details have changed"','A common line in invoice scams.',0,1]],
      more:"Their ABN and business name are real. Scammers copy a real supplier's invoice and change only the bank details."}
 };
 const ORDER=[1,4,3,2], TIERN=['Quick checks','Red flags','Deeper research','Specialist'];
+const BANNER={low:'You can continue.',lowNew:'You can continue.',med:'Have a look before you pay.',high:"Don't pay until you've checked.",crit:'Report it instead of paying.'};
 let cur=1, ctx='pay', checked=false, timer=null, reportPaid='no', soft=null;
 const $=s=>document.querySelector(s);
-const lvKey=()=>soft?soft.lv:S[cur].lv, scoreNow=()=>soft?soft.score:S[cur].score;
+const lvKey=()=>soft?soft.lv:S[cur].lv, scoreNow=()=>soft?soft.score:S[cur].score, cssLv=k=>k==='lowNew'?'low':k;
 
 function fill(){
   const s=S[cur],L=LV[lvKey()];
@@ -414,17 +555,26 @@ function fill(){
 }
 // ---------- Make a payment ----------
 function renderPay(){
-  const s=S[cur];
-  $('#attachBox').innerHTML=checked
-    ?`<div class="attached">${ICON.rd.replace('<svg','<svg style="width:16px;height:18px;color:var(--navy)"')}<span><b>${s.file}</b> · Radar checked · <b style="color:${LV[lvKey()].hex}">${LV[lvKey()].name} risk</b></span><a id="detach">Remove</a></div>`
-    :`<div class="attach" id="attach">${ICON.clip}<div><b>Paying an invoice? Attach it.</b><span>Radar checks it before you pay and fills in the details for you.</span></div><button class="btn navy">${ICON.rd}Attach invoice</button></div>`;
+  const s=S[cur],k=lvKey(),L=LV[k],src='<div><span class="src">From invoice</span></div>';
+  $('#attachSlot').innerHTML=checked
+    ?`<span class="attached" title="${s.file}">${ICON.rd}<b>Invoice attached</b><a id="detach">Remove</a></span>`
+    :`<span class="gbtn rbtn" id="attach">${ICON.rd}Attach invoice</span>`;
+  $('#attachHint').innerHTML=checked?`Radar checked <b>${s.file}</b> and filled in the payee and amount.`:`<b>Paying an invoice?</b> Attach it and Radar checks it before you pay, then fills in the payee and amount.`;
   const v=s.verify, ok=v[0]==='ok';
-  $('#payeeForm').innerHTML=`<div class="field"><label>I want to pay</label><div class="in">BSB &amp; account no.</div></div>
-    <div class="grid2"><div class="field"><label>BSB</label><div class="in mono ${checked?'filled':''}">${checked?s.bsb:''}</div>${checked?'<div class="src">From invoice</div>':''}</div><div class="field"><label>Account number</label><div class="in mono ${checked?'filled':''}">${checked?s.acc:''}</div>${checked?'<div class="src">From invoice</div>':''}</div></div>
-    <div class="field"><label>Account name</label><div class="in ${checked?'filled':''}">${checked?s.name:''}</div>${checked?'<div class="src">From invoice</div>':''}</div>
-    ${checked?`<div class="verify ${ok?'ok':'no'}">${ok?ICON.vok:ICON.vno}<div><b>${v[1]}</b><br>${v[2]}<div class="s">Westpac Verify · account name checked with the receiving bank</div></div></div>`:`<div class="info">Check the BSB and account number. Westpac Verify will check the account name with the receiving bank.</div>`}`;
-  $('#f-amt').innerHTML=checked?s.amt:'<span class="ph-txt">$</span>';$('#f-ref').innerHTML=checked?s.ref:'';
-  const c=$('#cont');c.disabled=!checked;c.textContent=checked&&lvKey()!=='low'?'Review Radar result':'Continue';
+  $('#payeeForm').innerHTML=!checked?'':`<div class="newpayee" style="--tip:110px">
+      <div class="field"><label>I want to pay</label><div class="in sel w60">BSB &amp; account no. ${ICON.chev}</div></div>
+      <div class="field"><label>BSB</label><div class="in w25 mono">${s.bsb}</div>${src}</div>
+      <div class="field"><label>Account or Westpac credit card number</label><div class="in w40 mono">${s.acc}</div>${src}</div>
+      <div class="field"><label>Account name</label><div class="frow"><div class="in w60">${s.name}</div><span class="btn red sm">Check details</span></div>${src}</div>
+      <div class="verify ${ok?'ok':'no'}">${ok?ICON.vok:ICON.vno}<div><b>${v[1]}</b> · ${v[2]}<div class="s">Westpac Verify · account name checked with the receiving bank</div></div></div>
+      <div class="field"><label>Payee nickname <span class="q">?</span></label><div class="in w60">${s.nick}</div></div>
+      <div class="rban lv-${cssLv(k)}">${ICON[L.icon]}<div><b>Radar: ${L.name} risk. ${L.title}.</b> ${BANNER[k]} <a data-go="result">See what Radar found</a></div></div>
+    </div>`;
+  $('#f-amt').innerHTML=checked?s.amt.replace('$',''):'';
+  $('#amtsrc').innerHTML=checked?src:'';
+  $('#f-ref').innerHTML=checked?s.ref:'';
+  $('#f-from').innerHTML=(checked?'Westpac Business One · 032-000 004321 · $12,480.22':'<span style="color:#555">Select an account</span>')+ICON.chev;
+  const c=$('#cont');c.disabled=!checked;c.textContent=checked&&cssLv(k)!=='low'?'Review Radar result':'Continue';
   if(!timer)radarPanel('#rpanel');
   const a=$('#attach');if(a)a.onclick=()=>scan('#rpanel',()=>{renderPay();});
   const d=$('#detach');if(d)d.onclick=()=>{checked=false;soft=null;clearTimeout(timer);timer=null;renderPay();};
@@ -433,17 +583,17 @@ function radarPanel(sel,running){
   const s=S[cur],el=$(sel);
   let body;
   if(!checked&&!running)body=ctx==='pay'
-    ?`<div class="idle">Attach the invoice you're paying and Radar checks it before money leaves your account:<br>• were the bank details edited after the PDF was made?<br>• do they match what you've paid this supplier before?<br>• is the ABN real, the GST right, the sender's website genuine?<br><br>It takes a few seconds. Westpac Verify still checks the account name as usual.</div>`
+    ?`<div class="idle">Attach the invoice you're paying and Radar checks it before money leaves your account:<ul><li>were the bank details edited after the PDF was made?</li><li>do they match what you've paid this supplier before?</li><li>is the ABN real, the GST right, the sender's website genuine?</li></ul>It takes a few seconds. Westpac Verify still checks the account name as usual.</div>`
     :`<div class="idle">Drop an invoice to start. Radar works outwards, quick checks first, and only digs deeper when something needs a closer look.</div>`;
-  else body=`<div id="steps">${s.tiers.map((t,i)=>{const done=checked;const cls=done?'st-'+t[2]:'';return `<div class="step ${cls}" id="${sel.slice(1)}st${i}"><div class="ic">${done?{g:'✓',w:'!',r:'!',skip:'–'}[t[2]]:i}</div><div>${t[0]}<div class="d">${done?t[1]:'Waiting'}</div></div></div>`}).join('')}</div>${checked?mini():''}`;
-  el.innerHTML=`<div class="h"><span class="rmark">${ICON.rd}RADAR CHECK</span>${checked?`<span class="rtag">${ICON.rd}Checked</span>`:''}</div><div class="b">${body}</div>`;
+  else body=`${running?`<div class="scanning-box">${radarAnim(64,true)}Checking ${s.file}…</div>`:''}<div id="steps">${s.tiers.map((t,i)=>{const done=checked;const cls=done?'st-'+t[2]:'';return `<div class="step ${cls}" id="${sel.slice(1)}st${i}"><div class="ic">${done?{g:'✓',w:'!',r:'!',skip:'–'}[t[2]]:i+1}</div><div>${t[0]}<div class="d">${done?t[1]:'Waiting'}</div></div></div>`}).join('')}</div>${checked?mini():''}`;
+  el.innerHTML=`<div class="h"><h4 class="ricon">${ICON.rd}Radar invoice check</h4>${checked?`<span class="rtag">Checked</span>`:''}</div><div class="b">${body}</div>`;
 }
-function mini(){const L=LV[lvKey()],k=lvKey();return `<div class="mini"><div class="t" style="background:${L.hex};${k==='med'?'color:var(--navy)':''}">${L.name.toUpperCase()} RISK<span>${scoreNow()}/100</span></div><div class="m" style="background:var(--${k==='lowNew'?'low':k}-t)"><b>${L.title}.</b> ${{low:'You can continue.',lowNew:'You can continue.',med:'Have a look before you pay.',high:'See what Radar found before doing anything else.',crit:'See what Radar found and report it.'}[k]}</div></div>`;}
+function mini(){const L=LV[lvKey()],k=lvKey();return `<div class="mini"><div class="t" style="background:${L.hex};${k==='med'?'color:var(--navy)':''}">${L.name.toUpperCase()} RISK<span>${scoreNow()}/100</span></div><div class="m" style="background:var(--${cssLv(k)}-t)"><b>${L.title}.</b> ${BANNER[k]}</div></div>`;}
 function scan(sel,done){
   checked=false;soft=null;radarPanel(sel,true);const s=S[cur];let i=0;const p=sel.slice(1);
   const tick=()=>{
     if(i>0){const t=s.tiers[i-1],e=$('#'+p+'st'+(i-1));e.className='step st-'+t[2];e.querySelector('.ic').textContent={g:'✓',w:'!',r:'!',skip:'–'}[t[2]];e.querySelector('.d').textContent=t[1];}
-    if(i<s.tiers.length){const e=$('#'+p+'st'+i);if(s.tiers[i][2]==='skip'){i++;return tick();}e.className='step run';e.querySelector('.d').textContent='Checking…';i++;timer=setTimeout(tick,600);}
+    if(i<s.tiers.length){const e=$('#'+p+'st'+i);if(s.tiers[i][2]==='skip'){i++;return tick();}e.className='step run';e.querySelector('.d').textContent='Checking…';i++;timer=setTimeout(tick,900);}
     else{checked=true;timer=null;radarPanel(sel);done&&done();}
   };tick();
 }
@@ -451,14 +601,14 @@ function scan(sel,done){
 function renderResult(){
   const s=S[cur],k=lvKey(),L=LV[k],score=scoreNow();fill();
   $('#rid').textContent=s.file;
-  $('#resBack').textContent=ctx==='pay'?'‹ Back to payment':'‹ Back to check';
+  $('#resBack').textContent=ctx==='pay'?'Back to payment':'Back to check';
   const c=2*Math.PI*40;
   $('#level').innerHTML=`<div class="level ${L.cls}"><div class="h">${L.name.toUpperCase()} RISK<small>RADAR</small></div><div class="b">${ICON[L.icon]}<div><h2>${L.title}</h2><p>${L.msg}</p></div><div class="ring"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="#fff" stroke-width="9"/><circle cx="48" cy="48" r="40" fill="none" stroke="${L.hex}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${Math.max(2,score/100*c)} ${c}"/></svg><div class="n"><div>${score}<small>Radar score</small></div></div></div></div></div>`;
   const v=s.verify;$('#verifyline').innerHTML=`<div class="verifyline">${v[0]==='ok'?ICON.vok:ICON.vno}<span><b>Westpac Verify:</b> ${v[1].toLowerCase()} · ${v[2]}</span></div>`;
   $('#finds').innerHTML=s.finds.map(f=>`<div class="find"><span class="ic ${f[0]}">${f[0]==='g'?'✓':f[0]==='v'?'↺':'!'}</span><div><b>${f[1]}</b><p>${f[2]}</p>${f[3]?'<span class="lock">Confirmed · can\'t be explained away</span>':''}${soft&&f[0]==='w'?'<span class="soft">Explained by you: met at expo, ordered this</span>':''}</div><span class="tier">${TIERN[f[4]]}</span></div>`).join('');
   $('#more').textContent=s.more;
-  $('#ctx').innerHTML=ctx==='pay'?`You're in the middle of paying ${s.amt}. Nothing has been sent.`:`You're checking this invoice. Nothing will be paid unless you choose to.`;
-  const kk=k==='lowNew'?'low':k;
+  $('#ctx').innerHTML=ctx==='pay'?`You're in the middle of paying <b>${s.amt}</b>. Nothing has been sent.`:`You're checking this invoice. Nothing will be paid unless you choose to.`;
+  const kk=cssLv(k);
   const A=ctx==='pay'?{
     low:`<button class="btn red big" data-modal>Continue to pay ${s.amt}</button>`,
     med:`<button class="btn red big" data-modal>Continue to pay ${s.amt}</button><button class="btn ghost big" data-go="overview">Save for later</button><button class="btn link" data-go="report">Report this invoice</button>`,
@@ -507,9 +657,9 @@ function show(v){
   $('#modal').classList.remove('on');
   document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));
   $('#t-ov').classList.toggle('on',v==='overview');$('#t-pay').classList.toggle('on',v!=='overview');
-  document.querySelectorAll('[data-start]').forEach(b=>b.classList&&b.closest('.demo')&&b.classList.toggle('on',b.dataset.start===(v==='overview'?'overview':ctx)&&['pay','check','overview'].includes(v)));
+  document.querySelectorAll('.demo [data-start]').forEach(b=>b.classList.toggle('on',b.dataset.start===(v==='overview'?'overview':ctx)&&['pay','check','overview'].includes(v)));
   if(v==='pay')renderPay();
-  if(v==='check'){radarPanel('#rpanel2');$('#checkDrop').style.display='block';}
+  if(v==='check'){radarPanel('#rpanel2');$('#dropLogo').innerHTML=radarAnim(84,false);}
   if(v==='result')renderResult();
   if(v==='report')renderReport();
   if(v==='reported')renderReported();
@@ -518,9 +668,9 @@ function show(v){
 }
 function start(where){clearTimeout(timer);timer=null;checked=false;soft=null;reportPaid='no';if(where==='pay'||where==='check')ctx=where;show(where);}
 function scen(n){cur=n;document.querySelectorAll('#scen button').forEach(b=>b.classList.toggle('on',+b.dataset.n===n));const on=document.querySelector('.view.on');start(on&&on.id==='v-check'?'check':on&&on.id==='v-overview'?'overview':'pay');}
-$('#scen').innerHTML=ORDER.map(n=>`<button data-n="${n}"><span class="dot" style="background:${LV[S[n].lv].hex}"></span>${LV[S[n].lv].name} · ${S[n].label}</button>`).join('');
-$('#cont').onclick=()=>{if(!checked)return;lvKey()==='low'||lvKey()==='lowNew'?openModal():show('result');};
-$('#checkDrop').onclick=()=>scan('#rpanel2',()=>setTimeout(()=>show('result'),500));
+$('#scen').innerHTML=ORDER.map(n=>`<button data-n="${n}"><span class="sw" style="background:${LV[S[n].lv].hex}"></span>${LV[S[n].lv].name} · ${S[n].label}</button>`).join('');
+$('#cont').onclick=()=>{if(!checked)return;cssLv(lvKey())==='low'?openModal():show('result');};
+$('#checkDrop').onclick=()=>{if(timer)return;scan('#rpanel2',()=>setTimeout(()=>show('result'),500));};
 $('#resBack').onclick=()=>show(ctx==='pay'?'pay':'check');
 function openModal(){fill();const L=LV[lvKey()];$('#mbar').innerHTML=`<span style="color:${L.hex}">✓</span> Radar check: ${L.name} risk · ${L.title}`;$('#modal').classList.add('on');}
 document.addEventListener('click',e=>{
