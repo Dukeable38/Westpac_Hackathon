@@ -37,3 +37,4 @@ class Signal(BaseModel):
     locked: bool = False
     softened_by: str | None = None
     points: int = 0
+    applicable: bool = True

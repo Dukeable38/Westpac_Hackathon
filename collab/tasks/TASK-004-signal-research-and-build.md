@@ -1,6 +1,6 @@
 # TASK-004 · Signal research, tier strategy call, and building the checks
 
-- **Status:** claimed
+- **Status:** in-review
 - **Assignee:** Paul's agent
 - **Branches:** `task/TASK-004a-research` (docs only), then `task/TASK-004b-build` (code)
 - **Hard deadline for anything that should appear in the video:** merged by **3:00pm AEDT 17 Nov** (video due 4pm). Work after that is for the Friday shortlist presentation.
@@ -67,13 +67,14 @@ With many checks returning `unknown`, a high score can hide a thin check. Design
 - Don't edit UI files (`app/static/index.html`, `app/static/app.js`, `mockups/`). `/radar` will pick up your catalogue changes by itself.
 
 ## Handback (fill in when done)
-- Decision (A2) in one line:
-- Checks added / changed (IDs), and which are full vs skeleton:
-- Confidence formula and example values for the 8 invoices:
-- How to verify (commands, which invoices to drop into `/radar`):
-- Open questions for Kiel:
+- Decision (A2) in one line: **Tier-gated, cost-aware whole-tier checking with deterministic gates and evidence-only follow-up after hard stops.**
+- Checks added / changed: full implementations C9, C12, C17, C22, C24, C27, C28, C33, C43, C44, C47, C50, C51. Honest skeletons C5, C6, C16, C25, C29, C32, C34, C36, C37, C38, C40, C41, C42, C48, C52. New catalogue IDs are C42, C43, C44, C47, C48, C50, C51, C52; gaps are documented proposals not selected for this build.
+- Confidence formula and examples: weighted applicable evidence coverage (High=3, Medium=2, Low=1; enablers/workflows=0), labels high ≥.80 / partial ≥.50 / low. Examples: demo 01 .812 high, 02 .717 partial, 03 .538 partial, 04 .716 partial; Nathan N1 .441 low, N2/N3/N4 .446 low. Full table in `docs/research/signals-review.md`.
+- How to verify: `.\.venv\Scripts\python.exe -m pytest tests\ -q` (62 passing), `.\.venv\Scripts\python.exe scripts\smoke_demo.py`; drop 01–04 and N1–N4 into `/radar` to see every catalogue item and skeleton reason.
+- Open questions for Kiel: whether to fund a live OpenRouter TASK-002 comparison; whether bank-side cross-customer observations may be shown in the pitch; whether C42 QR decoding is worth adding before Friday.
 
 ## Log
 - 2026-11-17 · opened by Kiel's side.
 - 2026-11-17 · claimed by Paul's Codex agent; Part A research and strategy decision started on `task/TASK-004a-research`.
 - 2026-11-17 · Parts A/A2/A3 complete on research branch: sourced signal review, tier decision, TASK-003 rewrite, and four-model OpenRouter shortlist. Part B/C remains in progress.
+- 2026-11-17 · Parts B/C complete on build branch; 49 catalogue checks have full or explicit skeleton implementations, confidence added, 62 tests and smoke green. Ready for review.

@@ -3,7 +3,7 @@ from fastapi import FastAPI,File,Form,UploadFile,HTTPException
 from .pdf_forensics import analyse
 from .extract import extract_invoice
 from .checks.run import evaluate
-from .score import calculate,risk_level
+from .score import calculate,confidence,risk_level
 from .policy import plan
 from .chat import respond
 from pydantic import BaseModel,Field
@@ -41,12 +41,14 @@ async def check(file:UploadFile=File(...),customer_id:str=Form('cust_greenline')
     tiers,reason=plan(invoice,signals,sup,score,coverage)
     for s in signals:
         if s['tier'] not in tiers:
-            s.update(state='unknown',evidence='Not needed: fast clear' if tiers==[0,1] else 'Not checked within this screening',weight=0)
+            s.update(state='unknown',evidence='Not needed: fast clear' if tiers==[0,1] else 'Not checked within this screening',weight=0,applicable=False)
     score,band,coverage=calculate(signals)
     level=risk_level(score,signals)
+    confidence_value,confidence_label=confidence(signals)
     advice='Call the supplier on a number you already know before paying.' if band=='high_risk' else 'Confirm the supplier and payment details independently before paying.' if band=='check' else 'No major warning signs found. Check the details before choosing whether to pay.'
     if band=='high_risk' and sup: advice=f"Do not pay yet. Call {sup['known_phone']} (the number on your earlier invoices)."
-    result=dict(check_id=uuid.uuid4().hex,file_name=file.filename,sha256=hashlib.sha256(data).hexdigest(),extracted=invoice.model_dump(),signals=signals,score=score,band=band,level=level,coverage=coverage,tiers_run=tiers,advice=advice,escalation_reason=reason,customer_id=customer_id)
+    if level=='low' and confidence_label=='low': advice='No major warning signs in the checks completed, but important checks were unavailable. Verify the details independently.'
+    result=dict(check_id=uuid.uuid4().hex,file_name=file.filename,sha256=hashlib.sha256(data).hexdigest(),extracted=invoice.model_dump(),signals=signals,score=score,band=band,level=level,coverage=coverage,confidence=confidence_value,confidence_label=confidence_label,tiers_run=tiers,advice=advice,escalation_reason=reason,customer_id=customer_id)
     RESULTS[result['check_id']]=result
     return copy.deepcopy(result)
 

@@ -70,3 +70,18 @@ Confidence is **weighted applicable evidence coverage**, separate from score:
 `confidence = Σ importance(check) for applicable risk/neutral/reassuring results ÷ Σ importance(check) for applicable checks`
 
 Importance is High=3, Medium=2, Low=1, enablers/workflows=0. `unknown` stays in the denominator when the check was applicable but unavailable; `not_applicable` and payment-method-specific checks for another method are excluded from both sides. Skeletons return `unknown`, never fake neutral evidence. Labels: `high ≥ 0.80`, `partial ≥ 0.50`, otherwise `low`. A Low risk result with low confidence must use qualified advice such as “No major warning signs in the checks completed; important checks were unavailable,” never “Looks good.”
+
+Offline fake/replay examples after TASK-004b (these measure evidence coverage, not model accuracy):
+
+| Invoice | Risk result | Confidence |
+|---|---|---:|
+| 01 Tallowwood clean | Low | 0.812 high |
+| 02 Tallowwood changed bank | Critical | 0.717 partial |
+| 03 Brightwater fake | High | 0.538 partial |
+| 04 Fernhill new business | Medium | 0.716 partial |
+| Nathan N1 Larana | High | 0.441 low |
+| Nathan N2 Bowing | High | 0.446 low |
+| Nathan N3 Skype | High | 0.446 low |
+| Nathan N4 Fusion | High | 0.446 low |
+
+Nathan results are deliberately low-confidence: the fake extractor misses most fields, so their High result is not presented as a reliable fraud conclusion.
