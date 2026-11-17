@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Demo Recording</title>
+<style>
+  :root{--red:#DA1710;--navy:#1F1C4F;--grey:#5E5E66;--line:#E2E1E8;--bg:#F6F5F9;--card:#fff;
+        --low:#1B7F4B;--med:#F2A900;--high:#DA1811;--crit:#7A0C09}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:#2B2B2B;font-size:15px;line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:28px 16px 60px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  header svg{width:34px;height:40px;flex:none}
+  h1{margin:0;font-size:28px;color:var(--navy)}
+  .sub{color:var(--grey);margin:0 0 22px}
+  h2{font-size:18px;color:var(--navy);margin:28px 0 10px;display:flex;align-items:center;gap:8px}
+  h2::before{content:'';width:4px;height:18px;background:var(--red);display:inline-block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 18px}
+  .box h3{margin:0 0 8px;font-size:15px;color:var(--navy)}
+  ol,ul{margin:0;padding-left:20px} li{margin:4px 0}
+  kbd{background:#fff;border:1px solid #C9C8D1;border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-size:13px;font-family:inherit;white-space:nowrap}
+  code{background:#EFEEF5;padding:1px 6px;border-radius:3px;font-size:13px;font-family:Consolas,monospace;white-space:nowrap}
+  .warn{background:#FFF6E0;border:1px solid #F2D28A;border-radius:6px;padding:10px 14px;margin-top:14px;font-size:14px}
+  .clip{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--navy);border-radius:6px;margin-bottom:14px;overflow:hidden}
+  .clip .top{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .clip .n{background:var(--navy);color:#fff;font-weight:700;border-radius:50%;width:28px;height:28px;display:grid;place-items:center;flex:none}
+  .clip .t{font-weight:700;font-size:17px;color:var(--navy)}
+  .clip .len{margin-left:auto;color:var(--grey);font-size:13px}
+  .tag{font-size:11px;font-weight:700;color:#fff;padding:2px 8px;border-radius:3px;letter-spacing:.04em}
+  .clip .body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  @media (max-width:760px){.clip .body{grid-template-columns:1fr}}
+  .col{padding:12px 18px}
+  .col+.col{border-left:1px solid var(--line)}
+  @media (max-width:760px){.col+.col{border-left:0;border-top:1px solid var(--line)}}
+  .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--grey);text-transform:uppercase;margin-bottom:4px}
+  .slide{font-weight:700;color:var(--navy);margin-bottom:10px}
+  .say{font-style:italic;color:#333}
+  .file{display:inline-block;background:#ECEBF5;color:var(--navy);font-family:Consolas,monospace;font-size:13px;padding:2px 8px;border-radius:3px;margin:2px 0 6px}
+  .opt{opacity:.75}
+  .flow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  .flow span{background:#fff;border:1px solid var(--line);border-radius:3px;padding:4px 9px;font-size:13px;color:var(--navy);font-weight:700}
+  .flow i{color:var(--grey);font-style:normal}
+  label.done{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--grey);cursor:pointer;margin-left:8px}
+  .foot{margin-top:28px;font-size:13px;color:var(--grey)}
+  @media print{body{background:#fff}.box,.clip{break-inside:avoid}}
+</style>
+</head>
+<body><div class="wrap">
+
+<header>
+  <svg viewBox="0 0 56 64"><path d="M10 14H26.4A22 22 0 0 0 40 30.5V54a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z" fill="#1F1C4F"/><path d="M48 22A12 12 0 0 1 36 10" fill="none" stroke="#DA1710" stroke-width="5" stroke-linecap="round"/><circle cx="48" cy="10" r="4.6" fill="#DA1710"/></svg>
+  <h1>Radar demo: recording guide</h1>
+</header>
+<p class="sub">One silent take, about 3½ minutes. Claude cuts it into one clip per slide afterwards. Nothing to download, no internet needed.</p>
+
+<h2>1 · Set up (2 minutes)</h2>
+<div class="grid">
+  <div class="box"><h3>Start the app</h3><ol>
+    <li>Double-click <code>run_demo.bat</code> in the project folder.</li>
+    <li>Leave the black window open: that's the app running.</li>
+    <li>The browser opens <code>127.0.0.1:8080</code>. <b>Use 8080, not 8000.</b></li>
+    <li>Browser zoom 100% (<kbd>Ctrl</kbd>+<kbd>0</kbd>).</li>
+  </ol></div>
+  <div class="box"><h3>Arrange the screen</h3><ol>
+    <li>Browser on the <b>right</b>, about ¾ of the screen.</li>
+    <li>File Explorer on the <b>left</b>, showing <code>demo\invoices</code>.</li>
+    <li>Close notifications, chat apps and other tabs.</li>
+  </ol></div>
+</div>
+
+<h2>2 · Record</h2>
+<div class="grid">
+  <div class="box"><h3>Snipping Tool (built into Windows)</h3><ol>
+    <li>Press <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>.</li>
+    <li>Drag a box around <b>both</b> windows, then click <b>Start</b> (3-second countdown).</li>
+    <li>Do clips 1 → 5 below, in order.</li>
+    <li>Click the red <b>stop</b> button. The video saves to <code>Videos\Screen Recordings</code>.</li>
+    <li>Send Claude the file path.</li>
+  </ol></div>
+  <div class="box"><h3>Rules that make cutting easy</h3><ul>
+    <li><b>Silent:</b> narrate live on the day, or record a voiceover later.</li>
+    <li><b>Between clips:</b> click <b>Overview</b>, then keep the mouse still for <b>3 seconds</b>.</li>
+    <li><b>Slow down:</b> pause 2 seconds whenever a result appears.</li>
+    <li><b>Mistake?</b> Pause 3 seconds and redo that step. Don't stop recording.</li>
+    <li>Click the chat suggestions; don't type.</li>
+  </ul></div>
+</div>
+<div class="warn"><b>Do clip 2 before clip 5.</b> The Payments list only shows what you paid during this run. Want a clean restart? Close the black window and double-click <code>run_demo.bat</code> again.</div>
+
+<h2>3 · Slides and clips</h2>
+<p style="margin:0 0 12px;color:var(--grey)">Each clip gets one short slide before it: a title plus one line. The <b>Say</b> line is what the presenter says over the slide or clip.</p>
+
+<div class="clip"><div class="top"><span class="n">1</span><span class="t">Radar lives where you already pay</span><span class="len">~15 s</span><label class="done"><input type="checkbox"> done</label></div>
+  <div class="body"><div class="col"><div class="lbl">Slide</div><div class="slide">No new app. Radar is part of Westpac Online Banking.</div><div class="lbl">Say</div><div class="say">"Radar is built into the payment screen small businesses already use. This is Greenline Landscaping's Online Banking."</div></div>
+  <div class="col"><div class="lbl">Do</div><div class="flow"><span>Overview</span><i>→</i><span>point at Radar bar + tile</span><i>→</i><span>Make a payment</span></div></div></div></div>
+
+<div class="clip" style="border-left-color:var(--low)"><div class="top"><span class="n">2</span><span class="t">Most invoices are fine</span><span class="tag" style="background:var(--low)">LOW</span><span class="len">~40 s</span><label class="done"><input type="checkbox"> done</label></div>
+  <div class="body"><div class="col"><div class="lbl">Slide</div><div class="slide">Drop the invoice in. Radar checks it and fills in the payment.</div><div class="lbl">Say</div><div class="say">"Mia drops in her regular mulch invoice. Radar checks it in seconds, fills in the BSB, account and amount: Low risk. She pays as normal, and Radar keeps a fingerprint of the invoice."</div></div>
+  <div class="col"><div class="lbl">Drag</div><span class="file">01-tallowwood-clean.pdf</span><div class="lbl">Do</div><div class="flow"><span>drop on page</span><i>→</i><span>wait for Low</span><i>→</i><span>Continue</span><i>→</i><span>Confirm</span><i>→</i><span>Overview, 3 s</span></div></div></div></div>
+
+<div class="clip" style="border-left-color:var(--crit)"><div class="top"><span class="n">3</span><span class="t">Sarah's invoice, with Radar</span><span class="tag" style="background:var(--crit)">CRITICAL</span><span class="len">~60 s · the hero</span><label class="done"><input type="checkbox"> done</label></div>
+  <div class="body"><div class="col"><div class="lbl">Slide</div><div class="slide">Same supplier. Same amount. Different bank account.</div><div class="lbl">Say</div><div class="say">"This is exactly what happened to Sarah: the real supplier's invoice with the bank details swapped. Radar spots the PDF was edited, recovers the original details, and Westpac Verify says the name doesn't match. The main button is Report. She can still pay anyway: we never block, but we make the risk unmistakable."</div></div>
+  <div class="col"><div class="lbl">Drag</div><span class="file">02-tallowwood-changed-bank.pdf</span><div class="lbl">Do</div><div class="flow"><span>Make a payment</span><i>→</i><span>drop</span><i>→</i><span>Critical</span><i>→</i><span>Review Radar result</span><i>→</i><span>hover "Pay anyway" (don't click)</span><i>→</i><span>Report this invoice</span><i>→</i><span>Send report</span><i>→</i><span>Overview, 3 s</span></div></div></div></div>
+
+<div class="clip" style="border-left-color:var(--med)"><div class="top"><span class="n">4</span><span class="t">New isn't the same as fake</span><span class="tag" style="background:var(--med);color:var(--navy)">MEDIUM → LOW</span><span class="len">~45 s</span><label class="done"><input type="checkbox"> done</label></div>
+  <div class="body"><div class="col"><div class="lbl">Slide</div><div class="slide">Context lowers false alarms.</div><div class="lbl">Say</div><div class="say">"Fernhill is a genuine new business. Radar flags it Medium and asks how Mia knows them. Her answer drops it to Low. Confirmed evidence, like an edited PDF, can never be explained away."</div></div>
+  <div class="col"><div class="lbl">Drag</div><span class="file">04-fernhill-new-business.pdf</span><div class="lbl">Do</div><div class="flow"><span>Payments ▸ Check an invoice</span><i>→</i><span>drop</span><i>→</i><span>click "I met the owner at the expo…"</span><i>→</i><span>59 → 84</span><i>→</i><span>Pay this invoice</span><i>→</i><span>Overview, 3 s</span></div></div></div></div>
+
+<div class="clip" style="border-left-color:var(--navy)"><div class="top"><span class="n">5</span><span class="t">Prove what you paid</span><span class="tag" style="background:var(--navy)">RECEIPT</span><span class="len">~40 s</span><label class="done"><input type="checkbox"> done</label></div>
+  <div class="body"><div class="col"><div class="lbl">Slide</div><div class="slide">Radar keeps a fingerprint, not your files.</div><div class="lbl">Say</div><div class="say">"Weeks later, Tallowwood says Mia still owes $572 and sends a different copy of the invoice. She drops it on the payment: not a match. Her receipt proves which invoice she actually paid. The same works if the ATO says you underpaid."</div></div>
+  <div class="col"><div class="lbl">Drag</div><span class="file">05-tallowwood-claimed-copy.pdf</span> then <span class="file">01-tallowwood-clean.pdf</span><div class="lbl">Do</div><div class="flow"><span>Payments ▸ Payments list</span><i>→</i><span>Compare an invoice</span><i>→</i><span>drop 05: not a match</span><i>→</i><span>drop 01: exact match</span><i>→</i><span>stop recording</span></div></div></div></div>
+
+<div class="clip opt" style="border-left-color:var(--high)"><div class="top"><span class="n">6</span><span class="t">Optional: many small tells</span><span class="tag" style="background:var(--high)">HIGH</span><span class="len">~20 s · only if time allows</span><label class="done"><input type="checkbox"> done</label></div>
+  <div class="body"><div class="col"><div class="lbl">Slide</div><div class="slide">Fake ABN, reported account, hidden text, pressure to pay.</div></div>
+  <div class="col"><div class="lbl">Drag</div><span class="file">03-brightwater-sloppy-fake.pdf</span><div class="lbl">Do</div><div class="flow"><span>Check an invoice</span><i>→</i><span>drop</span><i>→</i><span>High</span></div></div></div></div>
+
+<h2>4 · After recording</h2>
+<div class="box"><ol>
+  <li>Send Claude the video's path. Claude cuts it at the 3-second pauses into <code>clip1.mp4</code> … <code>clip5.mp4</code>.</li>
+  <li>In PowerPoint: <b>Insert → Video → This Device</b>, then under <b>Playback</b> set <b>Start: Automatically</b>.</li>
+  <li>Deck order: Team → Challenge → Scam stats → Sarah's story → Radar overview → <b>slides A–E with clips</b> → Sarah with Radar (video) → Desirability / Feasibility / Viability → Recommendations → Close.</li>
+</ol></div>
+
+<p class="foot">Words to avoid on any slide: "verified", "safe", "protected", "guaranteed". Say "Radar check" and "Radar found". All businesses in the demo are fictional.</p>
+</div></body>
+</html>
