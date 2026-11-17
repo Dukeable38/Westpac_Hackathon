@@ -1,6 +1,6 @@
 # TASK-004 · Signal research, tier strategy call, and building the checks
 
-- **Status:** ready
+- **Status:** claimed
 - **Assignee:** Paul's agent
 - **Branches:** `task/TASK-004a-research` (docs only), then `task/TASK-004b-build` (code)
 - **Hard deadline for anything that should appear in the video:** merged by **3:00pm AEDT 17 Nov** (video due 4pm). Work after that is for the Friday shortlist presentation.
@@ -75,3 +75,5 @@ With many checks returning `unknown`, a high score can hide a thin check. Design
 
 ## Log
 - 2026-11-17 · opened by Kiel's side.
+- 2026-11-17 · claimed by Paul's Codex agent; Part A research and strategy decision started on `task/TASK-004a-research`.
+- 2026-11-17 · Parts A/A2/A3 complete on research branch: sourced signal review, tier decision, TASK-003 rewrite, and four-model OpenRouter shortlist. Part B/C remains in progress.

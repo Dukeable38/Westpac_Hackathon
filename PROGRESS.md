@@ -77,3 +77,4 @@ python -m venv .venv
 Open http://127.0.0.1:8000. Default fake/replay needs no key. For cloud/Linux replace the executable with `.venv/bin/python`. The smoke server is automatically stopped. All implementation work took place in the cloud, not the user's Windows clone.
 
 - 2026-11-17 · TASK-001 · Added additive Low/Medium/High/Critical API levels to check, GET, chat, and receipt responses while preserving legacy bands. New fixture/chat/receipt tests pass; full suite **45 passed** and demo smoke passed on Windows.
+- 2026-11-17 · TASK-004a · Reviewed Radar signals against current Scamwatch, Cyber.gov.au, AUSTRAC, ATO, ASIC and OpenRouter sources. Chose tier-gated whole-tier checking with deterministic gates and evidence-only follow-up; rewrote TASK-003 to `ready`. Shortlisted 12 new checks and prioritised C44/C43/C42/C50/C47/C48/C51/C52.
