@@ -53,10 +53,13 @@ const RISK={C1:"Bank details differ from what you've paid before",C2:'Reported b
   C20:'Pressure to pay fast',C21:"The ABN doesn't match this business",C22:"Charges GST but isn't registered for GST",C23:'Business is very new',C24:'The ABN belongs to someone else',
   C25:"Doesn't match the official payment details",C26:"Email address doesn't match the business",C27:'Looks like a directory or domain-renewal offer',C29:'Spelling and formatting errors',
   C30:'Lookalike email address',C31:'Website or email domain is very new',C32:"The website's owner doesn't match the ABN",C33:"The email domain isn't set up like a real business",
-  C34:"Contact details don't match official sources",C35:'Scam reports, or hardly any online presence',C36:"The company isn't registered as active",C39:'Radar found the original bank details'};
+  C34:"Contact details don't match official sources",C35:'Scam reports, or hardly any online presence',C36:"The company isn't registered as active",C39:'Radar found the original bank details',
+  C17:"The invoice doesn't add up",C28:"Doesn't fit what your business usually buys",C42:'Payment link or QR code goes somewhere unexpected',C43:'Account is in a personal name, not the business',
+  C44:'The invoice dates look wrong',C47:'This account has been used for other, unrelated businesses',C48:'Same invoice template used by unrelated suppliers',C50:'Supplier is emailing from a new address',
+  C51:'Unexpected currency or overseas payment',C52:'BPAY details look wrong'};
 const GOOD={C1:'Same account you always pay',C8:'ABN is valid',C21:'ABN active and name matches',C13:"Invoice hasn't been edited",C35:'Established online presence'};
 // Most telling findings first (tampering and register hits before softer signs).
-const PRIORITY=['C15','C13','C39','C2','C5','C14','C8','C25','C24','C3','C1','C30','C19','C20','C35','C18','C10','C31','C23','C26','C4'];
+const PRIORITY=['C15','C13','C39','C2','C47','C5','C14','C8','C24','C43','C25','C24','C3','C1','C30','C19','C20','C35','C18','C10','C31','C23','C26','C4'];
 const rank=s=>{const i=PRIORITY.indexOf(s.id);return i<0?99:i;};
 const titleOf=s=>{
   if(s.id==='C35'&&s.state==='risk')return /[1-9]\d* scam report/.test(s.evidence)?'Reported as a scam online':'Hardly any online presence';
@@ -92,8 +95,9 @@ function fill(){
 }
 
 // ---------- tier progress ----------
+const tierRan=(r,t)=>r.tiers_run.includes(t)||r.signals.some(s=>s.tier===t&&s.disposition==='evidence'&&s.state==='risk');
 function tierState(r,t){
-  if(!r.tiers_run.includes(t))return 'skip';
+  if(!tierRan(r,t))return 'skip';
   const risks=r.signals.filter(s=>s.tier===t&&s.state==='risk');
   if(!risks.length)return 'g';
   return risks.some(s=>s.locked)||r.level==='high'||r.level==='critical'?'r':'w';
@@ -102,10 +106,11 @@ function tierText(r,t){
   const st=tierState(r,t);
   if(st==='skip'){
     const c1=r.signals.find(s=>s.id==='C1'&&s.state==='reassuring');const n=c1&&String(c1.evidence).match(/(\d+) times/);
+    if(r.gate==='hard_stop'&&t>(r.stopped_at??0))return 'Skipped: Radar already found enough to stop';
     return t===2&&n?`Not needed: you've paid this account ${n[1]} times`:'Not needed for this invoice';
   }
   const risks=r.signals.filter(s=>s.tier===t&&s.state==='risk');
-  if(!risks.length){const n=r.signals.filter(s=>s.tier===t&&s.state!=='unknown').length;return n?`${n} checks, nothing found`:'Nothing found';}
+  if(!risks.length){const n=r.signals.filter(s=>s.tier===t&&s.state!=='unknown').length;return n?`${n} check${n===1?'':'s'}, nothing found`:'Nothing found';}
   const names=risks.sort((a,b)=>rank(a)-rank(b)).map(titleOf);return names.slice(0,2).join(' · ')+(names.length>2?` · +${names.length-2} more`:'');
 }
 function stepsHTML(p,r){return TIERS.map((name,t)=>{
@@ -126,13 +131,15 @@ function radarPanel(sel,phase,fileName){
   else{body=`<div>${stepsHTML(p,current)}</div>${mini(current)}`;tag='<span class="rtag">Checked</span>';}
   el.innerHTML=`<div class="h"><h4 class="ricon">${ICON.rd}Radar invoice check</h4>${tag}</div><div class="b">${body}</div>`;
 }
+// Evidence checks after a hard stop: show them on the highest tier they belong to.
+const evTier=(r,d)=>Math.max(0,...(d.checks||[]).map(id=>(r.signals.find(s=>s.id===id)||{tier:0}).tier));
 // Paces the server's SSE tier events so people can follow them; the result itself is already final.
 function playProgress(r,p,myGen){return new Promise(resolve=>{
   const q=[];let es=null;
   const done=()=>{try{es&&es.close();}catch{}};
   if(window.EventSource){
     es=new EventSource('/api/check/'+encodeURIComponent(r.check_id)+'/events');
-    ['tier_start','tier_end','tier_skipped','complete'].forEach(type=>es.addEventListener(type,ev=>{let d={};try{d=JSON.parse(ev.data);}catch{}q.push([type,d]);if(type==='complete')done();}));
+    ['tier_start','tier_end','tier_skipped','evidence_start','evidence_end','complete'].forEach(type=>es.addEventListener(type,ev=>{let d={};try{d=JSON.parse(ev.data);}catch{}q.push([type,d]);if(type==='complete')done();}));
     es.onerror=()=>{done();q.push(['complete',{}]);};
   }else r.tiers_run.forEach(t=>q.push(['tier_start',{tier:t}],['tier_end',{tier:t}])),q.push(['complete',{}]);
   const safety=setTimeout(()=>q.push(['complete',{}]),20000);
@@ -142,6 +149,8 @@ function playProgress(r,p,myGen){return new Promise(resolve=>{
     const e=q.shift();if(!e)return setTimeout(loop,60);
     const [type,d]=e;
     if(type==='tier_start'){setStep(p,d.tier,'run',r);return setTimeout(loop,750);}
+    if(type==='evidence_start'){const t=evTier(r,d);setStep(p,t,'run',r);const m=$('#'+p+'msg');if(m)m.textContent='Gathering evidence for the report…';return setTimeout(loop,750);}
+    if(type==='evidence_end'){const t=evTier(r,d);setStep(p,t,'done',r);return setTimeout(loop,120);}
     if(type==='tier_end'||type==='tier_skipped'){setStep(p,d.tier,'done',r);return setTimeout(loop,120);}
     clearTimeout(safety);done();TIERS.forEach((_,t)=>setStep(p,t,'done',r));resolve(true);
   };loop();
