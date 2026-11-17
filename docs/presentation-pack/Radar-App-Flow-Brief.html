@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Radar: how the app works</title>
+<style>
+  @page{size:A4;margin:16mm 15mm}
+  :root{--red:#DA1710;--navy:#1F1C4F;--grey:#706F7C;--line:#DEDEE3;--low:#1B7F4B;--med:#F2A900;--high:#DA1811;--crit:#7A0C09}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#2B2B2B;font-size:10.5pt;line-height:1.45;background:#fff}
+  .wrap{max-width:180mm;margin:0 auto}
+  h1{font-size:26pt;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em}
+  h2{font-size:15pt;color:var(--navy);margin:0 0 8px;padding-top:4px;border-top:3px solid var(--red);padding-top:8px;display:inline-block}
+  h3{font-size:11.5pt;color:var(--navy);margin:0 0 4px}
+  p{margin:0 0 8px}
+  .sub{color:var(--grey);font-size:10pt;margin-bottom:18px}
+  .hero{display:flex;gap:16px;align-items:center;background:#F4F3F8;border-left:5px solid var(--navy);padding:14px 16px;margin:14px 0 18px}
+  .hero svg{width:44px;height:50px;flex:none}
+  .hero p{margin:0;font-size:12pt;color:var(--navy)}
+  section{margin-bottom:18px;break-inside:avoid}
+  section.walk{break-inside:auto}
+  h2,h3,.step .head,.step .say{break-after:avoid}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .card{border:1px solid var(--line);padding:10px 12px}
+  .card h3{display:flex;align-items:center;gap:8px}
+  .num{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;font-size:9pt;font-weight:700;flex:none}
+  table{width:100%;border-collapse:collapse;font-size:9.5pt;margin:4px 0 6px}
+  th{background:var(--navy);color:#fff;text-align:left;padding:6px 8px;font-weight:700}
+  td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  .lv{display:inline-block;color:#fff;font-weight:700;font-size:8.5pt;padding:2px 7px;border-radius:2px;letter-spacing:.04em;white-space:nowrap}
+  .lv.low{background:var(--low)}.lv.med{background:var(--med);color:var(--navy)}.lv.high{background:var(--high)}.lv.crit{background:var(--crit)}
+  ul{margin:4px 0 8px;padding-left:18px} li{margin-bottom:3px}
+  .do{border-left:4px solid var(--low);padding:6px 10px;background:#F1F8F4}
+  .dont{border-left:4px solid var(--high);padding:6px 10px;background:#FCF1F0}
+  .flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:9.5pt;margin:6px 0 2px}
+  .flow span{background:#F4F3F8;border:1px solid #D9D7EA;padding:4px 8px;border-radius:3px;color:var(--navy);font-weight:700}
+  .flow i{color:var(--grey);font-style:normal}
+  .walk{page-break-before:always}
+  .step{margin:0 0 16px;page-break-inside:avoid}
+  .step .head{display:flex;gap:10px;align-items:baseline;margin-bottom:4px}
+  .step .head .num{background:var(--red);width:24px;height:24px;font-size:10pt}
+  .step .say{font-size:9.5pt;color:#444;margin:0 0 6px 34px}
+  .step .say b{color:var(--navy)}
+  .step img{display:block;width:100%;max-height:118mm;object-fit:contain;object-position:top left;border:1px solid var(--line)}
+  .step img.tall{max-height:200mm}
+  .note{font-size:9pt;color:var(--grey)}
+  .foot{margin-top:18px;font-size:8.5pt;color:var(--grey);border-top:1px solid var(--line);padding-top:8px}
+  code{font-family:Consolas,monospace;font-size:9pt;background:#F4F3F8;padding:1px 4px}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>Radar: how the app works</h1>
+<div class="sub">Presenter brief for Nathan and Lauren · 2026 Westpac Hackathon · QUT Dean's Scholars · 17 Nov 2026</div>
+
+<div class="hero">
+  <svg viewBox="0 0 56 64"><path d="M10 14H26.4A22 22 0 0 0 40 30.5V54a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z" fill="#1F1C4F"/><path d="M48 22A12 12 0 0 1 36 10" fill="none" stroke="#DA1710" stroke-width="5" stroke-linecap="round"/><circle cx="48" cy="10" r="4.6" fill="#DA1710"/></svg>
+  <p><b>Radar checks an invoice for scam signs before a small business pays it, right inside Westpac Online Banking.</b> Attach the PDF, and in a few seconds Radar says how risky it is, shows what it found and tells you what to do next.</p>
+</div>
+
+<section>
+  <h2>The two ways in</h2>
+  <div class="grid2">
+    <div class="card"><h3><span class="num">A</span>Inside a payment</h3><p>Payments → Make a payment → <b>Attach invoice</b>. Radar checks the invoice, then fills in the payee, BSB, account and amount for you. This is the main story: the check happens <i>before</i> money leaves the account.</p></div>
+    <div class="card"><h3><span class="num">B</span>On its own</h3><p>Payments → <b>Check an invoice</b> (or the Radar tile on the Overview page). For people not ready to pay yet. If it looks right, <b>Pay this invoice</b> turns it into a payment in one step.</p></div>
+  </div>
+  <div class="flow"><span>Attach invoice</span><i>→</i><span>Radar checks (a few seconds)</span><i>→</i><span>Risk level + what it found</span><i>→</i><span>Pay, or Report this invoice</span><i>→</i><span>Confirmation + Radar receipt</span></div>
+</section>
+
+<section>
+  <h2>The four risk levels</h2>
+  <table>
+    <tr><th style="width:18%">Level</th><th style="width:26%">What the customer sees</th><th>When it happens</th><th style="width:24%">Main button</th></tr>
+    <tr><td><span class="lv low">LOW</span></td><td>Looks good</td><td>Nothing suspicious, e.g. the same account you've paid many times before. Score 80–100.</td><td>Continue to pay</td></tr>
+    <tr><td><span class="lv med">MEDIUM</span></td><td>Take a quick look</td><td>Something is new or changed but not proven bad, e.g. a brand-new supplier. Score 50–79.</td><td>Continue to pay (after checking)</td></tr>
+    <tr><td><span class="lv high">HIGH</span></td><td>Pause before paying</td><td>Serious warning signs: a fake ABN, an account other businesses have reported, or the account name doesn't match. Score under 50.</td><td><b>Report this invoice</b></td></tr>
+    <tr><td><span class="lv crit">CRITICAL</span></td><td>Don't pay this invoice</td><td>The invoice itself was tampered with: someone edited the bank details in the PDF.</td><td><b>Report this invoice</b></td></tr>
+  </table>
+  <p class="note">The <b>Radar score</b> runs from 0 to 100; higher means fewer warning signs. It is a guide, not a guarantee.</p>
+</section>
+
+<section>
+  <h2>How Radar checks</h2>
+  <p>Radar works outwards, cheapest and fastest first, and only digs deeper when something needs a closer look. You see these four steps tick off in the side panel while it runs.</p>
+  <table>
+    <tr><th style="width:24%">Step</th><th>What it looks at</th></tr>
+    <tr><td>1 · Quick checks</td><td>Has the PDF been edited? Hidden text? Are these the bank details you've paid before? Does the GST add up? Is the ABN valid?</td></tr>
+    <tr><td>2 · Common red flags</td><td>"Our bank details have changed", pressure to pay fast, a free email address, does the ABN belong to this business?</td></tr>
+    <tr><td>3 · Deeper research</td><td>Lookalike email domains, how old the website is, online reviews and scam reports.</td></tr>
+    <tr><td>4 · Specialist review</td><td>Recovering the original bank details from inside an edited PDF.</td></tr>
+  </table>
+  <p class="note">If the first two steps are clean and you've paid this account before, Radar stops early ("Not needed"). That's why a normal invoice is quick.</p>
+</section>
+
+<section>
+  <h2>What to say, and what not to say</h2>
+  <div class="grid2">
+    <div class="do"><b>Do</b><ul>
+      <li>Say "Radar check", "Radar score", "Radar found…".</li>
+      <li>Say <b>Westpac Verify</b> (the account-name check) is something Westpac already does. Radar adds evidence from the invoice on top.</li>
+      <li>Point out that every warning says what to do next.</li>
+      <li>Say the AI reads the invoice, but the score and level come from fixed rules. A chat answer can't undo a confirmed finding.</li>
+    </ul></div>
+    <div class="dont"><b>Don't</b><ul>
+      <li>Say "verified", "safe", "protected" or "guaranteed". Radar finds warning signs; it can't promise an invoice is genuine.</li>
+      <li>Promise "Westpac will call you". The High and Critical answer is <b>Report this invoice</b>.</li>
+      <li>Call Westpac Verify / Confirmation of Payee our feature.</li>
+      <li>Use real businesses. All four demo suppliers are made up.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>The four demo invoices</h2>
+  <p>Our customer is <b>Greenline Landscaping</b>, a small landscaping business. All the businesses are fictional.</p>
+  <table>
+    <tr><th style="width:30%">Invoice</th><th>The story</th><th style="width:15%">Result</th></tr>
+    <tr><td>Tallowwood · usual</td><td>A regular mulch supplier Greenline has paid 14 times, same bank account as always.</td><td><span class="lv low">LOW</span> 96</td></tr>
+    <tr><td>Fernhill · new business</td><td>A genuine but brand-new irrigation company: ABN 7 weeks old, tiny website. After the owner says "I met them at the expo and ordered this", Radar re-checks and it drops to Low.</td><td><span class="lv med">MEDIUM</span> 59 → <span class="lv low">LOW</span> 84</td></tr>
+    <tr><td>Brightwater · fake</td><td>A sloppy fake: invalid ABN, wrong GST, Gmail address, "pay within 24 hours", hidden text in the PDF, an account other businesses have reported.</td><td><span class="lv high">HIGH</span> 3</td></tr>
+    <tr><td>Tallowwood · bank changed</td><td>The scariest one: the real Tallowwood invoice, with only the bank details swapped by a scammer. Radar spots the edit, finds the original details and the lookalike email address.</td><td><span class="lv crit">CRITICAL</span> 0</td></tr>
+  </table>
+</section>
+
+<!-- WALKTHROUGH A -->
+<section class="walk">
+  <h2>Walkthrough A · Paying a normal invoice (Low)</h2>
+  <p class="note">Invoice: Tallowwood · usual. Shows the everyday case is fast and gets out of the way.</p>
+
+  <div class="step"><div class="head"><span class="num">1</span><h3>Start in Online Banking</h3></div>
+    <p class="say">The familiar Westpac Overview page. Radar appears as a <b>notice bar</b>, a <b>tile next to SafeBlock</b> and in the Payments menu. Click <b>Make a payment</b>.</p>
+    <img src="screenshots/01-overview.png" alt="Overview page"></div>
+
+  <div class="step"><div class="head"><span class="num">2</span><h3>Attach the invoice</h3></div>
+    <p class="say">The normal Make a payment form, with one new button: <b>Attach invoice</b>. The Radar panel on the right explains what it will check.</p>
+    <img src="screenshots/02-make-a-payment.png" alt="Make a payment with Attach invoice"></div>
+
+  <div class="step"><div class="head"><span class="num">3</span><h3>Radar checks it</h3></div>
+    <p class="say">The Radar logo "pings" across the invoice while the four steps tick off. It takes a few seconds.</p>
+    <img src="screenshots/03-radar-checking.png" alt="Radar checking"></div>
+
+  <div class="step"><div class="head"><span class="num">4</span><h3>Form filled in, Low risk</h3></div>
+    <p class="say">Radar has filled in the BSB, account, name and amount (each marked <b>From invoice</b>). Westpac Verify confirms the account name. The green banner says <b>Low risk · Looks good</b>; deeper research was skipped because they've paid this account 14 times.</p>
+    <img class="tall" src="screenshots/04-low-risk-payment-filled.png" alt="Payment form filled, low risk"></div>
+
+  <div class="step"><div class="head"><span class="num">5</span><h3>Confirm</h3></div>
+    <p class="say">The usual confirmation box, with the Radar result on it.</p>
+    <img src="screenshots/05-confirm-payment.png" alt="Confirm payment"></div>
+
+  <div class="step"><div class="head"><span class="num">6</span><h3>Paid, with a Radar receipt</h3></div>
+    <p class="say">Alongside the payment summary, a <b>Radar receipt</b> records the result and a fingerprint of the exact invoice that was checked, useful if there's a dispute later.</p>
+    <img src="screenshots/06-paid-with-radar-receipt.png" alt="Paid confirmation"></div>
+</section>
+
+<!-- WALKTHROUGH B -->
+<section class="walk">
+  <h2>Walkthrough B · Bank details swapped (Critical)</h2>
+  <p class="note">Invoice: Tallowwood · bank changed. The hero moment of the demo: same supplier, same amount, only the bank details changed.</p>
+
+  <div class="step"><div class="head"><span class="num">7</span><h3>Radar stops the payment before it happens</h3></div>
+    <p class="say">Same steps as before, but now every check lights up red. Westpac Verify says the account is held by someone else, and the Radar banner says <b>Critical risk · Don't pay this invoice</b>. The Continue button becomes <b>Review Radar result</b>.</p>
+    <img src="screenshots/07-critical-payment-warning.png" alt="Critical warning on the payment form"></div>
+
+  <div class="step"><div class="head"><span class="num">8</span><h3>What Radar found</h3></div>
+    <p class="say">Plain-English findings: the bank details were edited after the invoice was made, Radar <b>recovered the original details</b> (the account they always pay), and the email comes from a lookalike domain set up 18 days ago. "Confirmed" findings can't be explained away. The main button is <b>Report this invoice</b>, with advice to call the supplier on the number from earlier invoices.</p>
+    <img class="tall" src="screenshots/08-critical-result.png" alt="Critical result page"></div>
+
+  <div class="step"><div class="head"><span class="num">9</span><h3>Report it</h3></div>
+    <p class="say">Because they're mid-payment, the page says the payment <b>hasn't been sent</b> and doesn't ask "have you already paid?". The side panel shows what gets sent.</p>
+    <img src="screenshots/09-report-invoice.png" alt="Report this invoice"></div>
+
+  <div class="step"><div class="head"><span class="num">10</span><h3>Report confirmed</h3></div>
+    <p class="say">Report received, payment cancelled, no money sent, plus a reminder to warn the supplier, whose email may have been hacked.</p>
+    <img src="screenshots/10-report-confirmation.png" alt="Report confirmation"></div>
+</section>
+
+<!-- WALKTHROUGH C -->
+<section class="walk">
+  <h2>Walkthrough C · Checking first: a new supplier (Medium → Low)</h2>
+  <p class="note">Invoice: Fernhill · new business. Shows Radar isn't just a "scam / not scam" button. New isn't the same as fake, and context matters.</p>
+
+  <div class="step"><div class="head"><span class="num">11</span><h3>Check an invoice on its own</h3></div>
+    <p class="say">From Payments → Check an invoice. Drop the PDF in. Nothing gets paid.</p>
+    <img src="screenshots/11-check-an-invoice.png" alt="Check an invoice page"></div>
+
+  <div class="step"><div class="head"><span class="num">12</span><h3>Medium: take a quick look</h3></div>
+    <p class="say">Nothing fake, just new: first payment to them, ABN 7 weeks old, hardly any online presence. Radar asks <b>"How do you know them?"</b></p>
+    <img class="tall" src="screenshots/12-medium-result-with-chat.png" alt="Medium result with chat"></div>
+
+  <div class="step"><div class="head"><span class="num">13</span><h3>Context changes the answer</h3></div>
+    <p class="say">"I met the owner at the expo and ordered this." Radar re-checks: score <b>59 → 84, Medium → Low</b>. The findings it explained are tagged. <b>Pay this invoice</b> turns it into a payment.</p>
+    <img class="tall" src="screenshots/13-after-chat-now-low.png" alt="Low after chat"></div>
+</section>
+
+<!-- WALKTHROUGH D -->
+<section class="walk">
+  <h2>Walkthrough D · An obvious fake (High)</h2>
+  <p class="note">Invoice: Brightwater · fake. Shows Radar catching the many small tells of a sloppy scam.</p>
+  <div class="step"><div class="head"><span class="num">14</span><h3>Pause before paying</h3></div>
+    <p class="say">Reported by two other businesses, an ABN that isn't real, hidden instructions in the PDF, pressure to pay within 24 hours, wrong GST and a Gmail address. Telling Radar "I called the number on the invoice" doesn't help: that number could be the scammer's.</p>
+    <img class="tall" src="screenshots/14-high-result.png" alt="High result"></div>
+</section>
+
+<section class="walk">
+  <h2>Opening the mock-up</h2>
+  <ul>
+    <li>Open <code>mockup/index.html</code> in Chrome or Edge (double-click it). No internet or install needed.</li>
+    <li>The <b>dark bar at the top</b> isn't part of the bank: use it to pick one of the four invoices and where to start (Make a payment, Check an invoice or Overview).</li>
+    <li>Then click through like a real customer: Attach invoice → Continue / Review Radar result → Report or Pay.</li>
+    <li>The mock-up uses fixed example data so it always behaves the same. The working app on Kiel's laptop looks identical but runs the real checks on the PDF.</li>
+  </ul>
+  <h2>Good to know</h2>
+  <ul>
+    <li>Everything on the bank pages (balances, account numbers, upcoming payments) is made up. The Westpac look is recreated from Kiel's own Online Banking for the demo.</li>
+    <li>Radar is built for desktop first: small businesses pay invoices from a computer.</li>
+    <li>The invoice PDF isn't stored; Radar keeps a fingerprint so you can prove which invoice was checked.</li>
+  </ul>
+  <div class="foot">Questions: ask Kiel. Source of truth for decisions: <code>collab/DECISIONS.md</code> in the repo. Brand and level colours: <code>docs/brand-kit.md</code>.</div>
+</section>
+
+</div></body>
+</html>
