@@ -6,7 +6,7 @@ Where they disagree with `mockups/radar/index.html`, the screenshots win.
 
 | File | Screen |
 |---|---|
-| `01-overview-dashboard.png` | Overview: "Your accounts" tiles, Upcoming payments, SafeBlock tile, chat pop-up **Delete or redact before the repo goes public** (shows a payee name and a small balance). |
+| `01-overview-dashboard.png` | Overview page (removed before the repo went public: it showed personal details) |
 | `02-make-a-payment.png` | Make a payment: Pay to (tabs All / Payees / BPAY / International), From, Payment details, right-hand "Multiple Payment" panel |
 | `03-pay-new-payee-bsb.png` | Pay new payee, BSB & account no., with the **Check details** button (Westpac Verify / CoP) |
 | `04-pay-new-payee-bpay.png` | Pay new payee, BPAY biller code + CRN, with the orange **"Stay safe from scams"** banner |
