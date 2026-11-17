@@ -75,3 +75,5 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 Open http://127.0.0.1:8000. Default fake/replay needs no key. For cloud/Linux replace the executable with `.venv/bin/python`. The smoke server is automatically stopped. All implementation work took place in the cloud, not the user's Windows clone.
+
+- 2026-11-17 · M7 · Free-tier hardening: model timeout now `LLM_TIMEOUT` (default 60 s, was a hard-coded 12 s that free OpenRouter/NVIDIA models often exceed). openai_compatible retries 429 and 5xx up to 4 attempts, honouring Retry-After, else 2/4/8 s (each wait capped at 20 s); Anthropic SDK retries raised to 3. New mocked test covers it: 41 passed.
