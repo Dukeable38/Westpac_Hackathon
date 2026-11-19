@@ -166,9 +166,15 @@ const DEMOS=[['01-tallowwood-clean.pdf','01'],['02-tallowwood-changed-bank.pdf',
 let SIG=[],TIERS=[],byId={},state={},queue=[],playing=false,es=null,current=null,follow=true,lastSeen=null,selected=null,feedsInto={};
 
 function rank(s){return s.hard_stop?0:/^High/.test(s.weight_class)?1:/Med/.test(s.weight_class)?2:3;}
+// C17 (AI extraction) is not a check: it is how Radar reads the invoice before any check runs (app/main.py),
+// so it sits at the centre and its links run out from there.
+const READ='C17';
 function layout(){
+  SIG.forEach((s,i)=>s.seq=i);
+  const r0=byId[READ];if(r0){r0.x=C;r0.y=C;r0.order=0;}
   for(let t=0;t<4;t++){
-    const L=SIG.filter(s=>s.tier===t).sort((a,b)=>rank(a)-rank(b)||(b.weight||0)-(a.weight||0)||(+a.id.slice(1))-(+b.id.slice(1)));
+    // clockwise in firing order (catalogue order = SSE order), so the scan travels round each ring
+    const L=SIG.filter(s=>s.tier===t&&s.id!==READ).sort((a,b)=>a.seq-b.seq);
     L.forEach((s,i)=>{const a=-Math.PI/2+i/L.length*2*Math.PI+(t%2?Math.PI/L.length:0);s.x=C+R[t]*Math.cos(a);s.y=C+R[t]*Math.sin(a);s.order=i+1;});
   }
   feedsInto={};SIG.forEach(s=>(s.feeds||[]).forEach(f=>{(feedsInto[f]=feedsInto[f]||[]).push(s.id);}));
@@ -189,7 +195,7 @@ function draw(){
   const eg=el('g',{id:'edges'},s);
   SIG.forEach(a=>(a.feeds||[]).forEach(b=>{const B=byId[b];if(!B)return;const mx=(a.x+B.x)/2,my=(a.y+B.y)/2;el('path',{class:'edge',id:`e-${a.id}-${b}`,d:`M${a.x} ${a.y} Q${mx+(C-mx)*.3} ${my+(C-my)*.3} ${B.x} ${B.y}`},eg);}));
   el('g',{id:'fx'},s);
-  SIG.forEach(n=>{const g=el('g',{class:'node'+(n.built===true?'':' unbuilt'),id:'n-'+n.id,tabindex:0},s);const r=n.hard_stop?11:rank(n)===1?9.5:8;el('circle',{class:'dot',cx:n.x,cy:n.y,r},g);const t=el('text',{x:n.x,y:n.y-r-5},g);t.textContent=n.id;
+  SIG.forEach(n=>{if(n.id===READ)return;const g=el('g',{class:'node'+(n.built===true?'':' unbuilt'),id:'n-'+n.id,tabindex:0},s);const r=n.hard_stop?11:rank(n)===1?9.5:8;el('circle',{class:'dot',cx:n.x,cy:n.y,r},g);const t=el('text',{x:n.x,y:n.y-r-5},g);t.textContent=n.id;
     g.addEventListener('mouseenter',()=>{showDetail(n.id);hov(n.id,true);});g.addEventListener('mouseleave',()=>{hov(n.id,false);if(selected)showDetail(selected);else hideDetail();});
     g.addEventListener('click',()=>{selected=selected===n.id?null:n.id;document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.id==='n-'+selected));if(selected)showDetail(selected);else hideDetail();});});
   const cg=el('g',{class:'center',id:'center'},s);
@@ -203,7 +209,7 @@ const WORD=st=>st.locked&&st.state==='risk'?'confirmed risk':st.state==='neutral
 function hideDetail(){if(!selected)$('#detail').hidden=true;}
 function showDetail(id){
   if(!id)return;const n=byId[id],st=state[id];$('#detail').hidden=false;
-  $('#detail').innerHTML=`<h3>${n.id} · TIER ${n.tier}${n.built===true?'':' · PLANNED'}</h3><h4>${PN(n)}</h4><p>${n.plain||n.description||''}</p>
+  $('#detail').innerHTML=`<h3>${n.id} · ${n.id===READ?'STEP 1 · BEFORE ANY CHECK':'TIER '+n.tier}${n.built===true?'':' · PLANNED'}</h3><h4>${PN(n)}</h4><p>${n.plain||n.description||''}</p>
   ${st&&st.state!=='unknown'?`<div class="ev"><b class="${st.locked&&st.state==='risk'?'locked':st.state}" style="text-transform:uppercase">${WORD(st)}</b> · ${st.evidence}</div>`:''}
   <div class="tech"><b>Technical:</b> ${n.name}. ${n.description||''}</div>`;
 }
@@ -212,8 +218,9 @@ function glossary(open){
   $('#glossBtn').textContent=open?'Close glossary':'Glossary: what each check means';
   if(!open)return;$('#detail').hidden=true;
   g.innerHTML=`<h2>What each check means</h2><p class="sub">Radar works outwards in rings. Inner rings are instant checks on the invoice itself; outer rings only run when Radar still isn't sure. Click a check to find it on the radar.</p>`+
+    (byId[READ]?`<h3>STEP 1 · READING THE INVOICE · before any check</h3><div class="grid"><div class="g" data-g="${READ}"><b><span class="id">${READ}</span>${PN(byId[READ])}</b><p>${byId[READ].plain}</p></div></div>`:'')+
     TIERS.map(t=>`<h3>TIER ${t.tier} · ${t.name.toUpperCase()} · ${t.runs}</h3><div class="grid">`+
-      SIG.filter(n=>n.tier===t.tier).sort((a,b)=>(+a.id.slice(1))-(+b.id.slice(1))).map(n=>{const st=state[n.id];const cls=st&&st.state!=='unknown'?(st.locked&&st.state==='risk'?'locked':st.state):'';
+      SIG.filter(n=>n.tier===t.tier&&n.id!==READ).sort((a,b)=>(+a.id.slice(1))-(+b.id.slice(1))).map(n=>{const st=state[n.id];const cls=st&&st.state!=='unknown'?(st.locked&&st.state==='risk'?'locked':st.state):'';
         return `<div class="g ${cls} ${n.built===true?'':'planned'}" data-g="${n.id}"><b><span class="id">${n.id}</span>${PN(n)}</b><p>${n.plain||n.description||''}${n.built===true?'':' <i>(planned)</i>'}</p></div>`;}).join('')+`</div>`).join('');
 }
 function showDetailFull(id){
@@ -241,14 +248,19 @@ function setStatus(t,scan){$('#status').textContent=t;$('#status').classList.tog
 function watch(id,label){
   if(es)es.close();reset();current=id;setStatus('SCANNING',true);
   log(`<span class="t">${ts()}</span> <span class="sys">CONTACT · ${label||id}</span>`);
+  queue.push(['reading',{}]);
   es=new EventSource('/api/check/'+encodeURIComponent(id)+'/events');
   ['tier_start','signal','tier_end','tier_skipped','complete'].forEach(type=>es.addEventListener(type,ev=>{let d={};try{d=JSON.parse(ev.data);}catch{}queue.push([type,d]);if(type==='complete')es.close();pump();}));
   es.onerror=()=>{if(es)es.close();};
 }
-const PACE={tier_start:650,signal:170,signal_unknown:25,tier_end:250,tier_skipped:500,complete:0};
+const PACE={reading:1800,tier_start:650,signal:170,signal_unknown:25,tier_end:250,tier_skipped:500,complete:0};
 function pump(){if(playing)return;const next=queue.shift();if(!next)return;playing=true;const [type,d]=next;let wait=PACE[type];
-  if(type==='tier_start'){const t=d.tier;if(EMBED)wait=1100;caption(`TIER ${t} · ${TIERS[t]?TIERS[t].name.toUpperCase():''}`,t===0?'Instant checks on the invoice itself':t===1?'Common red flags':t===2?'Research: public records about the business':'Specialist checks',t>0&&d.reason?d.reason:'');$('#ring'+t).classList.add('active');$('#tl'+t).classList.add('active');wave(t);log(`<span class="t">${ts()}</span> <span class="sys">▶ TIER ${t} ${TIERS[t]?TIERS[t].name.toUpperCase():''}</span>${t>0&&d.reason?` <span class="t">· ${d.reason}</span>`:''}`,'e-sys');}
-  if(type==='signal'){const s=d.signal||d;const n=byId[s.id];if(n){state[s.id]=s;const g=document.getElementById('n-'+s.id);const locked=s.locked&&s.state==='risk';
+  if(type==='reading'){$('#coreSmall').textContent='READING';(byId[READ].feeds||[]).forEach(b=>{const e=document.getElementById(`e-${READ}-${b}`);if(e)e.classList.add('lit');});
+    caption('STEP 1 · READING THE INVOICE','Checking the PDF, then AI reads the details','Looks for edits and hidden text, then pulls out the supplier, ABN, amount and bank details. Every check uses these.');
+    log(`<span class="t">${ts()}</span> <b>Reading the invoice</b> · PDF checked for edits and hidden text; AI pulled out the supplier, ABN, amount and bank details`,'e-sys');}
+  if(type==='tier_start'){const t=d.tier;if(t===0)$('#coreSmall').textContent='SCANNING';if(EMBED)wait=1100;caption(`TIER ${t} · ${TIERS[t]?TIERS[t].name.toUpperCase():''}`,t===0?'Instant checks on the invoice itself':t===1?'Common red flags':t===2?'Research: public records about the business':'Specialist checks',t>0&&d.reason?d.reason:'');$('#ring'+t).classList.add('active');$('#tl'+t).classList.add('active');wave(t);log(`<span class="t">${ts()}</span> <span class="sys">▶ TIER ${t} ${TIERS[t]?TIERS[t].name.toUpperCase():''}</span>${t>0&&d.reason?` <span class="t">· ${d.reason}</span>`:''}`,'e-sys');}
+  if(type==='signal'&&(d.signal||d).id===READ){state[READ]=d.signal||d;wait=0;}
+  else if(type==='signal'){const s=d.signal||d;const n=byId[s.id];if(n){state[s.id]=s;const g=document.getElementById('n-'+s.id);const locked=s.locked&&s.state==='risk';
     g.classList.add('seen','s-'+(locked?'locked':s.state));
     if(s.state==='unknown'){wait=PACE.signal_unknown;}
     else{if(EMBED)wait=s.state==='risk'?1500:s.state==='reassuring'?1000:450;
