@@ -41,6 +41,7 @@ svg#scope{width:100%;height:100%;max-height:calc(100vh - 80px)}
 .edge.lit{stroke:var(--purple);stroke-width:1.6;opacity:.9}
 .edge.hov{stroke:#fff;stroke-width:1.6}
 .node{cursor:pointer}
+.node .hit{fill:transparent;stroke:none;pointer-events:all}
 .node .dot{fill:#24226A;stroke:#3B3990;stroke-width:1.2;transition:fill .3s}
 .node.unbuilt .dot{fill:none;stroke-dasharray:2 2}
 .node text{font-family:'Fira Code',monospace;font-size:9px;fill:var(--dim);text-anchor:middle;pointer-events:none}
@@ -65,10 +66,10 @@ svg#scope{width:100%;height:100%;max-height:calc(100vh - 80px)}
 .result .wait{color:var(--muted);font-size:13px;line-height:1.5}
 .lvl{font-family:Anton,Arial;font-size:26px;letter-spacing:.06em}
 .meta{font-size:12px;color:var(--muted);line-height:1.5}
-.scope-tools{position:absolute;top:12px;left:14px;right:14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;z-index:6}
-.scope-tools button{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+.scope-tools{pointer-events:none;position:absolute;top:12px;left:14px;right:14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;z-index:6}
+.scope-tools button{pointer-events:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
 .scope-tools button:hover,.scope-tools button.on{border-color:var(--purple)}
-.detail{position:absolute;top:56px;left:14px;width:360px;max-width:calc(100% - 28px);z-index:4;background:rgba(22,21,74,.97);border:1px solid #3B3990;border-radius:8px;padding:14px 16px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.detail{pointer-events:none;position:absolute;top:56px;left:14px;width:360px;max-width:calc(100% - 28px);z-index:4;background:rgba(22,21,74,.97);border:1px solid #3B3990;border-radius:8px;padding:14px 16px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
 .detail[hidden]{display:none}
 .detail h3{margin:0 0 6px;font-size:11px;letter-spacing:.15em;color:var(--muted);font-family:'Fira Code',monospace}
 .detail h4{margin:0 0 6px;font-size:19px;line-height:1.25}
@@ -195,7 +196,7 @@ function draw(){
   const eg=el('g',{id:'edges'},s);
   SIG.forEach(a=>(a.feeds||[]).forEach(b=>{const B=byId[b];if(!B)return;const mx=(a.x+B.x)/2,my=(a.y+B.y)/2;el('path',{class:'edge',id:`e-${a.id}-${b}`,d:`M${a.x} ${a.y} Q${mx+(C-mx)*.3} ${my+(C-my)*.3} ${B.x} ${B.y}`},eg);}));
   el('g',{id:'fx'},s);
-  SIG.forEach(n=>{if(n.id===READ)return;const g=el('g',{class:'node'+(n.built===true?'':' unbuilt'),id:'n-'+n.id,tabindex:0},s);const r=n.hard_stop?11:rank(n)===1?9.5:8;el('circle',{class:'dot',cx:n.x,cy:n.y,r},g);const t=el('text',{x:n.x,y:n.y-r-5},g);t.textContent=n.id;
+  SIG.forEach(n=>{if(n.id===READ)return;const g=el('g',{class:'node'+(n.built===true?'':' unbuilt'),id:'n-'+n.id,tabindex:0},s);const r=n.hard_stop?11:rank(n)===1?9.5:8;el('circle',{class:'hit',cx:n.x,cy:n.y,r:r+12},g);el('circle',{class:'dot',cx:n.x,cy:n.y,r},g);const t=el('text',{x:n.x,y:n.y-r-5},g);t.textContent=n.id;
     g.addEventListener('mouseenter',()=>{showDetail(n.id);hov(n.id,true);});g.addEventListener('mouseleave',()=>{hov(n.id,false);if(selected)showDetail(selected);else hideDetail();});
     g.addEventListener('click',()=>{selected=selected===n.id?null:n.id;document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.id==='n-'+selected));if(selected)showDetail(selected);else hideDetail();});});
   const cg=el('g',{class:'center',id:'center'},s);
