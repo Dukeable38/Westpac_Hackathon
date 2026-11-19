@@ -84,10 +84,32 @@ body.embed header{padding:8px 14px}
 body.embed .logo svg{width:24px;height:24px}
 body.embed .logo b{font-size:14px}
 body.embed .controls{display:none}
-body.embed .main{grid-template-columns:minmax(0,1fr) 300px}
+body.embed .main{grid-template-columns:minmax(0,1fr) 440px}
 body.embed svg#scope{max-height:calc(100vh - 60px)}
-@media (max-width:900px){body.embed .main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 34%}
-  body.embed .side{border-left:0;border-top:1px solid var(--line)}body.embed .detail{display:none}}
+body.embed .detail{display:none}
+body.embed.has-sel .detail{display:block}
+body.embed .log{font-family:Arial,Helvetica,sans-serif;font-size:14px;padding:6px 12px 16px}
+body.embed .log div{padding:9px 10px;margin:6px 0;border:0;border-left:4px solid var(--dim);background:rgba(28,27,85,.55);border-radius:3px;line-height:1.45}
+body.embed .log div.e-risk{border-left-color:var(--high)}
+body.embed .log div.e-locked{border-left-color:var(--crit);background:rgba(255,46,99,.12)}
+body.embed .log div.e-reassuring{border-left-color:var(--low)}
+body.embed .log div.e-neutral{border-left-color:var(--neutral)}
+body.embed .log div.e-sys{border-left-color:var(--ping);background:transparent;font-family:'Fira Code',monospace;font-size:12px}
+body.embed .log .t{color:#8F8DC4}
+body.embed .log div:first-child{box-shadow:0 0 0 1px #3B3990}
+@media (max-width:900px){body.embed .main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 40%}
+  body.embed .side{border-left:0;border-top:1px solid var(--line)}body.embed .detail,body.embed .result{display:none}}
+/* "Now checking" caption over the scope, so the audience can follow one check at a time */
+.caption{position:absolute;left:0;right:0;bottom:14px;text-align:center;pointer-events:none;padding:0 20px;transition:opacity .25s}
+.caption.off{opacity:0}
+.caption .c1{font-family:'Fira Code',monospace;font-size:12px;letter-spacing:.16em;color:var(--muted)}
+.caption .c2{font-size:24px;font-weight:700;color:#fff;margin-top:4px;text-shadow:0 2px 12px #0B0A22}
+.caption .c3{font-size:15px;color:#CFCEEA;margin:4px auto 0;max-width:760px;text-shadow:0 2px 12px #0B0A22}
+.caption .risk{color:var(--high)}.caption .locked{color:var(--crit)}.caption .reassuring{color:var(--low)}.caption .neutral{color:var(--neutral)}
+.node.seen text{font-size:12px;font-weight:700}
+.node.s-risk text,.node.s-locked text{fill:#fff;font-size:15px}
+.node.s-unknown text{fill:var(--dim);font-weight:400}
+body.embed #tierkey{display:none}
 </style>
 </head>
 <body>
@@ -106,7 +128,7 @@ body.embed svg#scope{max-height:calc(100vh - 60px)}
   </div>
 </header>
 <div class="main">
-  <div class="scope" id="scopeWrap"><svg id="scope" viewBox="0 0 1000 1000" role="img" aria-label="Radar scope of invoice checks"></svg></div>
+  <div class="scope" id="scopeWrap"><svg id="scope" viewBox="0 0 1000 1000" role="img" aria-label="Radar scope of invoice checks"></svg><div class="caption off" id="caption" aria-live="polite"><div class="c1"></div><div class="c2"></div><div class="c3"></div></div></div>
   <aside class="side">
     <div class="box result" id="result"></div>
     <div class="box detail" id="detail"><h3>CONTACT</h3><p class="hint">Hover or click a contact to see what it checks. Upload an invoice, or start a check in the main app with <b>Follow app</b> on, and watch Radar work through it.</p>
@@ -142,7 +164,7 @@ function draw(){
   el('circle',{cx:C,cy:C,r:490,fill:'url(#bgG)',stroke:'#2B2A6B'},s);
   [[C,10,C,990],[10,C,990,C]].forEach(([a,b,c,d])=>el('line',{x1:a,y1:b,x2:c,y2:d,class:'cross'},s));
   R.forEach((r,t)=>el('circle',{cx:C,cy:C,r,class:'ring',id:'ring'+t},s));
-  const key=el('g',{},s);el('text',{x:14,y:944,class:'tierlbl'},key).textContent='RINGS · INNER → OUTER';
+  const key=el('g',{id:'tierkey'},s);el('text',{x:14,y:944,class:'tierlbl'},key).textContent='RINGS · INNER → OUTER';
   TIERS.forEach((t,i)=>{el('text',{x:14,y:962+i*0,class:'tierlbl',id:'tl'+i,dx:i*118},key).textContent=`T${i} ${t.name.toUpperCase()}`;});
   const sw=el('g',{class:'sweep'},s);el('path',{d:`M${C} ${C} L${C+490} ${C} A490 490 0 0 0 ${C+490*Math.cos(-0.55)} ${C+490*Math.sin(-0.55)} Z`,fill:'url(#sweepG)'},sw);el('line',{x1:C,y1:C,x2:C+490,y2:C,stroke:'#FF4438','stroke-width':1.5,opacity:.7},sw);
   const eg=el('g',{id:'edges'},s);
@@ -150,7 +172,7 @@ function draw(){
   el('g',{id:'fx'},s);
   SIG.forEach(n=>{const g=el('g',{class:'node'+(n.built===true?'':' unbuilt'),id:'n-'+n.id,tabindex:0},s);const r=n.hard_stop?11:rank(n)===1?9.5:8;el('circle',{class:'dot',cx:n.x,cy:n.y,r},g);const t=el('text',{x:n.x,y:n.y-r-5},g);t.textContent=n.id;
     g.addEventListener('mouseenter',()=>{showDetail(n.id);hov(n.id,true);});g.addEventListener('mouseleave',()=>{hov(n.id,false);if(selected)showDetail(selected);});
-    g.addEventListener('click',()=>{selected=selected===n.id?null:n.id;document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.id==='n-'+selected));showDetail(selected||n.id);});});
+    g.addEventListener('click',()=>{selected=selected===n.id?null:n.id;document.body.classList.toggle('has-sel',!!selected);document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.id==='n-'+selected));showDetail(selected||n.id);});});
   const cg=el('g',{class:'center',id:'center'},s);
   el('circle',{cx:C,cy:C,r:62,fill:'#0E0D2E',stroke:'#3B3990','stroke-width':1.5,id:'core'},cg);
   const t1=el('text',{x:C,y:C-4,'font-family':'Anton,Arial','font-size':30,fill:'#fff',id:'coreBig'},cg);t1.textContent='—';
@@ -163,6 +185,9 @@ function showDetail(id){
   <dl class="kv"><dt>Weight</dt><dd>${n.weight_class}${n.weight!=null?' · '+n.weight:''}${n.hard_stop?' · <b style="color:var(--crit)">HARD STOP</b>':''}</dd><dt>Runs by</dt><dd>${n.exec}</dd><dt>Chat softens</dt><dd>${n.chat_adjustable}</dd><dt>Status</dt><dd>${n.built===true?'Built':n.built==='skeleton'?'Skeleton (returns unknown)':'Not built yet'}</dd>${n.feeds&&n.feeds.length?`<dt>Feeds</dt><dd>${n.feeds.join(', ')}</dd>`:''}</dl>
   ${st?`<div class="ev"><b class="${st.locked&&st.state==='risk'?'locked':st.state}" style="text-transform:uppercase">${st.locked&&st.state==='risk'?'confirmed risk':st.state}</b> · ${st.evidence}</div>`:''}`;
 }
+const EMBED=new URLSearchParams(location.search).has('embed');
+function caption(c1,c2,c3,cls){const c=$('#caption');c.querySelector('.c1').textContent=c1||'';const b=c.querySelector('.c2');b.textContent=c2||'';b.className='c2';b.style.color='';
+  const d=c.querySelector('.c3');d.innerHTML=c3||'';c.classList.remove('off');}
 function log(html,cls){const d=document.createElement('div');d.innerHTML=html;if(cls)d.className=cls;$('#log').prepend(d);}
 function ts(){return new Date().toLocaleTimeString('en-AU',{hour12:false});}
 function wave(t,colour){const fx=$('#fx');const c=el('circle',{cx:C,cy:C,r:62,class:'wave',stroke:colour||'#FF4438'},fx);c.animate([{r:62,opacity:.9},{r:R[t]+8,opacity:0}],{duration:900,easing:'ease-out'}).onfinish=()=>c.remove();}
@@ -171,7 +196,7 @@ function reset(){
   state={};queue=[];document.querySelectorAll('.node').forEach(g=>{g.classList.remove('seen','s-risk','s-locked','s-reassuring','s-neutral','s-unknown');});
   document.querySelectorAll('.edge').forEach(e=>e.classList.remove('lit'));document.querySelectorAll('.ring').forEach(r=>r.classList.remove('active','skipped'));
   document.querySelectorAll('.tierlbl').forEach(r=>r.classList.remove('active'));
-  $('#result').classList.remove('on');$('#core').setAttribute('stroke','#3B3990');$('#coreBig').textContent='…';$('#coreSmall').textContent='SCANNING';
+  $('#result').classList.remove('on');caption('NEW INVOICE','Radar is checking the invoice…','');$('#core').setAttribute('stroke','#3B3990');$('#coreBig').textContent='…';$('#coreSmall').textContent='SCANNING';
 }
 function setStatus(t,scan){$('#status').textContent=t;$('#status').classList.toggle('scan',!!scan);$('#scopeWrap').classList.toggle('scanning',!!scan);}
 
@@ -185,16 +210,18 @@ function watch(id,label){
 }
 const PACE={tier_start:650,signal:170,signal_unknown:25,tier_end:250,tier_skipped:500,complete:0};
 function pump(){if(playing)return;const next=queue.shift();if(!next)return;playing=true;const [type,d]=next;let wait=PACE[type];
-  if(type==='tier_start'){const t=d.tier;$('#ring'+t).classList.add('active');$('#tl'+t).classList.add('active');wave(t);log(`<span class="t">${ts()}</span> <span class="sys">▶ TIER ${t} ${TIERS[t]?TIERS[t].name.toUpperCase():''}</span>${t>0&&d.reason?` <span class="t">· ${d.reason}</span>`:''}`);}
+  if(type==='tier_start'){const t=d.tier;if(EMBED)wait=1100;caption(`TIER ${t} · ${TIERS[t]?TIERS[t].name.toUpperCase():''}`,t===0?'Instant checks on the invoice itself':t===1?'Common red flags':t===2?'Research: public records about the business':'Specialist checks',t>0&&d.reason?d.reason:'');$('#ring'+t).classList.add('active');$('#tl'+t).classList.add('active');wave(t);log(`<span class="t">${ts()}</span> <span class="sys">▶ TIER ${t} ${TIERS[t]?TIERS[t].name.toUpperCase():''}</span>${t>0&&d.reason?` <span class="t">· ${d.reason}</span>`:''}`,'e-sys');}
   if(type==='signal'){const s=d.signal||d;const n=byId[s.id];if(n){state[s.id]=s;const g=document.getElementById('n-'+s.id);const locked=s.locked&&s.state==='risk';
     g.classList.add('seen','s-'+(locked?'locked':s.state));
     if(s.state==='unknown'){wait=PACE.signal_unknown;}
-    else{const col={risk:locked?'#FF2E63':'#FF4438',reassuring:'#34C77B',neutral:'#C9C8E8'}[s.state];blip(n,col);
+    else{if(EMBED)wait=s.state==='risk'?1500:s.state==='reassuring'?1000:450;
+      const word=locked?'CONFIRMED RISK':s.state==='risk'?'RISK':s.state==='reassuring'?'REASSURING':'CLEAR';
+      caption(`${s.id} · TIER ${n.tier}`,n.name,`<b class="${locked?'locked':s.state}">${word}</b> · ${s.evidence}`);const col={risk:locked?'#FF2E63':'#FF4438',reassuring:'#34C77B',neutral:'#C9C8E8'}[s.state];blip(n,col);
       if(s.state==='risk'||s.state==='reassuring')(feedsInto[s.id]||[]).forEach(a=>{if(state[a]&&state[a].state!=='unknown'){const e=document.getElementById(`e-${a}-${s.id}`);if(e)e.classList.add('lit');}});
-      log(`<span class="t">${ts()}</span> <b>${s.id}</b> ${n.name} · <span class="${locked?'locked':s.state}">${locked?'CONFIRMED RISK':s.state.toUpperCase()}</span><br><span class="t">${s.evidence}</span>`);
+      log(`<span class="t">${ts()}</span> <b>${s.id}</b> ${n.name} · <span class="${locked?'locked':s.state}">${word}</span><br><span class="t">${s.evidence}</span>`,'e-'+(locked?'locked':s.state));
       if(!selected)showDetail(s.id);}}}
   if(type==='tier_end'){$('#ring'+d.tier).classList.remove('active');$('#tl'+d.tier).classList.remove('active');}
-  if(type==='tier_skipped'){$('#ring'+d.tier).classList.add('skipped');log(`<span class="t">${ts()}</span> <span class="sys">⏸ TIER ${d.tier} SKIPPED · ${d.reason||'not needed'}</span>`);}
+  if(type==='tier_skipped'){$('#ring'+d.tier).classList.add('skipped');caption(`TIER ${d.tier} · ${TIERS[d.tier]?TIERS[d.tier].name.toUpperCase():''}`,'Skipped',d.reason||'Not needed');log(`<span class="t">${ts()}</span> <span class="sys">⏸ TIER ${d.tier} SKIPPED · ${d.reason||'not needed'}</span>`,'e-sys');}
   if(type==='complete')finish(d);
   setTimeout(()=>{playing=false;pump();},wait);
 }
@@ -206,7 +233,9 @@ function finish(r){
   const risks=(r.signals||[]).filter(s=>s.state==='risk').length, ran=(r.signals||[]).filter(s=>s.state!=='unknown').length;
   $('#result').innerHTML=`<h3>RESULT · ${r.file_name||''}</h3><div class="lvl" style="color:${col}">${name} RISK · ${r.score}/100</div><div class="meta">${ran} checks returned evidence · ${risks} risk signals · tiers run ${(r.tiers_run||[]).join(', ')}<br>${r.escalation_reason||''}</div><div class="meta" style="margin-top:6px;color:#fff">${r.advice||''}</div>`;
   $('#result').classList.add('on');
-  log(`<span class="t">${ts()}</span> <span class="sys">■ COMPLETE · ${name} · ${r.score}/100</span>`);
+  caption('RESULT',`${name} RISK · ${r.score}/100`,`${risks} risk signal${risks===1?'':'s'} from ${ran} checks with evidence`);
+  const cb=$('#caption .c2');cb.style.color=col;
+  log(`<span class="t">${ts()}</span> <span class="sys">■ COMPLETE · ${name} · ${r.score}/100</span>`,'e-sys');
 }
 
 // --- inputs ---
