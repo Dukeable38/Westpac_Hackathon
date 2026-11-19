@@ -17,6 +17,14 @@ tempfile.tempdir=str(ROOT/'app/.tmp')
 app = FastAPI(title='Invoice Scam Checker')
 RESULTS={}
 app.mount('/static',StaticFiles(directory=ROOT/'app/static'),name='static')
+
+@app.middleware('http')
+async def no_stale_front_end(request,call_next):
+    # The demo front end changes often; make browsers revalidate so a refresh always shows the latest app.js/css.
+    response=await call_next(request)
+    if request.url.path.startswith('/static/') or request.url.path in ('/','/radar'):
+        response.headers['Cache-Control']='no-cache'
+    return response
 app.mount('/demo/invoices',StaticFiles(directory=ROOT/'demo/invoices'),name='invoices')
 from .radar_debug import router as radar_router
 app.include_router(radar_router)

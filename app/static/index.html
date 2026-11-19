@@ -26,7 +26,7 @@
   </div>
   <div class="sep"></div>
   <div class="grp"><span class="lbl">Start from</span><button data-start="pay">Make a payment</button><button data-start="check">Check an invoice</button><button data-start="overview">Overview</button></div>
-  <a href="/radar" target="_blank" rel="noopener">Live debug ↗</a><button id="mapToggle" type="button" style="margin-left:8px">Radar map</button><span class="lbl" style="margin-left:10px">Ctrl+Shift+D hides this bar · Ctrl+Shift+X map</span>
+  <a href="/radar" target="_blank" rel="noopener">Live debug ↗</a><button id="mapToggle" type="button" style="margin-left:8px">Radar map</button><span class="lbl" style="margin-left:10px">Ctrl+Shift+D hides this bar</span>
 </div>
 
 <div class="browser real">
@@ -223,10 +223,11 @@
   <div class="b" style="padding-top:0;display:flex;justify-content:flex-end;gap:24px;align-items:center"><a style="font-size:13px;text-decoration:underline;cursor:pointer" data-closewarn>Go back</a><button class="btn red" id="warnGo">I understand, pay anyway</button></div>
 </div></div>
 
+<button type="button" class="rmap-fab" id="mapFab" title="Open the Radar map">Radar map</button>
 <!-- Radar map drawer (debug view): the /radar scope embedded beside the app. Hidden until Ctrl+Shift+X or the demo bar button. -->
 <aside class="rmap" id="rmap" aria-label="Radar map" hidden>
   <div class="rmap-bar"><b>RADAR MAP</b><span>live view of every check</span>
-    <button type="button" id="mapWide" title="Expand / shrink (Ctrl+Shift+F)">⤢</button><button type="button" id="mapClose" title="Close (Ctrl+Shift+X)">✕</button></div>
+    <button type="button" id="mapWide" title="Expand / shrink">⤢ Full screen</button><button type="button" id="mapClose" title="Close the map">✕ Close</button></div>
   <iframe id="rmapFrame" title="Radar map of invoice checks"></iframe>
 </aside>
 

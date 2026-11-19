@@ -128,7 +128,7 @@ function radarPanel(sel,phase,fileName){
     ?`<div class="idle">Attach the invoice you're paying and Radar checks it before money leaves your account:<ul><li>were the bank details edited after the PDF was made?</li><li>do they match what you've paid this supplier before?</li><li>is the ABN real, the GST right, the sender's website genuine?</li></ul>It takes a few seconds. Westpac Verify still checks the account name as usual.</div>`
     :`<div class="idle">Drop an invoice to start. Radar works outwards, quick checks first, and only digs deeper when something needs a closer look.</div>`;
   else if(phase==='running')body=`<div class="scanning-box">${radarAnim(64,true)}<span id="${p}msg">Reading ${esc(fileName)}…</span></div><div>${stepsHTML(p,null)}</div>`;
-  else{body=`<div>${stepsHTML(p,current)}</div>${mini(current)}`;tag='<span class="rtag">Checked</span>';}
+  else{body=`<div>${stepsHTML(p,current)}</div>${mini(current)}<button type="button" class="showmap" data-showmap>See how Radar checked it ↗</button>`;tag='<span class="rtag">Checked</span>';}
   el.innerHTML=`<div class="h"><h4 class="ricon">${ICON.rd}Radar invoice check</h4>${tag}</div><div class="b">${body}</div>`;
 }
 // Evidence checks after a hard stop: show them on the highest tier they belong to.
@@ -424,13 +424,17 @@ document.addEventListener('click',async e=>{
 // Embeds /radar?embed=1 beside the app. The iframe loads on first open; each new check is posted to it so the
 // map starts at once (it also polls /api/checks/latest as a fallback). Opening after a check replays that check.
 let mapLoaded=false,mapLast=null;
-function mapWatch(id){mapLast=id;const f=$('#rmapFrame');if(mapLoaded&&f.contentWindow)f.contentWindow.postMessage({radarWatch:id},location.origin);}
+function mapWatch(id,replay){mapLast=id;const f=$('#rmapFrame');if(mapLoaded&&f.contentWindow)f.contentWindow.postMessage({radarWatch:id,replay:!!replay},location.origin);}
 function mapToggle(force){
   const m=$('#rmap'),open=force===undefined?m.hidden:force;m.hidden=!open;document.body.classList.toggle('rmap-on',open&&!m.classList.contains('wide'));
   if(open&&!mapLoaded){const f=$('#rmapFrame');f.onload=()=>{mapLoaded=true;if(mapLast)mapWatch(mapLast);};f.src='/radar?embed=1';}
 }
 function mapWide(){const m=$('#rmap');if(m.hidden)mapToggle(true);m.classList.toggle('wide');document.body.classList.toggle('rmap-on',!m.classList.contains('wide'));}
-$('#mapToggle').onclick=()=>mapToggle();$('#mapClose').onclick=()=>mapToggle(false);$('#mapWide').onclick=mapWide;
+// "See how Radar checked it": open full screen and replay the current check from the start.
+function mapShow(){const m=$('#rmap');const wasOpen=!m.hidden;mapToggle(true);m.classList.add('wide');document.body.classList.remove('rmap-on');
+  if(wasOpen&&mapLast)mapWatch(mapLast,true);}
+$('#mapToggle').onclick=()=>mapToggle();$('#mapClose').onclick=()=>mapToggle(false);$('#mapWide').onclick=mapWide;$('#mapFab').onclick=()=>mapToggle(true);
+document.addEventListener('click',e=>{if(e.target.closest('[data-showmap]'))mapShow();});
 document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.shiftKey&&(e.key==='X'||e.key==='x')){e.preventDefault();mapToggle();}if(e.ctrlKey&&e.shiftKey&&(e.key==='F'||e.key==='f')){e.preventDefault();mapWide();}});
 if(new URLSearchParams(location.search).has('map'))mapToggle(true);
 

@@ -309,7 +309,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){glossary(false);sel
 // Embedded in the app's map drawer: the app posts each new check id so the map starts without waiting for poll().
 // Ids that arrive before the catalogue has loaded wait in `pending`.
 let pending=null;
-window.addEventListener('message',e=>{if(e.origin!==location.origin)return;const id=e.data&&e.data.radarWatch;if(!id||id===current)return;if(!SIG.length){pending=id;return;}lastSeen=id;watch(id);});
+window.addEventListener('message',e=>{if(e.origin!==location.origin)return;const id=e.data&&e.data.radarWatch;if(!id||(id===current&&!e.data.replay))return;if(!SIG.length){pending=id;return;}lastSeen=id;watch(id);});
 (async function init(){
   const d=await (await fetch('/api/signals')).json();SIG=d.signals;TIERS=d.tiers;byId=Object.fromEntries(SIG.map(s=>[s.id,s]));
   layout();draw();
