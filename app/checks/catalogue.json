@@ -12,7 +12,9 @@
    "C3",
    "C19",
    "C39"
-  ]
+  ],
+  "plain_name": "New bank account for a known supplier",
+  "plain": "Is this a different bank account from the one you've always paid this supplier? The number one sign of invoice fraud."
  },
  "C2": {
   "name": "Flag register hit (account/PayID/ABN/email)",
@@ -25,7 +27,9 @@
   "built": true,
   "feeds": [
    "C41"
-  ]
+  ],
+  "plain_name": "Already reported as a scam",
+  "plain": "Have these bank details, ABN or email already been reported in a scam?"
  },
  "C3": {
   "name": "Confirmation of Payee result",
@@ -36,7 +40,9 @@
   "chat_adjustable": "Close match via TRADING_NAME",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Account name check (Westpac Verify)",
+  "plain": "Does the name on the bank account match the business you think you're paying?"
  },
  "C4": {
   "name": "New payee + high amount",
@@ -49,7 +55,9 @@
   "built": true,
   "feeds": [
    "C28"
-  ]
+  ],
+  "plain_name": "First payment to this payee",
+  "plain": "You've never paid this account before. Not bad on its own, but there's no history to lean on."
  },
  "C5": {
   "name": "Invoice hash / template seen before (fraud or duplicate)",
@@ -62,7 +70,9 @@
   "built": "skeleton",
   "feeds": [
    "C6"
-  ]
+  ],
+  "plain_name": "Invoice seen before",
+  "plain": "Is this exact invoice, or its template, already known from a scam or a past payment?"
  },
  "C6": {
   "name": "Duplicate invoice number or amount",
@@ -73,7 +83,9 @@
   "chat_adjustable": "Yes",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Duplicate invoice",
+  "plain": "Have you already paid an invoice with this number or amount?"
  },
  "C7": {
   "name": "Amount anomaly vs supplier history",
@@ -86,7 +98,9 @@
   "built": true,
   "feeds": [
    "C28"
-  ]
+  ],
+  "plain_name": "Unusual amount",
+  "plain": "Is the amount far higher than you normally pay this supplier?"
  },
  "C8": {
   "name": "ABN checksum (mod 89)",
@@ -99,7 +113,9 @@
   "built": true,
   "feeds": [
    "C21"
-  ]
+  ],
+  "plain_name": "ABN is a real number",
+  "plain": "ABNs have a built-in maths check. A made-up ABN usually fails it."
  },
  "C9": {
   "name": "ACN checksum",
@@ -112,7 +128,9 @@
   "built": true,
   "feeds": [
    "C36"
-  ]
+  ],
+  "plain_name": "ACN is a real number",
+  "plain": "The same built-in maths check, for company numbers (ACN)."
  },
  "C10": {
   "name": "GST maths and tax-invoice validity",
@@ -123,7 +141,9 @@
   "chat_adjustable": "GST-free items",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "GST and totals add up",
+  "plain": "Is the GST 10% and do the totals add up? Rushed fakes often get the maths wrong."
  },
  "C11": {
   "name": "BSB validity and bank-name match (AusPayNet)",
@@ -134,7 +154,9 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "BSB is real",
+  "plain": "Does the BSB exist, and does it belong to the bank the invoice names?"
  },
  "C12": {
   "name": "PDF metadata (online editor, mod ≫ create date)",
@@ -147,7 +169,9 @@
   "built": true,
   "feeds": [
    "C13"
-  ]
+  ],
+  "plain_name": "Which app made the PDF",
+  "plain": "Was the PDF made by normal invoicing software, or changed later in an online editor?"
  },
  "C13": {
   "name": "Incremental updates editing payment fields",
@@ -160,7 +184,9 @@
   "built": true,
   "feeds": [
    "C39"
-  ]
+  ],
+  "plain_name": "PDF edited after it was made",
+  "plain": "Were the payment details changed in a later edit saved on top of the original PDF?"
  },
  "C14": {
   "name": "Hidden text, zero-width chars, homoglyphs",
@@ -173,7 +199,9 @@
   "built": true,
   "feeds": [
    "C29"
-  ]
+  ],
+  "plain_name": "Hidden text",
+  "plain": "Is there text a person can't see, like white or tiny writing, often aimed at tricking AI?"
  },
  "C15": {
   "name": "Overlay or annotation over the bank details",
@@ -187,7 +215,9 @@
   "feeds": [
    "C38",
    "C39"
-  ]
+  ],
+  "plain_name": "Something drawn over the bank details",
+  "plain": "Has new text or a box been pasted over the original bank details?"
  },
  "C16": {
   "name": "Embedded JS, launch actions, odd links",
@@ -198,7 +228,9 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Hidden code in the PDF",
+  "plain": "Does the PDF contain scripts, auto-run actions or odd links?"
  },
  "C17": {
   "name": "Structured extraction + internal consistency",
@@ -221,7 +253,9 @@
    "C27",
    "C28",
    "C29"
-  ]
+  ],
+  "plain_name": "AI reads the invoice",
+  "plain": "AI pulls out the supplier, ABN, amounts and bank details, and code checks they agree with each other."
  },
  "C18": {
   "name": "Payment-method inconsistency (BPAY vs BSB, two accounts)",
@@ -232,7 +266,9 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Payment details contradict",
+  "plain": "Do the payment details disagree, like two different accounts on one invoice?"
  },
  "C19": {
   "name": "\"Bank details have changed\" language",
@@ -243,7 +279,9 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "\"Our bank details have changed\"",
+  "plain": "Does the invoice say the bank details have changed? Scammers often warn you first."
  },
  "C20": {
   "name": "Urgency / pressure / secrecy language",
@@ -254,7 +292,9 @@
   "chat_adjustable": "\"genuinely overdue\"",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Pressure to pay",
+  "plain": "Is there pressure: pay today, urgent, don't call us, keep this quiet?"
  },
  "C21": {
   "name": "ABN Lookup: active, name match, entity type",
@@ -270,7 +310,9 @@
    "C23",
    "C24",
    "C36"
-  ]
+  ],
+  "plain_name": "ABN is active and the name matches",
+  "plain": "On the official ABN register, is the ABN active and does the name match the supplier?"
  },
  "C22": {
   "name": "GST charged but not GST-registered",
@@ -281,7 +323,9 @@
   "chat_adjustable": "Just registered",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Charging GST without GST registration",
+  "plain": "The invoice charges GST, but the business isn't registered for GST."
  },
  "C23": {
   "name": "ABN age vs claimed history",
@@ -294,7 +338,9 @@
   "built": true,
   "feeds": [
    "C35"
-  ]
+  ],
+  "plain_name": "Business age",
+  "plain": "Has the ABN existed as long as the business claims?"
  },
  "C24": {
   "name": "Real ABN, but payee or email belongs to someone else",
@@ -307,7 +353,9 @@
   "built": true,
   "feeds": [
    "C40"
-  ]
+  ],
+  "plain_name": "Real business, wrong account holder",
+  "plain": "The ABN is real, but the bank account or email belongs to someone else: a real business being impersonated."
  },
  "C25": {
   "name": "ATO / government official payment-details allowlist",
@@ -318,7 +366,9 @@
   "chat_adjustable": "No",
   "hard_stop": true,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Fake government invoice",
+  "plain": "Invoices claiming to be from the ATO or government must use the official payment details."
  },
  "C26": {
   "name": "Contact consistency (email vs website domain, free-mail, area code)",
@@ -332,7 +382,9 @@
   "feeds": [
    "C30",
    "C34"
-  ]
+  ],
+  "plain_name": "Contact details fit together",
+  "plain": "Do the email, website and phone number belong together? A Gmail address for a company is a weak warning sign."
  },
  "C27": {
   "name": "Directory / domain-renewal offer disguised as invoice",
@@ -343,7 +395,9 @@
   "chat_adjustable": "\"I have a listing\"",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Not really an invoice",
+  "plain": "Is this a sales offer, like a directory listing or domain renewal, dressed up as a bill?"
  },
  "C28": {
   "name": "Relationship plausibility (fits the customer's business?)",
@@ -354,7 +408,9 @@
   "chat_adjustable": "ORDERED_THIS",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Makes sense for your business",
+  "plain": "Would your business normally buy this? A landscaper paying for aviation surveys is odd."
  },
  "C29": {
   "name": "Spelling / formatting quality",
@@ -365,7 +421,9 @@
   "chat_adjustable": "Yes",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Spelling and formatting",
+  "plain": "Is it as polished as a real business invoice? A weak signal on its own."
  },
  "C30": {
   "name": "Lookalike domain (dnstwist-style)",
@@ -378,7 +436,9 @@
   "built": true,
   "feeds": [
    "C31"
-  ]
+  ],
+  "plain_name": "Lookalike website",
+  "plain": "Is the email or website one letter off the real supplier's?"
  },
  "C31": {
   "name": "Domain age (RDAP; for .au use crt.sh / Wayback)",
@@ -391,7 +451,9 @@
   "built": true,
   "feeds": [
    "C33"
-  ]
+  ],
+  "plain_name": "Website age",
+  "plain": "How old is the sender's website? Days-old websites are a red flag."
  },
  "C32": {
   "name": ".au registrant eligibility ID ≠ invoice ABN",
@@ -402,7 +464,9 @@
   "chat_adjustable": "Agency-registered",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Website owner matches ABN",
+  "plain": "For .au websites, is it registered to the same ABN as the invoice?"
  },
  "C33": {
   "name": "Email DNS posture (MX/SPF/DMARC)",
@@ -413,7 +477,9 @@
   "chat_adjustable": "Yes",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Email security set up",
+  "plain": "Is the sender's email properly set up so it's hard to fake?"
  },
  "C34": {
   "name": "Official contact details cross-check",
@@ -424,7 +490,9 @@
   "chat_adjustable": "\"they moved\" (address only)",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Official contact details",
+  "plain": "Find the supplier's real contact details independently and compare them with the invoice."
  },
  "C35": {
   "name": "Web presence / scam reports",
@@ -435,7 +503,9 @@
   "chat_adjustable": "Absence only",
   "hard_stop": false,
   "built": true,
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Online reputation",
+  "plain": "Does the business have reviews and a real web presence, or scam reports?"
  },
  "C36": {
   "name": "ASIC company status",
@@ -446,7 +516,9 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Company still registered (ASIC)",
+  "plain": "Is the company still registered, or deregistered or in administration?"
  },
  "C37": {
   "name": "Logo provenance",
@@ -457,7 +529,9 @@
   "chat_adjustable": "Yes",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Logo copied",
+  "plain": "Was the logo copied from the real supplier's website?"
  },
  "C38": {
   "name": "Render-vs-text OCR forensics on payment fields",
@@ -468,7 +542,9 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "What you see vs what's underneath",
+  "plain": "Does the page show different bank details from the text hidden underneath?"
  },
  "C39": {
   "name": "Prior-revision recovery (\"original details were…\")",
@@ -481,7 +557,9 @@
   "built": true,
   "feeds": [
    "C41"
-  ]
+  ],
+  "plain_name": "Recover the original bank details",
+  "plain": "Dig out the original bank details from earlier versions inside the PDF."
  },
  "C40": {
   "name": "Director / officeholder checks",
@@ -492,7 +570,9 @@
   "chat_adjustable": "—",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Director checks",
+  "plain": "Are the company's directors linked to known scams or failed companies?"
  },
  "C41": {
   "name": "Human call-back / fraud-team referral",
@@ -503,7 +583,9 @@
   "chat_adjustable": "—",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": []
+  "feeds": [],
+  "plain_name": "Human call-back",
+  "plain": "Hand it to a person: call the supplier on a known number or refer to the fraud team."
  },
  "C42": {
   "name": "Embedded payment link or QR destination",
@@ -514,7 +596,12 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": ["C16", "C30"]
+  "feeds": [
+   "C16",
+   "C30"
+  ],
+  "plain_name": "Payment link or QR code",
+  "plain": "Where do the payment links or QR codes really go? Checked without opening them."
  },
  "C43": {
   "name": "Account-name and entity-type mismatch",
@@ -525,7 +612,12 @@
   "chat_adjustable": "Trading name only",
   "hard_stop": false,
   "built": true,
-  "feeds": ["C3", "C24"]
+  "feeds": [
+   "C3",
+   "C24"
+  ],
+  "plain_name": "Personal name on a company account",
+  "plain": "Is a company being paid into a personal account, or one unrelated to the business?"
  },
  "C44": {
   "name": "Invoice chronology anomaly",
@@ -536,7 +628,12 @@
   "chat_adjustable": "Contractual explanation",
   "hard_stop": false,
   "built": true,
-  "feeds": ["C6", "C20"]
+  "feeds": [
+   "C6",
+   "C20"
+  ],
+  "plain_name": "Dates don't make sense",
+  "plain": "Is it dated in the future, due before it was issued, or very old?"
  },
  "C47": {
   "name": "Cross-customer payee reuse or mule pattern",
@@ -547,7 +644,12 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": true,
-  "feeds": ["C2", "C41"]
+  "feeds": [
+   "C2",
+   "C41"
+  ],
+  "plain_name": "Same account, many businesses",
+  "plain": "Is this new account turning up for several unrelated suppliers? A sign of a money-mule account."
  },
  "C48": {
   "name": "Template reuse across unrelated suppliers",
@@ -558,7 +660,12 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": ["C5", "C47"]
+  "feeds": [
+   "C5",
+   "C47"
+  ],
+  "plain_name": "Same template, different businesses",
+  "plain": "Is the same invoice layout being used by businesses that should be unrelated?"
  },
  "C50": {
   "name": "Supplier domain changed from history",
@@ -569,7 +676,12 @@
   "chat_adjustable": "Known-number callback only",
   "hard_stop": false,
   "built": true,
-  "feeds": ["C30", "C31"]
+  "feeds": [
+   "C30",
+   "C31"
+  ],
+  "plain_name": "Supplier's email domain changed",
+  "plain": "Is a known supplier suddenly emailing from a different domain?"
  },
  "C51": {
   "name": "Currency or geography mismatch",
@@ -580,7 +692,12 @@
   "chat_adjustable": "Yes",
   "hard_stop": false,
   "built": true,
-  "feeds": ["C7", "C28"]
+  "feeds": [
+   "C7",
+   "C28"
+  ],
+  "plain_name": "Foreign currency or country",
+  "plain": "Is a local supplier suddenly asking for foreign currency or an overseas account?"
  },
  "C52": {
   "name": "BPAY biller and CRN consistency",
@@ -591,6 +708,11 @@
   "chat_adjustable": "No",
   "hard_stop": false,
   "built": "skeleton",
-  "feeds": ["C3", "C18"]
+  "feeds": [
+   "C3",
+   "C18"
+  ],
+  "plain_name": "BPAY details are valid",
+  "plain": "Are the BPAY biller code and reference number valid for this biller?"
  }
 }

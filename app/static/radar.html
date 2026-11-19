@@ -61,19 +61,46 @@ svg#scope{width:100%;height:100%;max-height:calc(100vh - 80px)}
 .side{border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:rgba(19,18,58,.6)}
 .box{padding:14px 16px;border-bottom:1px solid var(--line)}
 .box h3{margin:0 0 8px;font-size:11px;letter-spacing:.15em;color:var(--muted);font-weight:700;font-family:'Fira Code',monospace}
-.result{display:none}
-.result.on{display:block}
+.result{height:212px;overflow:auto;flex:none}
+.result .wait{color:var(--muted);font-size:13px;line-height:1.5}
 .lvl{font-family:Anton,Arial;font-size:26px;letter-spacing:.06em}
 .meta{font-size:12px;color:var(--muted);line-height:1.5}
-.detail h4{margin:0 0 4px;font-size:15px}
-.detail p{margin:4px 0;font-size:13px;line-height:1.45;color:#CFCEEA}
+.scope-tools{position:absolute;top:12px;left:14px;right:14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;z-index:6}
+.scope-tools button{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+.scope-tools button:hover,.scope-tools button.on{border-color:var(--purple)}
+.detail{position:absolute;top:56px;left:14px;width:360px;max-width:calc(100% - 28px);z-index:4;background:rgba(22,21,74,.97);border:1px solid #3B3990;border-radius:8px;padding:14px 16px;box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.detail[hidden]{display:none}
+.detail h3{margin:0 0 6px;font-size:11px;letter-spacing:.15em;color:var(--muted);font-family:'Fira Code',monospace}
+.detail h4{margin:0 0 6px;font-size:19px;line-height:1.25}
+.detail p{margin:4px 0;font-size:14px;line-height:1.45;color:#E9E8F7}
+.detail .tech{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.45}
+.gloss{position:absolute;inset:0;z-index:5;background:rgba(11,10,34,.97);overflow:auto;padding:58px 28px 28px}
+.gloss[hidden]{display:none}
+.gloss h2{font-size:22px;margin:0 0 4px}
+.gloss .sub{color:var(--muted);font-size:14px;margin:0 0 6px}
+.gloss h3{font-family:'Fira Code',monospace;font-size:12px;letter-spacing:.15em;color:var(--ping);margin:22px 0 8px}
+.gloss .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.gloss .g{background:rgba(28,27,85,.6);border:1px solid var(--line);border-left:4px solid #3B3990;border-radius:4px;padding:10px 12px;cursor:pointer}
+.gloss .g:hover{border-color:var(--purple)}
+.gloss .g b{font-size:15px}
+.gloss .g .id{font-family:'Fira Code',monospace;font-size:11px;color:#8F8DC4;margin-right:6px}
+.gloss .g p{margin:4px 0 0;font-size:13.5px;line-height:1.45;color:#CFCEEA}
+.gloss .g.planned{opacity:.6;border-style:dashed}
+.gloss .g.risk{border-left-color:var(--high)}.gloss .g.locked{border-left-color:var(--crit)}.gloss .g.reassuring{border-left-color:var(--low)}.gloss .g.neutral{border-left-color:var(--neutral)}
 .kv{display:grid;grid-template-columns:96px 1fr;gap:3px 8px;font-size:12px;margin-top:8px}
 .kv dt{color:var(--muted)}.kv dd{margin:0}
 .ev{margin-top:8px;padding:8px 10px;border-left:3px solid var(--purple);background:#1C1B55;font-size:12px;line-height:1.4}
-.log{flex:1;overflow:auto;padding:8px 16px 16px;font-family:'Fira Code',monospace;font-size:11.5px}
-.log div{padding:5px 0;border-bottom:1px solid #1F1E58;line-height:1.4;animation:in .3s}
+.log{flex:1;min-height:0;overflow:auto;padding:6px 12px 16px;font-size:14px}
+.log div{padding:9px 10px;margin:6px 0;border-left:4px solid var(--dim);background:rgba(28,27,85,.55);border-radius:3px;line-height:1.45;animation:in .3s}
+.log div.e-risk{border-left-color:var(--high)}
+.log div.e-locked{border-left-color:var(--crit);background:rgba(255,46,99,.12)}
+.log div.e-reassuring{border-left-color:var(--low)}
+.log div.e-neutral{border-left-color:var(--neutral)}
+.log div.e-sys{border-left-color:var(--ping);background:transparent;font-family:'Fira Code',monospace;font-size:12px}
+.log div:first-child{box-shadow:0 0 0 1px #3B3990}
+.log .id{font-family:'Fira Code',monospace;font-size:11px;color:#8F8DC4;margin-left:6px}
 @keyframes in{from{opacity:0;transform:translateX(8px)}}
-.log .t{color:var(--dim)}
+.log .t{color:#8F8DC4}
 .log .risk{color:var(--high)}.log .locked{color:var(--crit);font-weight:700}.log .reassuring{color:var(--low)}.log .neutral{color:var(--neutral)}.log .unknown{color:var(--dim)}
 .log .sys{color:var(--ping)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11px;color:var(--muted)}
@@ -86,19 +113,8 @@ body.embed .logo b{font-size:14px}
 body.embed .controls{display:none}
 body.embed .main{grid-template-columns:minmax(0,1fr) 440px}
 body.embed svg#scope{max-height:calc(100vh - 60px)}
-body.embed .detail{display:none}
-body.embed.has-sel .detail{display:block}
-body.embed .log{font-family:Arial,Helvetica,sans-serif;font-size:14px;padding:6px 12px 16px}
-body.embed .log div{padding:9px 10px;margin:6px 0;border:0;border-left:4px solid var(--dim);background:rgba(28,27,85,.55);border-radius:3px;line-height:1.45}
-body.embed .log div.e-risk{border-left-color:var(--high)}
-body.embed .log div.e-locked{border-left-color:var(--crit);background:rgba(255,46,99,.12)}
-body.embed .log div.e-reassuring{border-left-color:var(--low)}
-body.embed .log div.e-neutral{border-left-color:var(--neutral)}
-body.embed .log div.e-sys{border-left-color:var(--ping);background:transparent;font-family:'Fira Code',monospace;font-size:12px}
-body.embed .log .t{color:#8F8DC4}
-body.embed .log div:first-child{box-shadow:0 0 0 1px #3B3990}
 @media (max-width:900px){body.embed .main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 40%}
-  body.embed .side{border-left:0;border-top:1px solid var(--line)}body.embed .detail,body.embed .result{display:none}}
+  body.embed .side{border-left:0;border-top:1px solid var(--line)}body.embed .result{display:none}}
 /* "Now checking" caption over the scope, so the audience can follow one check at a time */
 .caption{position:absolute;left:0;right:0;bottom:14px;text-align:center;pointer-events:none;padding:0 20px;transition:opacity .25s}
 .caption.off{opacity:0}
@@ -109,7 +125,7 @@ body.embed .log div:first-child{box-shadow:0 0 0 1px #3B3990}
 .node.seen text{font-size:12px;font-weight:700}
 .node.s-risk text,.node.s-locked text{fill:#fff;font-size:15px}
 .node.s-unknown text{fill:var(--dim);font-weight:400}
-body.embed #tierkey{display:none}
+#tierkey{display:none}
 </style>
 </head>
 <body>
@@ -128,11 +144,14 @@ body.embed #tierkey{display:none}
   </div>
 </header>
 <div class="main">
-  <div class="scope" id="scopeWrap"><svg id="scope" viewBox="0 0 1000 1000" role="img" aria-label="Radar scope of invoice checks"></svg><div class="caption off" id="caption" aria-live="polite"><div class="c1"></div><div class="c2"></div><div class="c3"></div></div></div>
+  <div class="scope" id="scopeWrap"><svg id="scope" viewBox="0 0 1000 1000" role="img" aria-label="Radar scope of invoice checks"></svg><div class="caption off" id="caption" aria-live="polite"><div class="c1"></div><div class="c2"></div><div class="c3"></div></div>
+    <div class="scope-tools"><button id="glossBtn" type="button">Glossary: what each check means</button>
+      <div class="legend"><span><i style="background:var(--low)"></i>Reassuring</span><span><i style="background:var(--neutral)"></i>Clear</span><span><i style="background:var(--high)"></i>Risk</span><span><i style="background:var(--crit);box-shadow:0 0 0 2px #fff"></i>Confirmed risk</span><span><i style="background:#3A3880"></i>No data</span><span><i style="border:1px dashed #6A68B0"></i>Planned</span></div></div>
+    <div class="detail" id="detail" hidden></div>
+    <div class="gloss" id="gloss" hidden></div>
+  </div>
   <aside class="side">
-    <div class="box result" id="result"></div>
-    <div class="box detail" id="detail"><h3>CONTACT</h3><p class="hint">Hover or click a contact to see what it checks. Upload an invoice, or start a check in the main app with <b>Follow app</b> on, and watch Radar work through it.</p>
-      <div class="legend" style="margin-top:10px"><span><i style="background:var(--low)"></i>Reassuring</span><span><i style="background:var(--neutral)"></i>Clear</span><span><i style="background:var(--high)"></i>Risk</span><span><i style="background:var(--crit);box-shadow:0 0 0 2px #fff"></i>Confirmed risk</span><span><i style="background:#3A3880"></i>No data</span><span><i style="border:1px dashed #6A68B0"></i>Not built</span></div></div>
+    <div class="box result" id="result"><h3>RESULT</h3><div class="wait">Waiting for an invoice. Hover any dot on the radar, or open the Glossary, to see what each check means.</div></div>
     <div class="box" style="padding-bottom:6px"><h3>CONTACT LOG</h3></div>
     <div class="log" id="log"></div>
   </aside>
@@ -171,15 +190,33 @@ function draw(){
   SIG.forEach(a=>(a.feeds||[]).forEach(b=>{const B=byId[b];if(!B)return;const mx=(a.x+B.x)/2,my=(a.y+B.y)/2;el('path',{class:'edge',id:`e-${a.id}-${b}`,d:`M${a.x} ${a.y} Q${mx+(C-mx)*.3} ${my+(C-my)*.3} ${B.x} ${B.y}`},eg);}));
   el('g',{id:'fx'},s);
   SIG.forEach(n=>{const g=el('g',{class:'node'+(n.built===true?'':' unbuilt'),id:'n-'+n.id,tabindex:0},s);const r=n.hard_stop?11:rank(n)===1?9.5:8;el('circle',{class:'dot',cx:n.x,cy:n.y,r},g);const t=el('text',{x:n.x,y:n.y-r-5},g);t.textContent=n.id;
-    g.addEventListener('mouseenter',()=>{showDetail(n.id);hov(n.id,true);});g.addEventListener('mouseleave',()=>{hov(n.id,false);if(selected)showDetail(selected);});
-    g.addEventListener('click',()=>{selected=selected===n.id?null:n.id;document.body.classList.toggle('has-sel',!!selected);document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.id==='n-'+selected));showDetail(selected||n.id);});});
+    g.addEventListener('mouseenter',()=>{showDetail(n.id);hov(n.id,true);});g.addEventListener('mouseleave',()=>{hov(n.id,false);if(selected)showDetail(selected);else hideDetail();});
+    g.addEventListener('click',()=>{selected=selected===n.id?null:n.id;document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.id==='n-'+selected));if(selected)showDetail(selected);else hideDetail();});});
   const cg=el('g',{class:'center',id:'center'},s);
   el('circle',{cx:C,cy:C,r:62,fill:'#0E0D2E',stroke:'#3B3990','stroke-width':1.5,id:'core'},cg);
   const t1=el('text',{x:C,y:C-4,'font-family':'Anton,Arial','font-size':30,fill:'#fff',id:'coreBig'},cg);t1.textContent='—';
   const t2=el('text',{x:C,y:C+20,'font-family':'Fira Code','font-size':11,fill:'#9A98C8','letter-spacing':'.12em',id:'coreSmall'},cg);t2.textContent='AWAITING INVOICE';
 }
 function hov(id,on){const n=byId[id];[...(n.feeds||[]).map(b=>`e-${id}-${b}`),...(feedsInto[id]||[]).map(a=>`e-${a}-${id}`)].forEach(e=>{const x=document.getElementById(e);if(x)x.classList.toggle('hov',on);});}
+const PN=n=>n.plain_name||n.name;
+const WORD=st=>st.locked&&st.state==='risk'?'confirmed risk':st.state==='neutral'?'clear':st.state;
+function hideDetail(){if(!selected)$('#detail').hidden=true;}
 function showDetail(id){
+  if(!id)return;const n=byId[id],st=state[id];$('#detail').hidden=false;
+  $('#detail').innerHTML=`<h3>${n.id} · TIER ${n.tier}${n.built===true?'':' · PLANNED'}</h3><h4>${PN(n)}</h4><p>${n.plain||n.description||''}</p>
+  ${st&&st.state!=='unknown'?`<div class="ev"><b class="${st.locked&&st.state==='risk'?'locked':st.state}" style="text-transform:uppercase">${WORD(st)}</b> · ${st.evidence}</div>`:''}
+  <div class="tech"><b>Technical:</b> ${n.name}. ${n.description||''}</div>`;
+}
+function glossary(open){
+  const g=$('#gloss');open=open===undefined?g.hidden:open;g.hidden=!open;$('#glossBtn').classList.toggle('on',open);
+  $('#glossBtn').textContent=open?'Close glossary':'Glossary: what each check means';
+  if(!open)return;$('#detail').hidden=true;
+  g.innerHTML=`<h2>What each check means</h2><p class="sub">Radar works outwards in rings. Inner rings are instant checks on the invoice itself; outer rings only run when Radar still isn't sure. Click a check to find it on the radar.</p>`+
+    TIERS.map(t=>`<h3>TIER ${t.tier} · ${t.name.toUpperCase()} · ${t.runs}</h3><div class="grid">`+
+      SIG.filter(n=>n.tier===t.tier).sort((a,b)=>(+a.id.slice(1))-(+b.id.slice(1))).map(n=>{const st=state[n.id];const cls=st&&st.state!=='unknown'?(st.locked&&st.state==='risk'?'locked':st.state):'';
+        return `<div class="g ${cls} ${n.built===true?'':'planned'}" data-g="${n.id}"><b><span class="id">${n.id}</span>${PN(n)}</b><p>${n.plain||n.description||''}${n.built===true?'':' <i>(planned)</i>'}</p></div>`;}).join('')+`</div>`).join('');
+}
+function showDetailFull(id){
   if(!id)return;const n=byId[id],st=state[id];
   $('#detail').innerHTML=`<h3>CONTACT · ${n.id} · TIER ${n.tier} · #${n.order}</h3><h4>${n.name}</h4><p>${n.description||''}</p>
   <dl class="kv"><dt>Weight</dt><dd>${n.weight_class}${n.weight!=null?' · '+n.weight:''}${n.hard_stop?' · <b style="color:var(--crit)">HARD STOP</b>':''}</dd><dt>Runs by</dt><dd>${n.exec}</dd><dt>Chat softens</dt><dd>${n.chat_adjustable}</dd><dt>Status</dt><dd>${n.built===true?'Built':n.built==='skeleton'?'Skeleton (returns unknown)':'Not built yet'}</dd>${n.feeds&&n.feeds.length?`<dt>Feeds</dt><dd>${n.feeds.join(', ')}</dd>`:''}</dl>
@@ -196,7 +233,7 @@ function reset(){
   state={};queue=[];document.querySelectorAll('.node').forEach(g=>{g.classList.remove('seen','s-risk','s-locked','s-reassuring','s-neutral','s-unknown');});
   document.querySelectorAll('.edge').forEach(e=>e.classList.remove('lit'));document.querySelectorAll('.ring').forEach(r=>r.classList.remove('active','skipped'));
   document.querySelectorAll('.tierlbl').forEach(r=>r.classList.remove('active'));
-  $('#result').classList.remove('on');caption('NEW INVOICE','Radar is checking the invoice…','');$('#core').setAttribute('stroke','#3B3990');$('#coreBig').textContent='…';$('#coreSmall').textContent='SCANNING';
+  $('#result').innerHTML='<h3>RESULT</h3><div class="wait">Checking the invoice…</div>';caption('NEW INVOICE','Radar is checking the invoice…','');$('#core').setAttribute('stroke','#3B3990');$('#coreBig').textContent='…';$('#coreSmall').textContent='SCANNING';
 }
 function setStatus(t,scan){$('#status').textContent=t;$('#status').classList.toggle('scan',!!scan);$('#scopeWrap').classList.toggle('scanning',!!scan);}
 
@@ -216,10 +253,10 @@ function pump(){if(playing)return;const next=queue.shift();if(!next)return;playi
     if(s.state==='unknown'){wait=PACE.signal_unknown;}
     else{if(EMBED)wait=s.state==='risk'?1500:s.state==='reassuring'?1000:450;
       const word=locked?'CONFIRMED RISK':s.state==='risk'?'RISK':s.state==='reassuring'?'REASSURING':'CLEAR';
-      caption(`${s.id} · TIER ${n.tier}`,n.name,`<b class="${locked?'locked':s.state}">${word}</b> · ${s.evidence}`);const col={risk:locked?'#FF2E63':'#FF4438',reassuring:'#34C77B',neutral:'#C9C8E8'}[s.state];blip(n,col);
+      caption(`${s.id} · TIER ${n.tier}`,PN(n),`<b class="${locked?'locked':s.state}">${word}</b> · ${s.evidence}`);const col={risk:locked?'#FF2E63':'#FF4438',reassuring:'#34C77B',neutral:'#C9C8E8'}[s.state];blip(n,col);
       if(s.state==='risk'||s.state==='reassuring')(feedsInto[s.id]||[]).forEach(a=>{if(state[a]&&state[a].state!=='unknown'){const e=document.getElementById(`e-${a}-${s.id}`);if(e)e.classList.add('lit');}});
-      log(`<span class="t">${ts()}</span> <b>${s.id}</b> ${n.name} · <span class="${locked?'locked':s.state}">${word}</span><br><span class="t">${s.evidence}</span>`,'e-'+(locked?'locked':s.state));
-      if(!selected)showDetail(s.id);}}}
+      log(`<span class="t">${ts()}</span> <b>${PN(n)}</b><span class="id">${s.id}</span> · <span class="${locked?'locked':s.state}">${word}</span><br><span class="t">${s.evidence}</span>`,'e-'+(locked?'locked':s.state));
+}}}
   if(type==='tier_end'){$('#ring'+d.tier).classList.remove('active');$('#tl'+d.tier).classList.remove('active');}
   if(type==='tier_skipped'){$('#ring'+d.tier).classList.add('skipped');caption(`TIER ${d.tier} · ${TIERS[d.tier]?TIERS[d.tier].name.toUpperCase():''}`,'Skipped',d.reason||'Not needed');log(`<span class="t">${ts()}</span> <span class="sys">⏸ TIER ${d.tier} SKIPPED · ${d.reason||'not needed'}</span>`,'e-sys');}
   if(type==='complete')finish(d);
@@ -252,6 +289,10 @@ $('#follow').onclick=()=>{follow=!follow;$('#follow').classList.toggle('on',foll
 async function poll(){if(follow){try{const r=await fetch('/api/checks/latest');if(r.ok){const d=await r.json();if(lastSeen===null){lastSeen=d.check_id;}else if(d.check_id!==lastSeen){lastSeen=d.check_id;watch(d.check_id,d.file_name);}}else if(lastSeen===null)lastSeen='';}catch{}}setTimeout(poll,1200);}
 
 if(new URLSearchParams(location.search).has('embed'))document.body.classList.add('embed');
+$('#glossBtn').onclick=()=>glossary();
+$('#gloss').onclick=e=>{const g=e.target.closest('[data-g]');if(!g)return;glossary(false);selected=g.dataset.g;
+  document.querySelectorAll('.node').forEach(x=>x.classList.toggle('sel',x.id==='n-'+selected));showDetail(selected);};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){glossary(false);selected=null;document.querySelectorAll('.node').forEach(x=>x.classList.remove('sel'));$('#detail').hidden=true;}});
 // Embedded in the app's map drawer: the app posts each new check id so the map starts without waiting for poll().
 // Ids that arrive before the catalogue has loaded wait in `pending`.
 let pending=null;
