@@ -311,6 +311,20 @@ svg.ra.scanning .p2{animation-delay:.2s}
 body:has(.browser.real){background:#fff}
 .browser.real{max-width:1280px;margin:0 auto;border-radius:0;box-shadow:none;overflow:visible}
 .demo[hidden]{display:none}
+
+/* Radar map drawer (debug view, Ctrl+Shift+X). Side mode pushes the bank page left; wide mode covers it. */
+.rmap{position:fixed;top:0;right:0;bottom:0;width:44vw;min-width:420px;z-index:60;background:#0B0A22;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(11,10,34,.35);transition:width .35s ease}
+.rmap[hidden]{display:none}
+.rmap.wide{left:0;width:auto;min-width:0}
+.rmap-bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#13123A;color:#E9E8F7;border-bottom:1px solid #2B2A6B;font-size:12px}
+.rmap-bar b{letter-spacing:.2em;font-size:12px}
+.rmap-bar span{color:#9A98C8}
+.rmap-bar button{background:#16154A;color:#E9E8F7;border:1px solid #2B2A6B;border-radius:12px;padding:3px 10px;cursor:pointer;font-size:13px}
+.rmap-bar button:first-of-type{margin-left:auto}
+.rmap-bar button:hover{border-color:#B44DF0}
+.rmap iframe{flex:1;border:0;width:100%;background:#0B0A22}
+body.rmap-on .browser.real{margin-left:0;margin-right:max(44vw,420px)}
+body.rmap-on .demo{margin-right:max(44vw,420px)}
 .dropcover{display:none;position:fixed;inset:0;z-index:40;background:rgba(31,28,79,.55);align-items:center;justify-content:center}
 .dropcover.on{display:flex}
 .dropcover>div{background:#fff;border:3px dashed var(--navy);padding:34px 46px;text-align:center;font-size:20px;color:var(--navy);font-weight:700;pointer-events:none}

@@ -168,6 +168,7 @@ async function runCheck(file){
     const form=new FormData();form.append('file',file);form.append('customer_id',CUSTOMER);
     const [r]=await Promise.all([api('/api/check',{method:'POST',body:form,signal:AbortSignal.timeout(120000)}),new Promise(ok=>setTimeout(ok,600))]);
     if(myGen!==gen)return;
+    mapWatch(r.check_id);
     const finished=await playProgress(r,sel.slice(1),myGen);
     if(!finished||myGen!==gen)return;
     current=r;checking=false;radarPanel(sel,'done');
@@ -419,6 +420,20 @@ document.addEventListener('click',async e=>{
   const r=e.target.closest('[data-r]');if(r){reportPaid=r.dataset.r;$$('#paidQ .radio').forEach(o=>o.classList.remove('on'));r.classList.add('on');}
   const g=e.target.closest('[data-go]');if(g){e.preventDefault();show(g.dataset.go);}
 });
+// ---------- Radar map drawer (debug view) ----------
+// Embeds /radar?embed=1 beside the app. The iframe loads on first open; each new check is posted to it so the
+// map starts at once (it also polls /api/checks/latest as a fallback). Opening after a check replays that check.
+let mapLoaded=false,mapLast=null;
+function mapWatch(id){mapLast=id;const f=$('#rmapFrame');if(mapLoaded&&f.contentWindow)f.contentWindow.postMessage({radarWatch:id},location.origin);}
+function mapToggle(force){
+  const m=$('#rmap'),open=force===undefined?m.hidden:force;m.hidden=!open;document.body.classList.toggle('rmap-on',open&&!m.classList.contains('wide'));
+  if(open&&!mapLoaded){const f=$('#rmapFrame');f.onload=()=>{mapLoaded=true;if(mapLast)mapWatch(mapLast);};f.src='/radar?embed=1';}
+}
+function mapWide(){const m=$('#rmap');if(m.hidden)mapToggle(true);m.classList.toggle('wide');document.body.classList.toggle('rmap-on',!m.classList.contains('wide'));}
+$('#mapToggle').onclick=()=>mapToggle();$('#mapClose').onclick=()=>mapToggle(false);$('#mapWide').onclick=mapWide;
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.shiftKey&&(e.key==='X'||e.key==='x')){e.preventDefault();mapToggle();}if(e.ctrlKey&&e.shiftKey&&(e.key==='F'||e.key==='f')){e.preventDefault();mapWide();}});
+if(new URLSearchParams(location.search).has('map'))mapToggle(true);
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#modal').classList.remove('on');$('#warnModal').classList.remove('on');}if(e.ctrlKey&&e.shiftKey&&(e.key==='D'||e.key==='d')){e.preventDefault();const b=$('#demobar');b.hidden=!b.hidden;}if((e.key==='Enter'||e.key===' ')&&e.target.id==='attach'){e.preventDefault();pick();}});
 const q=new URLSearchParams(location.search);
 start(['pay','check'].includes(q.get('v'))?q.get('v'):'overview');
