@@ -79,6 +79,21 @@ function verify(r){
   const ok=/^match$/i.test(m[1]);
   return ok?{state:'ok',head:'Account name matches',body:m[2]}:{state:'no',head:"Account name doesn't match",body:'Account is held by '+m[2]};
 }
+// Saved payee: the customer's payment history for this supplier (from the bank's own records).
+const MONTH=d=>new Date(d).toLocaleDateString('en-AU',{month:'short',year:'numeric'});
+const DAY=d=>new Date(d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+function savedPayee(r){
+  const sp=r.saved_payee,p=pm(r);if(!sp||!p.bsb)return '';
+  const a=(sp.accounts||[])[0]||{},n=sp.payments||{};
+  const same=(sp.accounts||[]).some(x=>x.bsb===p.bsb&&String(x.account_number).replace(/\s/g,'')===String(p.account_number).replace(/\s/g,''));
+  const hist=`Paid ${n.count} times since ${MONTH(n.first)} · last paid ${DAY(n.last)}`;
+  if(same)return `<div class="saved ok">${ICON.vok}<div><b>Saved payee · ${esc(sp.name)}</b><div>${esc(a.bsb)} · ${esc(acct(a.account_number))} · ${hist}</div></div></div>`;
+  return `<div class="saved no">${ICON.vno}<div><b>These aren't the bank details you've paid before</b>
+    <table class="cmp"><tr><th></th><th>BSB</th><th>Account</th><th></th></tr>
+    <tr><td>Saved payee</td><td class="mono">${esc(a.bsb)}</td><td class="mono">${esc(acct(a.account_number))}</td><td class="s">${hist}</td></tr>
+    <tr class="new"><td>This invoice</td><td class="mono">${esc(p.bsb)}</td><td class="mono">${esc(acct(p.account_number))}</td><td class="s">Never paid before</td></tr></table>
+    <div class="s">Scammers pose as your supplier and say they've "changed banks". Call ${esc(sp.name.split(' ')[0])} on a number you already have before paying.</div></div></div>`;
+}
 function err(where,msg){const e=$('#err-'+where);if(!e)return;e.textContent=msg||'';e.hidden=!msg;}
 async function api(url,options={}){
   const res=await fetch(url,options);let body;
@@ -199,7 +214,7 @@ function renderPay(){
         <div class="field"><label>Account or Westpac credit card number</label><div class="in w40 mono">${esc(acct(p.account_number))}</div>${src}</div>`
       :p.payid?`<div class="field"><label>I want to pay</label><div class="in sel w60">PayID ${ICON.chev}</div></div><div class="field"><label>PayID</label><div class="in w60">${esc(p.payid)}</div>${src}</div>`
       :`<div class="field"><label>Biller code</label><div class="in w40 mono">${esc(p.biller_code)}</div>${src}</div><div class="field"><label>Customer reference number (CRN)</label><div class="in w40 mono">${esc(p.reference)}</div>${src}</div>`;
-    $('#payeeForm').innerHTML=`<div class="newpayee" style="--tip:110px">${how}
+    $('#payeeForm').innerHTML=`<div class="newpayee" style="--tip:110px">${savedPayee(r)}${how}
       <div class="field"><label>Account name</label><div class="frow"><div class="in w60">${esc(p.account_name||ex.supplier_name)}</div><span class="btn red sm">Check details</span></div>${src}</div>
       <div class="verify ${v.state==='ok'?'ok':'no'}" ${v.state==='unknown'?'style="background:#F3F3F4;border-color:#D5D5DA"':''}>${v.state==='ok'?ICON.vok:v.state==='no'?ICON.vno:ICON.vq}<div><b>${esc(v.head)}</b> · ${esc(v.body)}<div class="s">Westpac Verify · account name checked with the receiving bank</div></div></div>
       <div class="field"><label>Payee nickname <span class="q">?</span></label><div class="in w60">${esc(ex.supplier_name)}</div></div>
@@ -246,17 +261,17 @@ function renderResult(){
     med:`<button class="btn red big" data-topay>Pay this invoice</button><button class="btn ghost big" data-hold>Save for later</button><button class="btn link" data-go="report">Report this invoice</button>`,
     high:`<button class="btn red big" data-go="report">Report this invoice</button><button class="btn ghost big" data-hold>Don't pay it</button>`,
     crit:`<button class="btn red big" data-go="report">Report this invoice</button><button class="btn ghost big" data-hold>Don't pay it</button>`};
-  $('#actions').innerHTML=A[kk]+(kk==='low'?'':'<button class="btn link" data-payanyway style="font-size:12px;color:var(--muted)">Pay anyway</button>');
+  $('#actions').innerHTML=A[kk]+(kk==='low'||ctx==='check'?'':'<button class="btn link" data-payanyway style="font-size:12px;color:var(--muted)">Pay anyway</button>');
   const phone=String(r.advice||'').match(/(0\d[\d ]{7,11}\d)/);
   $('#callout').innerHTML=(kk==='high'||kk==='crit')?`<div class="callout">${ICON.phone}<div><b>Want to check with them? Call first</b><span>${phone?'Only on the number from your earlier invoices:<span class="num">'+esc(phone[1])+'</span>':'Use a number you already have, never one on this invoice.'}</span></div></div>`:'';
-  const chatOn=chatLog.length>0||kk==='med'||kk==='high';
+  const chatOn=chatLog.length>0||kk==='med'||kk==='high'||kk==='crit';
   $('#chatbox').style.display=chatOn?'block':'none';
   if(chatOn)renderChat();
 }
 function renderChat(){
   const r=current,kk=LV[levelKey(r)].css;
   if(!chatLog.length)chatLog.push({who:'bot',text:kk==='med'?'This supplier is new to you. How do you know them?':'Have you spoken to the supplier? Which number did you call?'});
-  $('#chat').innerHTML=chatLog.map(m=>`<div class="msg ${m.who}">${esc(m.text)}${m.delta?`<span class="delta">${esc(m.delta)}</span>`:''}</div>`).join('');
+  $('#chat').innerHTML=chatLog.map(m=>m.typing?'<div class="msg bot typing"><i></i><i></i><i></i></div>':`<div class="msg ${m.who}">${esc(m.text)}${m.delta?`<span class="delta">${esc(m.delta)}</span>`:''}</div>`).join('');
   $('#chat').scrollTop=$('#chat').scrollHeight;
   const asked=chatLog.some(m=>m.who==='me');
   const chips=asked?[]:kk==='med'?['Yes, new business. I met the owner at the expo and ordered this.','They emailed me out of the blue']
@@ -271,12 +286,13 @@ async function ask(message){
   try{
     const reply=await api('/api/check/'+encodeURIComponent(current.check_id)+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message}),signal:AbortSignal.timeout(45000)});
     if(myGen!==gen)return;
-    const names=reply.changed.map(id=>{const s=reply.result.signals.find(x=>x.id===id);return s?titleOf(s).toLowerCase():id;});
-    const locked=reply.result.signals.some(s=>s.locked&&s.state==='risk');
-    const adv=reply.level==='low'?'':' '+reply.advice;
-    const text=names.length?`Thanks. That explains: ${names.join(', ')}.${locked?" Confirmed findings can't be changed by chat.":''}${adv}`:`${reply.reply.replace('Locked findings','Confirmed findings')}${adv}`;
     current=reply.result;const after=LV[levelKey(current)].name;
-    chatLog.push({who:'bot',text,delta:`Radar score ${reply.score_before} → ${reply.score_after}`+(before!==after?` · ${before} → ${after}`:' · level unchanged')});
+    // typing indicator, then the reply types itself out
+    chatLog.push({who:'bot',typing:true,text:''});renderChat();
+    await new Promise(r=>setTimeout(r,700+Math.random()*500));if(myGen!==gen)return;
+    const m=chatLog[chatLog.length-1];m.typing=false;const words=reply.reply.split(' ');
+    for(let i=1;i<=words.length;i++){m.text=words.slice(0,i).join(' ');renderChat();await new Promise(r=>setTimeout(r,28));if(myGen!==gen)return;}
+    m.delta=`Radar score ${reply.score_before} → ${reply.score_after}`+(before!==after?` · ${before} → ${after}`:' · level unchanged');
     renderChat();
     if(before!==after)setTimeout(()=>{if(myGen===gen)renderResult();},900);
   }catch(e){if(myGen===gen){chatLog.push({who:'bot',text:'Sorry, that message could not be processed: '+e.message});renderChat();}}

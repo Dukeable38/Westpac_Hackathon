@@ -61,7 +61,8 @@ async def check(file:UploadFile=File(...),customer_id:str=Form('cust_greenline')
     advice='Call the supplier on a number you already know before paying.' if band=='high_risk' else 'Confirm the supplier and payment details independently before paying.' if band=='check' else 'No major warning signs found. Check the details before choosing whether to pay.'
     if band=='high_risk' and sup: advice=f"Do not pay yet. Call {sup['known_phone']} (the number on your earlier invoices)."
     if level=='low' and confidence_label=='low': advice='No major warning signs in the checks completed, but important checks were unavailable. Verify the details independently.'
-    result=dict(check_id=uuid.uuid4().hex,file_name=file.filename,sha256=hashlib.sha256(data).hexdigest(),extracted=invoice.model_dump(),signals=signals,score=score,band=band,level=level,coverage=coverage,confidence=confidence_value,confidence_label=confidence_label,tiers_run=tiers,stopped_at=stopped_at,gate=gate,tier_gates=tier_gates,advice=advice,escalation_reason=reason,customer_id=customer_id)
+    result=dict(check_id=uuid.uuid4().hex,file_name=file.filename,sha256=hashlib.sha256(data).hexdigest(),extracted=invoice.model_dump(),signals=signals,score=score,band=band,level=level,coverage=coverage,confidence=confidence_value,confidence_label=confidence_label,tiers_run=tiers,stopped_at=stopped_at,gate=gate,tier_gates=tier_gates,advice=advice,escalation_reason=reason,customer_id=customer_id,
+                saved_payee={k:sup[k] for k in ('name','accounts','payments')} if sup else None)
     RESULTS[result['check_id']]=result
     return copy.deepcopy(result)
 
