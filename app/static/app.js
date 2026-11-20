@@ -40,7 +40,7 @@ const LV={
   lowNew:{cls:'lv-low',css:'low',name:'Low',hex:'#1B7F4B',icon:'ok',title:'Looks good',msg:"With what you've told us, nothing on this invoice looks like a scam. Radar can't confirm a new supplier, so pay the amount you agreed.",next:'You can continue.'},
   medium:{cls:'lv-med',css:'med',name:'Medium',hex:'#F2A900',icon:'bell',title:'Take a quick look',msg:"Something's new or changed on this invoice. Check it with your supplier before you pay.",next:'Have a look before you pay.'},
   high:{cls:'lv-high',css:'high',name:'High',hex:'#DA1811',icon:'alert',title:'Pause before paying',msg:"Radar found serious warning signs on this invoice. Don't pay it until you've checked with the supplier on a number you already have.",next:"Don't pay until you've checked."},
-  critical:{cls:'lv-crit',css:'crit',name:'Critical',hex:'#7A0C09',icon:'stop',title:"Don't pay this invoice",msg:'This invoice has been tampered with. This is how invoice scams work. Please report it.',next:'Report it instead of paying.'}
+  critical:{cls:'lv-crit',css:'crit',name:'Critical',hex:'#7A0C09',icon:'stop',title:"This invoice has been tampered with",msg:"Radar found proof it was changed after it was made. This is how invoice scams work. We recommend you don't pay it and report it instead.",next:'We recommend reporting it instead of paying.'}
 };
 const TIERS=['Quick checks','Common red flags','Deeper research','Specialist review'];
 const TIERN=['Quick checks','Red flags','Deeper research','Specialist'];
