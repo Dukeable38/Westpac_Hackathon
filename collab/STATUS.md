@@ -1,6 +1,8 @@
 # Status (where things stand)
 
-Snapshot for anyone (human or agent) picking up the work. Update it at the end of a session. Last update: **17 Nov 2026, ~12:40 AEDT**.
+> **Final status (20 Nov 2026): the hackathon is over and Radar won 1st place out of 16 teams.** The project is finished and archived; there is no work in flight. The notes below are the 17 Nov snapshot, kept for history. See the top-level `README.md` for how to run it.
+
+Snapshot for anyone (human or agent) picking up the work. Last update before the final: **17 Nov 2026, ~12:40 AEDT**.
 
 **Hard deadline: demo video due 4:00pm 17 Nov.** Shortlist presentation Friday.
 
@@ -19,7 +21,7 @@ Snapshot for anyone (human or agent) picking up the work. Update it at the end o
 Merge their `task/*` branches after review; they may arrive on `origin` or on Paul's repo (`git fetch paul`).
 
 ## Not started / next
-- Before the repo goes public: delete or redact `docs/westpac-reference/01-overview-dashboard.png`.
+- ~~Before the repo goes public: delete or redact `docs/westpac-reference/01-overview-dashboard.png`.~~ Done (removed 17 Nov).
 - Unmerged: `paul/invoice-scam-checker` eb5e975 (LLM timeout + Retry-After backoff). Review and merge if useful.
 - Real LLM: put an OpenRouter key in `.env` (never commit), pick a model from TASK-002/004, run `scripts/llm_smoke.py` and the 4 Nathan invoices.
 - Lauren: tone of voice, final logo colour, clean logo exports.

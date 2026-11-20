@@ -1,5 +1,7 @@
 # Instructions for AI coding agents
 
+> **PROJECT FINISHED (20 Nov 2026):** Radar won 1st place at the hackathon final. There are no open tasks, and the build loop and deadlines below are history. Don't start new feature work unless a person asks for it; see `README.md` for how to run the app.
+
 > **START HERE (updated 17 Nov 2026):** read `collab/README.md` first. Work now arrives as task files in `collab/tasks/`, one branch per task. `collab/DECISIONS.md` overrides anything below that conflicts with it: the product is now **Radar**, there are **four risk levels**, and `mockups/index.html` is **no longer the UI target**. The "work autonomously until Done" loop below applies only within the scope of your assigned task.
 
 You are building the **Invoice Scam Checker**, a hackathon MVP for the Westpac AI Hackathon.

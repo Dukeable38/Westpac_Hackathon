@@ -1,82 +1,117 @@
-# Invoice Scam Checker
+# Radar: check an invoice before you pay it
 
-A local, fictional-data hackathon prototype: upload an invoice PDF, inspect deterministic signals and tier progress, add context, and save a decision receipt. **It does not make payments, send fraud reports, or guarantee that an invoice is safe.** No Westpac integration or official logo is used.
+> 🏆 **1st place, 2026 Westpac AI Hackathon (QUT Dean's Scholars)**, out of 16 teams.
 
-## Windows quick start (PowerShell)
+Fake invoices are one of the most common scams against Australian small businesses and sole traders. A scammer edits a real invoice's bank details, or sends one that looks real enough, and the money is gone before anyone notices.
 
-Install/use an existing Python **3.10 or newer**. From this repository folder:
+**Radar** sits inside online banking. You attach the invoice when you make a payment (or check it on its own), and Radar reads the PDF, runs a set of checks on it, and gives one of four risk levels, **Low, Medium, High or Critical**, along with the evidence behind it. If something looks off, you can explain it in a chat (for example, "it's a new business, I met the owner at an expo"), and Radar re-scores. Every decision gets a receipt that proves which invoice was checked.
+
+This is a hackathon prototype. It uses fictional businesses only, makes no real payments, and doesn't guarantee an invoice is safe.
+
+## What it checks
+
+- **PDF forensics:** finds earlier revisions (for example, bank details edited after the invoice was made), overlays, hidden or invisible text, and mixed-alphabet look-alike characters.
+- **Business identity:** ABN/ACN checksums, the ABN register, the GST maths, how old the domain is, and free email addresses.
+- **Payment details:** whether the BSB and account match the supplier's history, BPAY consistency, and amount anomalies.
+- **Pressure tactics:** urgency language, "our bank details have changed" wording, and instructions hidden from the reader.
+- **Tiered checking:** cheap checks run first. A clearly tampered invoice stops early and a known, clean supplier clears fast. Only unclear invoices go on to deeper research.
+
+There are 49 checks in the catalogue (`app/checks/catalogue.json`). Any check that isn't built yet returns `unknown` rather than guessing.
+
+### Design rules
+
+- **The AI never decides the score.** The model only pulls fields out of the invoice and answers narrow questions about text that our code fetched. Scores, levels and escalation are plain Python (`app/policy.py`, `app/score.py`, `app/weights.yaml`).
+- **The AI never sees the raw invoice.** Hidden text is stripped out first, so instructions planted in the PDF can't reach the model.
+- **Chat can't talk its way past hard evidence.** A tampered invoice stays Critical whatever the user says.
+- **Radar never blocks a payment.** It warns, recommends "Report", and leaves the decision with the customer.
+
+## Run the demo (Windows)
+
+Needs Python 3.10 or newer. From the repo folder:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m pytest tests/ -q
-.\.venv\Scripts\python.exe scripts\smoke_demo.py
-.\.venv\Scripts\python.exe scripts\llm_smoke.py
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+.\run_demo.bat
 ```
 
-Open **http://127.0.0.1:8000**. The Radar UI sits inside a mock Westpac Online Banking page (layout from `docs/westpac-reference/`). Use **Make a payment → Attach invoice** or **Payments → Check an invoice**, or click a sample invoice in the dark demo bar along the top (it runs the real checks). `/radar` is the live debug view; the previous UI is kept at `/static/classic.html`. Stop the interactive demo server with Ctrl+C. The smoke script starts a background server, tests it and always shuts it down itself. No Node build or system software is required. A `.env` file is optional: defaults are `LLM_PROVIDER=fake`, `DEMO_MODE=replay`.
+`run_demo.bat` starts the app at http://127.0.0.1:8080 in offline replay mode (recorded model answers, no API key or network needed). Then:
 
-Linux/macOS: use `.venv/bin/python` instead of `.\.venv\Scripts\python.exe`.
+- **Make a payment → Attach invoice**, or **Payments → Check an invoice**, and choose a PDF from `demo/invoices/`.
+- Press **Ctrl+Shift+D** to show the demo bar with one-click sample invoices.
+- `/radar` shows the "Radar map": every check firing tier by tier.
 
-The cloud build was tested with Python 3.12; `requirements-lock.txt` records the exact installed dependency set. Windows installation/runtime itself has not been tested. `requirements.txt` is the portable supported-range installation file.
+On macOS or Linux, use `.venv/bin/python -m uvicorn app.main:app --port 8080` instead of the batch file.
 
-## Expected demo
+### The demo invoices
 
-| PDF | Initial result | Context |
+| PDF | Result | The story |
 |---|---|---|
-| 01 Tallowwood clean | 96, Looks genuine | Known supplier; Tier 2 skipped |
-| 02 Tallowwood changed bank | 0, High risk | Original 064-118 / 10482291 recovered; locked payment tampering and no-match |
-| 03 Brightwater sloppy fake | 0, High risk | Invalid ABN, wrong GST, BPAY inconsistency, urgency and hidden instructions |
-| 04 Fernhill new business | 59, Check before paying | Say “Yes, new business, I met the owner at the expo and ordered this” → 84, Looks genuine |
+| `01-tallowwood-clean` | 96 · **Low** | Known supplier, everything matches. Clears after the first tiers. |
+| `02-tallowwood-changed-bank` | **Critical** | The bank details were edited after the invoice was made. Radar recovers the original BSB and account from the PDF's earlier revision. Saying "they told me they changed banks" doesn't help: Radar suggests calling the supplier's known number instead. |
+| `03-brightwater-sloppy-fake` | **High** | Invalid ABN, wrong GST, a BPAY mismatch, urgency language and hidden instructions. |
+| `04-fernhill-new-business` | 59 · **Medium** | A genuine but brand-new business. Explaining "new business, I met the owner at the expo and ordered this" moves it to 84 · **Low**. |
+| `05-tallowwood-claimed-copy` | 96 · **Low** | Used with the receipt "Compare an invoice" feature: is this the same invoice I already paid? |
 
-For #2, “They told me they changed banks” does not improve the score and recommends calling **07 5550 2184**, the prior known number. Chat cannot change locked findings. A decision is only a demo record. Receipt verification compares the local file's SHA-256, without uploading it again.
+`demo/invoices/nathan/` holds four extra real-world-style invoices that were used to measure extraction accuracy (`scripts/extract_eval.py`), not as demo stories.
 
-## Model configuration
+## Tests
 
-Copy `.env.example` to `.env`, uncomment one provider block and restart the server. **The team is using OpenRouter** (the first block): one key gives access to many models, so comparing models is a one-line `LLM_MODEL` change. Model shortlist and eval: `collab/tasks/TASK-002-extraction-eval.md`, `TASK-004`. Never commit `.env` or real keys. Process environment variables take precedence over `.env`.
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ -q      # 72 tests, offline
+.\.venv\Scripts\python.exe scripts\smoke_demo.py    # starts a server, runs every fixture, shuts down
+```
 
-| Variable | Purpose/default |
+## Using a real model
+
+By default Radar runs with `LLM_PROVIDER=fake` (deterministic regex extraction) and `DEMO_MODE=replay` (no network). To switch to a real model, copy `.env.example` to `.env`, fill in one provider block, then run `scripts\llm_smoke.py` to check it. Changing models only needs `.env`, not code.
+
+| `LLM_PROVIDER` | Covers |
 |---|---|
-| `LLM_PROVIDER` | `fake` (offline), `anthropic`, or `openai_compatible` |
-| `DEMO_MODE` | `replay` default: no network; `record`: call and save evidence; `live`: call without recording |
-| `DEMO_DELAY_MS` | SSE playback delay per tier; default 300, tests use 0 |
-| `LLM_MODEL` | Model identifier; Anthropic default `claude-opus-5-5`; required for compatible providers |
-| `ANTHROPIC_API_KEY` | Required only for Anthropic |
-| `LLM_BASE_URL` | Compatible API base ending in `/v1` or provider equivalent; `/chat/completions` is appended |
-| `LLM_API_KEY` | Compatible API key; local providers may accept a placeholder |
-| `SEARCH_PROVIDER` | Optional `tavily`; otherwise search unavailable |
-| `TAVILY_API_KEY` | Optional Tavily search key |
+| `fake` | Offline and tests |
+| `anthropic` | Claude, via the official SDK |
+| `openai_compatible` | Anything with an OpenAI-style endpoint: OpenRouter (used for the demo), Gemini, NVIDIA NIM, Groq, local Ollama |
 
-To test a real provider, set its key/model plus `DEMO_MODE=live` (or `record`) in `.env`, then run `scripts/llm_smoke.py`. In replay, a missing real-provider cache entry fails safely without calling the network. Both real adapters are implemented and tested with mocked transports, **not verified live**. API reference checks: [Anthropic Messages](https://platform.claude.com/docs/en/api/python/messages/create), [Chat Completions](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create).
+| `DEMO_MODE` | Behaviour |
+|---|---|
+| `replay` | Default. Uses answers saved in `demo/cache/`, never touches the network |
+| `record` | Calls the model and saves the answers to `demo/cache/` |
+| `live` | Calls the model without saving |
 
-`record` mode can save extracted fields and evidence to `demo/cache/`; use fictional data only. Review cache changes before committing. API keys and request headers are never cached. Seed-first fictional records work without network. Live ABN/domain/search adapters are best-effort, bounded, and return unknown on unavailable evidence. A live search narrative never determines the score.
+The demo used `nvidia/nemotron-3.5-super-vl:free` on OpenRouter. It got 78% of fields right on the extraction eval, against 32% for the regex fallback. All five demo invoices give the same results as the offline run. Never commit `.env` or API keys.
 
-## API and storage
+## API
 
-- `POST /api/check`: multipart `file`, optional `customer_id` (default `cust_greenline`), synchronous complete result.
-- `GET /api/check/{id}`: current result.
-- `GET /api/check/{id}/events`: finite SSE **playback of completed checks**, including tier starts/ends, signals, skipped tiers and terminal `complete`.
-- `POST /api/check/{id}/chat`: `{"message":"..."}`; returns score diff and updated result.
-- `POST /api/check/{id}/decision`: `{"decision":"pay"}`, `hold` or `report`; stores receipt in ignored `app/db.sqlite`.
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/check` | Upload a PDF (`file`) and get the full result |
+| `GET /api/check/{id}` / `.../events` | The result, or a server-sent-events replay of the tiers |
+| `POST /api/check/{id}/chat` | `{"message": "..."}` gives you the re-score and what changed |
+| `POST /api/check/{id}/decision` | `pay`, `hold` or `report`, and returns a receipt (SHA-256 of the invoice, never the file name) |
+| `GET /api/receipts`, `POST /api/receipts/{id}/verify` | List receipts, or check a later copy of an invoice against one |
 
-PDF uploads are limited to 10 MB / 20 pages. Encrypted, malformed and unsupported invisible-rendering PDFs are rejected. Multipart temporary files are confined to ignored `app/.tmp` and closed after reading. PDF bytes are not retained after processing; extracted fields/results remain in process memory until restart, and receipts persist in SQLite. No receipt deletion UI, authentication, access isolation, background worker or retention scheduler is provided. **Bind to localhost only; do not expose this prototype publicly.**
+## Project layout
 
-## Limits and honest coverage
+```
+app/                FastAPI app: PDF forensics, extraction, checks, policy and scoring, chat, receipts
+app/static/         The Radar UI built into a mock online-banking page (index.html, app.js, radar.css)
+demo/invoices/      Fictional demo invoices and the scripts that generate them
+demo/seed/          Fictional supplier history, ABN register and warning-list data
+demo/cache/         Recorded model answers for offline replay
+docs/               Build plan, check research, brand kit, presentation pack
+collab/             How the team and our AI agents handed work to each other (task files, decisions)
+mockups/            Earlier static mock-ups, kept for history
+tests/              Acceptance and unit tests
+```
 
-- CoP, warning register, supplier history, fixture registry/domain/web data are explicitly mocked/seeded. No bank access exists. Fictional fixture ages are measured at 16 Nov 2026 for repeatable replay.
-- PDF forensics are heuristic, not a full renderer/OCR or malware scanner. The supplied incremental overlay is recovered; unsupported revision layouts are unknown. Modes 3/7 are rejected; hidden small/white/off-page/zero-width text is stripped, mixed Latin/Greek/Cyrillic identifiers flagged. Complex transparency, nested forms, image-only documents and every possible malicious PDF are not comprehensively supported.
-- Fake extraction is deterministic regex extraction for readable text PDFs. It is not production-grade document understanding; line items are not yet populated and GST assumes a 10% taxable subtotal. Real provider extraction validates the declared schema.
-- All unimplemented checks return `unknown`; coverage is intentionally partial, not a claim of complete verification. P1/P2 IDs remain unknown unless specifically documented in `PROGRESS.md`.
-- A follow-up official ABN Lookup audit found one original seed collision and replaced it: Corella now uses **93 270 000 491**. [Official lookup](https://abr.business.gov.au/ABN/View?abn=93270000491) returned no matching record. All eight checksum-valid seeded ABNs were checked and now returned no record; dated URLs/results are in `demo/seed/abn-audit.json`. This is a point-in-time check, not a permanent reservation. Domain ownership remains unverified; recheck before a public video and never use real invoices or personal data.
-- The front end (`app/static/index.html`, `radar.css`, `app.js`) is the signed-off `mockups/radar/index.html` wired to the real API. It was checked in a browser on 17 Nov 2026 with all four fixtures (pay flow, standalone check, chat re-score, pay and report receipts) and two of Nathan's invoices. Bank chrome, balances and upcoming payments are fictional static demo content.
+## Limits
 
-See `PROGRESS.md` for precise verification and the final handover. `mockups/` and original acceptance assertions remain unchanged.
+- Supplier history, the scam warning register and Confirmation of Payee are **mocked**. ABN, domain and web evidence for the fictional businesses comes from seed data. Nothing connects to a real bank.
+- PDF forensics are heuristic. They aren't full rendering, OCR or a malware scan, and image-only invoices aren't supported.
+- GST checks assume 10% on a taxable subtotal.
+- There's no authentication or production hardening. Run it on localhost only.
+- The mock banking screens copy the look of a real online-banking site for the demo. This project is not affiliated with or endorsed by Westpac.
 
-## Comparing models
+## Team
 
-Configure `LLM_PROVIDER`, `LLM_MODEL`, endpoint and key in `.env` as described above.
-Run `.\.venv\Scripts\python.exe scripts\extract_eval.py` from the repository root.
-The evaluator sanitises each Nathan PDF, calls the configured extractor and prints ✓/✗ per field.
-Money is compared to the cent; BSB and account formatting differences are ignored.
-Use `LLM_PROVIDER=fake` for the offline baseline; keys and `.env` must never be committed.
+Built in a week by **Kiel** (product, design and UI), **Paul** (backend and checks), **Lauren** (research and branding), **Nathan** (test invoices) and **Delvin** (the Radar name and logo animation), with AI coding agents doing a lot of the typing. `PROGRESS.md` and `collab/` keep the full build log.
